@@ -36,6 +36,17 @@ public class LzfseTests
     }
 
     [Fact]
+    public void Extracts_real_apple_signed_shortcut()
+    {
+        // Signed by Apple's signing (via a shortcut-signing-server) from a two-action test shortcut.
+        var shortcut = ShortcutFileReader.Read(File.ReadAllBytes(DataFile("real-signed.shortcut")), "Valódi");
+
+        Assert.Equal(["is.workflow.actions.gettext", "is.workflow.actions.showresult"], shortcut.Actions.Select(a => a.Identifier));
+        var text = Assert.IsType<Model.TokenString>(shortcut.Actions[0].Parameters["WFTextActionText"]);
+        Assert.Equal("Szia a ShortcutForge-bol!", text.Text);
+    }
+
+    [Fact]
     public void Rejects_garbage()
     {
         Assert.Throws<InvalidDataException>(() => Lzfse.Decode("bvx2garbage garbage garbage garbage"u8.ToArray()));

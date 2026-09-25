@@ -10,6 +10,7 @@ public enum SignerKind
 {
     Unsigned,
     MacSsh,
+    RemoteServer,
 }
 
 /// <summary>User settings, stored in %APPDATA%\ShortcutForge\settings.json. The password is DPAPI-encrypted.</summary>
@@ -23,6 +24,9 @@ public sealed class AppSettings
 
     public SignerKind Signer { get; set; } = SignerKind.Unsigned;
     public SigningMode SigningMode { get; set; } = SigningMode.Anyone;
+
+    /// <summary>URL of a shortcut-signing-server compatible service (SignerKind.RemoteServer).</summary>
+    public string RemoteServerUrl { get; set; } = "";
 
     public string MacHost { get; set; } = "";
     public int MacPort { get; set; } = 22;
@@ -100,6 +104,8 @@ public sealed class AppSettings
             Password = MacPassword,
             PrivateKeyPath = MacKeyPath,
         }),
+        SignerKind.RemoteServer => new RemoteSigner(
+            ShortcutForge.Core.Localization.L.T($"Aláíró szerver ({RemoteServerUrl})", $"Signing server ({RemoteServerUrl})"), RemoteServerUrl),
         _ => new UnsignedExporter(),
     };
 }

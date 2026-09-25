@@ -11,6 +11,13 @@
                    Text="{l:T 'iOS 15 óta az iPhone, iPad és Mac csak Apple által aláírt .shortcut fájlt importál. Aláírni csak macOS-en lehet (shortcuts sign). Ha van elérhető Maced (saját vagy bérelt felhős Mac), az alkalmazás SSH-n keresztül aláírja a fájlt.', 'Since iOS 15, iPhone, iPad and Mac only import .shortcut files signed by Apple. Signing is only possible on macOS (shortcuts sign). If you have access to a Mac (your own or a rented cloud Mac), the app signs the file over SSH.'}" />
 
         <RadioButton x:Name="UnsignedRadio" GroupName="Signer" Margin="0,4" Content="{l:T 'Aláírás nélküli export (később Macen aláírandó)', 'Unsigned export (sign later on a Mac)'}" />
+        <RadioButton x:Name="ServerRadio" GroupName="Signer" Margin="0,4"
+                     Content="{l:T 'Aláíró szerver (shortcut-signing-server kompatibilis URL)', 'Signing server (shortcut-signing-server compatible URL)'}" />
+        <StackPanel Margin="28,2,0,6" IsEnabled="{Binding IsChecked, ElementName=ServerRadio}">
+            <TextBox x:Name="ServerUrlBox" />
+            <TextBlock TextWrapping="Wrap" Foreground="{DynamicResource MutedText}" FontSize="11" Margin="0,4,0,0"
+                       Text="{l:T 'Pl. saját Macen futó github.com/scaxyz/shortcut-signing-server. Figyelem: a parancs tartalma erre a szerverre kerül.', 'E.g. github.com/scaxyz/shortcut-signing-server running on your own Mac. Note: the shortcut content is sent to this server.'}" />
+        </StackPanel>
         <RadioButton x:Name="MacRadio" GroupName="Signer" Margin="0,4" Content="{l:T 'Aláírás Macen, SSH-n keresztül', 'Sign on a Mac over SSH'}" />
 
         <Border Background="{DynamicResource PanelBg}" CornerRadius="8" Padding="12" Margin="0,8,0,0"

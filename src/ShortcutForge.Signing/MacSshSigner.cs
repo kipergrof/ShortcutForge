@@ -29,7 +29,7 @@ public sealed class MacSshSigner(MacSshSettings settings) : ISigner
 
     public bool ProducesSignedFile => true;
 
-    public async Task<byte[]> SignAsync(byte[] unsignedPlist, SigningMode mode, CancellationToken cancellationToken = default)
+    public async Task<byte[]> SignAsync(byte[] unsignedPlist, SigningMode mode, string shortcutName, CancellationToken cancellationToken = default)
     {
         if (string.IsNullOrWhiteSpace(settings.Host) || string.IsNullOrWhiteSpace(settings.User))
             throw new SigningException(L.T("Add meg a Mac címét és a felhasználónevet a beállításokban.", "Enter the Mac's address and user name in the settings."));

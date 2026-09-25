@@ -16,6 +16,8 @@ public partial class SettingsWindow : Window
         _settings = settings;
         UnsignedRadio.IsChecked = settings.Signer == SignerKind.Unsigned;
         MacRadio.IsChecked = settings.Signer == SignerKind.MacSsh;
+        ServerRadio.IsChecked = settings.Signer == SignerKind.RemoteServer;
+        ServerUrlBox.Text = settings.RemoteServerUrl;
         HostBox.Text = settings.MacHost;
         PortBox.Text = settings.MacPort.ToString();
         UserBox.Text = settings.MacUser;
@@ -59,7 +61,10 @@ public partial class SettingsWindow : Window
     private void Ok_Click(object sender, RoutedEventArgs e)
     {
         var ssh = CurrentSsh();
-        _settings.Signer = MacRadio.IsChecked == true ? SignerKind.MacSsh : SignerKind.Unsigned;
+        _settings.Signer = MacRadio.IsChecked == true ? SignerKind.MacSsh
+            : ServerRadio.IsChecked == true ? SignerKind.RemoteServer
+            : SignerKind.Unsigned;
+        _settings.RemoteServerUrl = ServerUrlBox.Text.Trim();
         _settings.MacHost = ssh.Host;
         _settings.MacPort = ssh.Port;
         _settings.MacUser = ssh.User;

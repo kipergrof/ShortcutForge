@@ -20,7 +20,7 @@ public interface ISigner
     /// <summary>True if the result can be imported on iOS 15+ directly.</summary>
     bool ProducesSignedFile { get; }
 
-    Task<byte[]> SignAsync(byte[] unsignedPlist, SigningMode mode, CancellationToken cancellationToken = default);
+    Task<byte[]> SignAsync(byte[] unsignedPlist, SigningMode mode, string shortcutName, CancellationToken cancellationToken = default);
 }
 
 /// <summary>Writes the binary plist as-is. Must be signed on a Mac before importing on iOS 15+.</summary>
@@ -30,7 +30,7 @@ public sealed class UnsignedExporter : ISigner
 
     public bool ProducesSignedFile => false;
 
-    public Task<byte[]> SignAsync(byte[] unsignedPlist, SigningMode mode, CancellationToken cancellationToken = default) =>
+    public Task<byte[]> SignAsync(byte[] unsignedPlist, SigningMode mode, string shortcutName, CancellationToken cancellationToken = default) =>
         Task.FromResult(unsignedPlist);
 }
 

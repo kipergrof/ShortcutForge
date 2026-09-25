@@ -23,7 +23,13 @@ iOS 15 óta iPhone-ra, iPadre és Macre csak **Apple által aláírt** parancs i
 shortcuts sign --mode anyone --input parancs.shortcut --output alairt.shortcut
 ```
 
-Ha van elérhető Mac (saját vagy bérelt felhős Mac), az *Eszközök › Beállítások* menüben megadható SSH-n. Ekkor exportáláskor az alkalmazás automatikusan aláírja a fájlt. A Macen be kell kapcsolni a *Távoli bejelentkezést*, a „Bárki” módhoz pedig iCloud-fiók kell.
+Lehetőségek:
+
+1. **Ingyen, Mac nélkül (iPhone-on):** *Fájl › Exportálás iPhone-ra*. Ez egy `Név.plist` fájlt ment. Ezt a telefonon a RoutineHub ingyenes [Shortcut Source Helper](https://routinehub.co/shortcut/10060/) parancsával kell megnyitni, amely távoli aláírással (Remote Sign) aláírja és importálja. Az alkalmazás lépésről lépésre végigvezet rajta.
+2. **Mac SSH-n:** az *Eszközök › Beállítások* menüben megadható egy Mac (saját vagy bérelt felhős), és az alkalmazás exportáláskor automatikusan aláír vele. A Macen be kell kapcsolni a *Távoli bejelentkezést*, a „Bárki” módhoz pedig iCloud-fiók kell.
+3. **Aláíró szerver:** egy [shortcut-signing-server](https://github.com/scaxyz/shortcut-signing-server) kompatibilis URL, például saját Macen futtatva. A parancs tartalma erre a szerverre kerül.
+
+A RoutineHub HubSign szolgáltatása csak engedélyezett klienseket fogad, ezért közvetlenül nem használható. Az alkalmazás nem álcázza magát más kliensnek.
 
 ## A szöveges nyelv röviden
 

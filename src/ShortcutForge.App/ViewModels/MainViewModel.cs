@@ -899,7 +899,7 @@ public sealed partial class MainViewModel : ObservableObject
 
             var signer = Settings.CreateSigner();
             Status = L.T($"Exportálás: {signer.DisplayName}…", $"Exporting: {signer.DisplayName}…");
-            var bytes = await signer.SignAsync(ShortcutDocument.UnsignedBytes(Current), Settings.SigningMode);
+            var bytes = await signer.SignAsync(ShortcutDocument.UnsignedBytes(Current), Settings.SigningMode, Current.Name);
             await File.WriteAllBytesAsync(path, bytes);
 
             if (signer.ProducesSignedFile)
@@ -915,7 +915,9 @@ public sealed partial class MainViewModel : ObservableObject
                     L.T("A fájl aláírás nélkül készült. iOS 15 óta az iPhone csak aláírt parancsot importál.\n\n", "The file is unsigned. Since iOS 15, iPhone only imports signed shortcuts.\n\n") +
                     L.T("Aláírás Macen (Terminál):\n", "To sign on a Mac (Terminal):\n") +
                     L.T($"  shortcuts sign --mode anyone --input \"{Path.GetFileName(path)}\" --output \"alairt.shortcut\"\n\n", $"  shortcuts sign --mode anyone --input \"{Path.GetFileName(path)}\" --output \"signed.shortcut\"\n\n") +
-                    L.T("Vagy állíts be Mac-es aláírást SSH-n keresztül: Eszközök › Beállítások.", "Or set up signing on a Mac over SSH: Tools › Settings."));
+                    L.T("Vagy állíts be Mac-es aláírást SSH-n keresztül: Eszközök › Beállítások.\n\n", "Or set up signing on a Mac over SSH: Tools › Settings.\n\n") +
+                    L.T("Mac nélkül, ingyen: Fájl › Exportálás iPhone-ra (Shortcut Source Helper).",
+                        "Without a Mac, for free: File › Export for iPhone (Shortcut Source Helper)."));
             }
         }
         catch (SigningException ex)
@@ -930,6 +932,53 @@ public sealed partial class MainViewModel : ObservableObject
         finally
         {
             IsBusy = false;
+        }
+    }
+
+    public const string SourceHelperUrl = "https://routinehub.co/shortcut/10060/";
+
+    /// <summary>
+    /// Free route without a Mac: saves "Name.plist" for the "Shortcut Source Helper" shortcut
+    /// (RoutineHub), which signs it remotely on the iPhone and imports it.
+    /// </summary>
+    [RelayCommand]
+    private async Task ExportForIPhoneAsync()
+    {
+        if (!ApplyDslIfNeeded())
+        {
+            _dialogs.Error(L.T("Exportálás", "Export"), L.T("A szöveges nézetben hiba van:\n", "The text view has an error:\n") + DslError);
+            return;
+        }
+        if (ControlFlow.Validate(Current.Actions) is { } problem &&
+            !_dialogs.Confirm(L.T("Szerkezeti hiba", "Structure error"), problem + L.T("\n\nÍgy is exportálod?", "\n\nExport anyway?")))
+            return;
+
+        // The helper names the imported shortcut after the file name.
+        var path = _dialogs.SaveFile("Plist (*.plist)|*.plist", SafeFileName(Current.Name) + ".plist");
+        if (path is null) return;
+        try
+        {
+            await File.WriteAllTextAsync(path, PlistSerializer.WriteXml(Current));
+            Status = L.T($"iPhone-os plist exportálva: {path}", $"Plist for iPhone exported: {path}");
+            _dialogs.Info(L.T("Küldés iPhone-ra – ingyenes út Mac nélkül", "Sending to iPhone – free route without a Mac"),
+                L.T("A fájl elkészült. Így kerül fel a telefonra:\n\n" +
+                    "1. iPhone-on telepítsd egyszer a „Shortcut Source Helper” parancsot (ingyenes, RoutineHub):\n" +
+                    $"   {SourceHelperUrl}\n" +
+                    "2. Juttasd át a .plist fájlt a telefonra (AirDrop, iCloud Drive, e-mail, OneDrive…).\n" +
+                    "3. A Fájlok appban nyisd meg a megosztás menüt, és válaszd a Shortcut Source Helpert.\n" +
+                    "4. A helper aláírja (Remote Sign) és importálja a parancsot – a neve a fájlnév lesz.\n\n" +
+                    "A távoli aláírást a helper szolgáltatása végzi; ha épp nem elérhető, próbáld később.",
+                    "The file is ready. To get it onto your phone:\n\n" +
+                    "1. On the iPhone, install the \"Shortcut Source Helper\" shortcut once (free, RoutineHub):\n" +
+                    $"   {SourceHelperUrl}\n" +
+                    "2. Transfer the .plist file to the phone (AirDrop, iCloud Drive, email, OneDrive…).\n" +
+                    "3. In the Files app open the share menu and choose Shortcut Source Helper.\n" +
+                    "4. The helper signs it (Remote Sign) and imports the shortcut, named after the file.\n\n" +
+                    "Remote signing is done by the helper's service; if it is unavailable, try again later."));
+        }
+        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
+        {
+            _dialogs.Error(L.T("Exportálás sikertelen", "Export failed"), ex.Message);
         }
     }
 
