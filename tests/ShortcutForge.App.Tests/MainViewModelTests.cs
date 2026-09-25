@@ -133,6 +133,21 @@ public class MainViewModelTests : IDisposable
     });
 
     [Fact]
+    public void All_templates_parse_in_both_languages()
+    {
+        foreach (var template in ShortcutTemplates.All)
+        {
+            foreach (var source in new[] { template.SourceHu, template.SourceEn })
+            {
+                var shortcut = Dsl.DslParser.Parse(source);
+                Assert.Null(ControlFlow.Validate(shortcut.Actions));
+                // Everything used in templates must be a known catalog action.
+                Assert.All(shortcut.Actions, a => Assert.NotNull(ActionCatalog.Default.ById(a.Identifier)));
+            }
+        }
+    }
+
+    [Fact]
     public void Renaming_an_output_updates_references() => Sta(() =>
     {
         var vm = new MainViewModel(new FakeDialogs());
@@ -178,6 +193,44 @@ public class MainViewModelTests : IDisposable
         items = Assert.IsType<ArrayValue>(start.Parameters["WFMenuItems"]);
         Assert.Equal(2, items.Items.Count);
         Assert.Null(ControlFlow.Validate(vm.Current.Actions));
+    });
+
+    [Fact]
+    public void Block_editing_keeps_structure_valid() => Sta(() =>
+    {
+        var vm = new MainViewModel(new FakeDialogs());
+        vm.OnDslEdited("""
+            menu "M" {
+                case "A" {
+                    Vibrate()
+                }
+                case "B" {
+                }
+            }
+            Alert("vége")
+            """);
+        Assert.True(vm.ApplyDslIfNeeded());
+
+        // Duplicating a menu item keeps it inside its menu.
+        var caseA = vm.Cards.First(c => c.IsMenuCase);
+        vm.DuplicateCardCommand.Execute(caseA);
+        Assert.Null(ControlFlow.Validate(vm.Current.Actions));
+        var items = Assert.IsType<ArrayValue>(vm.Current.Actions[0].Parameters["WFMenuItems"]);
+        Assert.Equal(3, items.Items.Count);
+
+        // Dragging a menu item out of its menu is refused.
+        var count = vm.Current.Actions.Count;
+        var firstCase = vm.Cards.First(c => c.IsMenuCase);
+        vm.MoveBlock(firstCase.Index, vm.Cards.Count);
+        Assert.Null(ControlFlow.Validate(vm.Current.Actions));
+        Assert.Equal(count, vm.Current.Actions.Count);
+        Assert.True(vm.Current.Actions[1].ControlFlow == ControlFlowMode.Middle);
+
+        // With a block start selected, a new action goes inside the block.
+        vm.SelectedCard = vm.Cards[0];
+        vm.AddAction(Def("ShowResult"));
+        Assert.Equal("is.workflow.actions.showresult", vm.Current.Actions[1].Identifier);
+        Assert.Equal(1, vm.Cards[1].Indent);
     });
 
     [Fact]

@@ -221,6 +221,69 @@ public static class DslEditorSupport
         private static Pen FreezePen(Pen p) { p.Freeze(); return p; }
     }
 
+    /// <summary>Makes multi-line { … } blocks collapsible (braces inside strings and comments are ignored).</summary>
+    public static void EnableFolding(TextEditor editor)
+    {
+        var manager = ICSharpCode.AvalonEdit.Folding.FoldingManager.Install(editor.TextArea);
+        var timer = new System.Windows.Threading.DispatcherTimer { Interval = TimeSpan.FromMilliseconds(600) };
+        timer.Tick += (_, _) =>
+        {
+            timer.Stop();
+            manager.UpdateFoldings(ComputeFoldings(editor.Document), -1);
+        };
+        editor.Document.TextChanged += (_, _) => { timer.Stop(); timer.Start(); };
+        editor.DocumentChanged += (_, _) =>
+        {
+            editor.Document.TextChanged += (_, _) => { timer.Stop(); timer.Start(); };
+            timer.Start();
+        };
+        timer.Start();
+    }
+
+    public static IEnumerable<ICSharpCode.AvalonEdit.Folding.NewFolding> ComputeFoldings(TextDocument document)
+    {
+        var text = document.Text;
+        var result = new List<ICSharpCode.AvalonEdit.Folding.NewFolding>();
+        var stack = new Stack<int>();
+        for (var i = 0; i < text.Length; i++)
+        {
+            var c = text[i];
+            if (c == '/' && i + 1 < text.Length && text[i + 1] == '/')
+            {
+                while (i < text.Length && text[i] != '\n') i++;
+                continue;
+            }
+            if (c == '/' && i + 1 < text.Length && text[i + 1] == '*')
+            {
+                var end = text.IndexOf("*/", i + 2, StringComparison.Ordinal);
+                i = end < 0 ? text.Length : end + 1;
+                continue;
+            }
+            if (c == '"')
+            {
+                // Skip the string literal, including nested {…} interpolations with their own strings.
+                var depth = 0;
+                for (i++; i < text.Length; i++)
+                {
+                    if (text[i] == '\\') { i++; continue; }
+                    if (text[i] == '{') depth++;
+                    else if (text[i] == '}' && depth > 0) depth--;
+                    else if (text[i] == '"' && depth == 0) break;
+                }
+                continue;
+            }
+            if (c == '{') stack.Push(i);
+            else if (c == '}' && stack.Count > 0)
+            {
+                var start = stack.Pop();
+                if (document.GetLineByOffset(start).LineNumber != document.GetLineByOffset(i).LineNumber)
+                    result.Add(new ICSharpCode.AvalonEdit.Folding.NewFolding(start, i + 1) { Name = "{ … }" });
+            }
+        }
+        result.Sort((a, b) => a.StartOffset.CompareTo(b.StartOffset));
+        return result;
+    }
+
     public static void ShowError(TextEditor editor, int offset, int length)
     {
         var renderer = editor.TextArea.TextView.BackgroundRenderers.OfType<ErrorRenderer>().FirstOrDefault();

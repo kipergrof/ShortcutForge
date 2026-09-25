@@ -11,6 +11,8 @@ Apple Parancsok (Shortcuts) készítése és szerkesztése **Windowson**.
 - **194 beépített akció** kategóriákba rendezve. Bármely más akció, például külső appok App Intentjei, általános blokként szerkeszthető, így importáláskor semmi sem vész el.
 - **Megnyitás / import**: `.shortcut` (aláírt és aláíratlan), bináris és XML plist, iCloud megosztási link.
 - **Export**: `.shortcut` fájl, opcionálisan **Macen, SSH-n keresztül automatikusan aláírva** (`shortcuts sign`).
+- **Sablonok** (*Fájl › Új sablonból*): üdvözlés, JSON API lekérés, gyors menü, listafeldolgozás, akkumulátor-figyelő, megosztási lapos link-megnyitó.
+- **Kényelem**: kategóriaikonok, összecsukható kártyák (egyenként vagy *Nézet › Összes kártya összecsukása*), vezetővonalak a beágyazott blokkoknál, Ctrl+F keresés (Enter: az első találat hozzáadása), összecsukható `{ }` blokkok a szöveges nézetben.
 - **Sötét / világos téma** (a Windows beállítását követi), **magyar / angol** felület.
 
 ## Aláírás – fontos

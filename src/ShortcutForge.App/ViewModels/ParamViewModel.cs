@@ -124,8 +124,18 @@ public sealed partial class ParamViewModel : ObservableObject
         if (!_loading) Commit();
     }
 
+    /// <summary>Bool editor choices: default (not set) / yes / no.</summary>
+    public IReadOnlyList<string> BoolOptions => [L.T("(alapértelmezett)", "(default)"), L.T("Igen", "Yes"), L.T("Nem", "No")];
+
+    public int BoolChoice
+    {
+        get => Flag switch { null => 0, true => 1, false => 2 };
+        set => Flag = value switch { 1 => true, 2 => false, _ => null };
+    }
+
     partial void OnFlagChanged(bool? value)
     {
+        OnPropertyChanged(nameof(BoolChoice));
         if (_loading) return;
         _owner.Main.Checkpoint();
         _owner.Action.SetOrRemove(Key, value is null ? null : new BoolValue(value.Value));

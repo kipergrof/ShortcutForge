@@ -31,6 +31,7 @@ public partial class MainWindow : Window
         DataContext = _vm;
 
         DslEditorSupport.Attach(DslEditor, () => _vm.VariableSuggestions);
+        DslEditorSupport.EnableFolding(DslEditor);
         _dslTimer = new DispatcherTimer { Interval = TimeSpan.FromMilliseconds(400) };
         _dslTimer.Tick += (_, _) =>
         {
@@ -52,6 +53,16 @@ public partial class MainWindow : Window
         };
 
         CommandBindings.Add(new CommandBinding(AppCommands.Help, (_, _) => new HelpWindow { Owner = this }.Show()));
+        CommandBindings.Add(new CommandBinding(AppCommands.FocusSearch, (_, _) => FocusSearch()));
+
+        // Keep the scroll position when the cards are recreated; bring new / moved cards into view.
+        double savedOffset = 0;
+        _vm.CardsRebuilding += (_, _) => savedOffset = CardsScrollViewer()?.VerticalOffset ?? 0;
+        _vm.CardsRebuilt += (_, select) => Dispatcher.BeginInvoke(DispatcherPriority.Loaded, () =>
+        {
+            CardsScrollViewer()?.ScrollToVerticalOffset(savedOffset);
+            if (select is { } i && i >= 0 && i < _vm.Cards.Count) CardsList.ScrollIntoView(_vm.Cards[i]);
+        });
 
         var args = Environment.GetCommandLineArgs();
         if (args.Length > 1 && System.IO.File.Exists(args[1])) _vm.OpenPath(args[1]);
@@ -161,6 +172,53 @@ public partial class MainWindow : Window
         DslEditor.TextArea.Caret.Column = _vm.DslErrorColumn;
         DslEditor.ScrollToLine(line);
         DslEditor.Focus();
+    }
+
+    // ------------------------------------------------------------------ library keyboard
+
+    private void FocusSearch()
+    {
+        SearchBox.Focus();
+        SearchBox.SelectAll();
+    }
+
+    private void FocusSearch_Click(object sender, RoutedEventArgs e) => FocusSearch();
+
+    private void SearchBox_PreviewKeyDown(object sender, KeyEventArgs e)
+    {
+        switch (e.Key)
+        {
+            case Key.Enter:
+                // Add the first match.
+                if (_vm.Library.Cast<object>().FirstOrDefault() is ActionDefinition first)
+                {
+                    _vm.AddAction(first);
+                    e.Handled = true;
+                }
+                break;
+            case Key.Down:
+                if (_vm.Library.Cast<object>().FirstOrDefault() is { } item)
+                {
+                    LibraryList.SelectedItem = item;
+                    LibraryList.UpdateLayout();
+                    (LibraryList.ItemContainerGenerator.ContainerFromItem(item) as ListBoxItem)?.Focus();
+                    e.Handled = true;
+                }
+                break;
+            case Key.Escape:
+                _vm.SearchText = "";
+                e.Handled = true;
+                break;
+        }
+    }
+
+    private void LibraryList_KeyDown(object sender, KeyEventArgs e)
+    {
+        if (e.Key == Key.Enter && LibraryList.SelectedItem is ActionDefinition definition)
+        {
+            _vm.AddAction(definition);
+            e.Handled = true;
+        }
     }
 
     // ------------------------------------------------------------------ library drag & drop
@@ -317,6 +375,19 @@ public partial class MainWindow : Window
     }
 
     // ------------------------------------------------------------------ helpers
+
+    private ScrollViewer? CardsScrollViewer() => FindDescendant<ScrollViewer>(CardsList);
+
+    private static T? FindDescendant<T>(DependencyObject root) where T : DependencyObject
+    {
+        for (var i = 0; i < VisualTreeHelper.GetChildrenCount(root); i++)
+        {
+            var child = VisualTreeHelper.GetChild(root, i);
+            if (child is T found) return found;
+            if (FindDescendant<T>(child) is { } deeper) return deeper;
+        }
+        return null;
+    }
 
     private static DependencyObject? GetParent(DependencyObject d) =>
         d is Visual or System.Windows.Media.Media3D.Visual3D ? VisualTreeHelper.GetParent(d) : LogicalTreeHelper.GetParent(d);

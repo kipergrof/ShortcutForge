@@ -1,4 +1,4 @@
-<Window x:Class="ShortcutForge.App.Views.HelpWindow"
+<Window Icon="/Assets/app.ico" x:Class="ShortcutForge.App.Views.HelpWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:l="clr-namespace:ShortcutForge.App.Services"

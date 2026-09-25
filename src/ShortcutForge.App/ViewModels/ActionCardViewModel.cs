@@ -1,5 +1,6 @@
 using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
+using ShortcutForge.App.Services;
 using ShortcutForge.Core.Catalog;
 using ShortcutForge.Core.Model;
 using ShortcutForge.Dsl;
@@ -78,22 +79,49 @@ public sealed partial class ActionCardViewModel : ObservableObject
 
     public bool HasOutput => OutputName is not null;
 
-    public string CategoryColor => ControlKind != ControlFlowKind.None ? "#8E8E93" : Definition?.Category switch
+    public string CategoryColor => CategoryStyle.ColorOf(Definition);
+
+    public string Glyph => CategoryStyle.GlyphOf(Definition);
+
+    // ------------------------------------------------------------------ collapsing
+
+    /// <summary>Cards with editable content can be collapsed to a one-line summary.</summary>
+    public bool CanCollapse => HasParams || IsIfStart || IsMenuCase;
+
+    public bool IsCollapsed
     {
-        "Vezérlés" => "#8E8E93",
-        "Változók" => "#FF9500",
-        "Szöveg" => "#FFCC00",
-        "Számok és matek" => "#5AC8FA",
-        "Listák és szótárak" => "#FF9500",
-        "Dátum és idő" => "#FF3B30",
-        "Web" => "#007AFF",
-        "Párbeszédek és értesítések" => "#FF2D55",
-        "Fájlok és dokumentumok" => "#34AADC",
-        "Média és fotók" => "#AF52DE",
-        "Eszköz" => "#4CD964",
-        "Appok és kommunikáció" => "#34C759",
-        _ => "#636366",
-    };
+        get => Main.CollapsedActions.Contains(Action);
+        set
+        {
+            if (value == IsCollapsed) return;
+            if (value) Main.CollapsedActions.Add(Action);
+            else Main.CollapsedActions.Remove(Action);
+            OnPropertyChanged();
+            OnPropertyChanged(nameof(IsExpanded));
+            OnPropertyChanged(nameof(Summary));
+        }
+    }
+
+    public bool IsExpanded => !IsCollapsed;
+
+    [CommunityToolkit.Mvvm.Input.RelayCommand]
+    private void ToggleCollapse() => IsCollapsed = !IsCollapsed;
+
+    /// <summary>One-line preview of the set values, shown when collapsed.</summary>
+    public string Summary
+    {
+        get
+        {
+            if (IsIfStart)
+                return $"{ConditionInput} {ConditionOperator?.Label} {(ConditionNeedsValue ? ConditionValue : "")}".Trim();
+            if (IsMenuCase) return CaseTitle;
+            var parts = Params.Where(p => p.IsSet)
+                .Select(p => p.Editor == EditorKind.Bool ? $"{p.Label}: {(p.Flag == true ? L.T("igen", "yes") : L.T("nem", "no"))}" : $"{p.Label}: {p.Text}")
+                .Select(s => s.ReplaceLineEndings(" "));
+            var text = string.Join("  ·  ", parts);
+            return text.Length > 140 ? text[..140] + "…" : text;
+        }
+    }
 
     private static string ShortName(string identifier)
     {
@@ -136,6 +164,7 @@ public sealed partial class ActionCardViewModel : ObservableObject
         if (except is null || !Params.Contains(except)) LoadSpecial();
         OnPropertyChanged(nameof(OutputName));
         OnPropertyChanged(nameof(HasOutput));
+        OnPropertyChanged(nameof(Summary));
     }
 
     // ------------------------------------------------------------------ If condition

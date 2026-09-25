@@ -111,6 +111,7 @@ public sealed partial class MainViewModel : ObservableObject
         OnPropertyChanged(nameof(IsHungarian));
         OnPropertyChanged(nameof(IsEnglish));
         OnPropertyChanged(nameof(ActionCountText));
+        OnPropertyChanged(nameof(Templates));
         RaiseAppearanceChanged();
         if (DslError is not null && PendingDsl is not null) OnDslEdited(PendingDsl);
         Status = L.T("Nyelv: magyar", "Language: English");
@@ -123,6 +124,16 @@ public sealed partial class MainViewModel : ObservableObject
     public NameScope Scope { get; private set; } = new();
 
     public ObservableCollection<ActionCardViewModel> Cards { get; } = [];
+
+    /// <summary>Actions whose cards are collapsed (kept across card rebuilds).</summary>
+    public HashSet<ActionInstance> CollapsedActions { get; } = new(ReferenceEqualityComparer.Instance);
+
+    [RelayCommand]
+    private void CollapseAll(string? collapse)
+    {
+        var value = collapse != "false";
+        foreach (var card in Cards.Where(c => c.CanCollapse)) card.IsCollapsed = value;
+    }
 
     [ObservableProperty] private ActionCardViewModel? _selectedCard;
 
@@ -268,8 +279,15 @@ public sealed partial class MainViewModel : ObservableObject
     }
 
     /// <summary>Recreates all cards from the model (after structural changes).</summary>
+    /// <summary>Raised before the cards are recreated (the view saves its scroll position).</summary>
+    public event EventHandler? CardsRebuilding;
+
+    /// <summary>Raised after the cards were recreated, with the index of the card to bring into view.</summary>
+    public event EventHandler<int?>? CardsRebuilt;
+
     public void RebuildCards(int? select = null)
     {
+        CardsRebuilding?.Invoke(this, EventArgs.Empty);
         RefreshScope();
         var indent = ControlFlow.ComputeIndent(Current.Actions);
         Cards.Clear();
@@ -279,6 +297,7 @@ public sealed partial class MainViewModel : ObservableObject
         if (select is { } s && s >= 0 && s < Cards.Count) SelectedCard = Cards[s];
         OnPropertyChanged(nameof(ActionCountText));
         StructureWarning = ControlFlow.Validate(Current.Actions);
+        CardsRebuilt?.Invoke(this, select);
     }
 
     [ObservableProperty] private string? _structureWarning;
@@ -400,7 +419,8 @@ public sealed partial class MainViewModel : ObservableObject
             actions = [a];
         }
 
-        var at = index ?? (SelectedCard is { } sel ? ControlFlow.BlockRange(Current.Actions, sel.Index).Last + 1 : Current.Actions.Count);
+        // Right after the selected card: inside a block when its "If" / "Otherwise" / menu item is selected.
+        var at = index ?? (SelectedCard is { } sel ? sel.Index + 1 : Current.Actions.Count);
         at = Math.Clamp(at, 0, Current.Actions.Count);
         Current.Actions.InsertRange(at, actions);
         if (definition.Control == ControlFlowKind.Menu) SyncMenuItems(actions[0].GroupingIdentifier);
@@ -455,26 +475,31 @@ public sealed partial class MainViewModel : ObservableObject
     private void DuplicateCard(ActionCardViewModel? card)
     {
         card ??= SelectedCard;
-        if (card is null || card.IsMarker) return;
+        if (card is null || (card.IsMarker && !card.IsMenuCase)) return;
         _checkpointTaken = false;
         Checkpoint();
         var (first, last) = OperationRange(card);
         var copies = Current.Actions.Skip(first).Take(last - first + 1).Select(a => a.Clone()).ToList();
 
-        // Fresh UUIDs and grouping identifiers; references inside the copy follow them.
+        // Fresh UUIDs, and fresh grouping identifiers for blocks that are copied whole.
+        // A copied menu case keeps its menu's group so it stays inside that menu.
         var uuidMap = new Dictionary<string, string>();
-        var groupMap = new Dictionary<string, string>();
+        var groupMap = copies
+            .Where(c => c.ControlFlow == ControlFlowMode.Start && c.GroupingIdentifier is not null)
+            .Select(c => c.GroupingIdentifier!)
+            .Distinct()
+            .ToDictionary(g => g, _ => ActionInstance.NewUuid());
         foreach (var c in copies)
         {
             if (c.Uuid is { } u) uuidMap[u] = c.Uuid = ActionInstance.NewUuid();
-            if (c.GroupingIdentifier is { } g)
-                c.GroupingIdentifier = groupMap.TryGetValue(g, out var ng) ? ng : groupMap[g] = ActionInstance.NewUuid();
+            if (c.GroupingIdentifier is { } g && groupMap.TryGetValue(g, out var ng)) c.GroupingIdentifier = ng;
         }
         foreach (var c in copies)
             foreach (var key in c.Parameters.Keys.ToList())
                 c.Parameters[key] = RemapOutputs(c.Parameters[key], uuidMap);
 
         Current.Actions.InsertRange(last + 1, copies);
+        if (card.IsMenuCase) SyncMenuItems(card.Action.GroupingIdentifier);
         _checkpointTaken = false;
         MarkDirty();
         RebuildCards(last + 1);
@@ -555,13 +580,29 @@ public sealed partial class MainViewModel : ObservableObject
         var (first, last) = OperationRange(card);
         if (target >= first && target <= last + 1) return;
 
-        _checkpointTaken = false;
-        Checkpoint();
+        var wasValid = ControlFlow.Validate(Current.Actions) is null;
+        var snapshot = TakeSnapshot();
+        var before = Current.Actions.ToList();
         var moved = Current.Actions.GetRange(first, last - first + 1);
         Current.Actions.RemoveRange(first, moved.Count);
         if (target > last) target -= moved.Count;
         target = Math.Clamp(target, 0, Current.Actions.Count);
         Current.Actions.InsertRange(target, moved);
+
+        // A move must not break the block structure (e.g. a menu item dragged out of its menu).
+        if (wasValid && ControlFlow.Validate(Current.Actions) is not null)
+        {
+            Current.Actions.Clear();
+            Current.Actions.AddRange(before);
+            Status = L.T("Ide nem mozgatható: elrontaná a blokkok szerkezetét.", "Cannot move there: it would break the block structure.");
+            return;
+        }
+
+        _checkpointTaken = false;
+        _undo.Push(snapshot);
+        _redo.Clear();
+        UndoCommand.NotifyCanExecuteChanged();
+        RedoCommand.NotifyCanExecuteChanged();
         if (card.IsMenuCase) SyncMenuItems(card.Action.GroupingIdentifier);
         _checkpointTaken = false;
         MarkDirty();
@@ -727,6 +768,17 @@ public sealed partial class MainViewModel : ObservableObject
         if (!ConfirmDiscard()) return;
         LoadShortcut(new Shortcut(), null);
         Status = L.T("Új parancs.", "New shortcut.");
+    }
+
+    /// <summary>A fresh list each time, so the menu re-reads the (localized) names.</summary>
+    public IReadOnlyList<ShortcutTemplate> Templates => ShortcutTemplates.All.ToList();
+
+    [RelayCommand]
+    private void NewFromTemplate(ShortcutTemplate? template)
+    {
+        if (template is null || !ConfirmDiscardIncludingDsl()) return;
+        LoadShortcut(DslParser.Parse(template.Source), null);
+        Status = L.F("Új parancs sablonból: {0}", "New shortcut from template: {0}", template.Name);
     }
 
     [RelayCommand]
