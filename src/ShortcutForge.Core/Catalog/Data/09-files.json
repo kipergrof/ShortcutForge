@@ -1,0 +1,142 @@
+{
+  "category": "Fájlok és dokumentumok",
+  "actions": [
+    {
+      "id": "is.workflow.actions.documentpicker.open", "name": "Get File", "dsl": "GetFile", "output": "File",
+      "params": [
+        { "key": "WFShowFilePicker", "name": "showPicker", "label": "Dokumentumválasztó", "type": "bool" },
+        { "key": "WFGetFilePath", "name": "path", "label": "Útvonal", "type": "text" },
+        { "key": "WFFile", "name": "folder", "label": "Mappa", "type": "raw" },
+        { "key": "WFFileErrorIfNotFound", "name": "errorIfNotFound", "label": "Hiba, ha nincs", "type": "bool" },
+        { "key": "SelectMultiple", "name": "multiple", "label": "Több fájl", "type": "bool" }
+      ]
+    },
+    {
+      "id": "is.workflow.actions.documentpicker.save", "name": "Save File", "dsl": "SaveFile", "output": "Saved File",
+      "params": [
+        { "key": "WFInput", "name": "input", "label": "Fájl", "type": "variable" },
+        { "key": "WFAskWhereToSave", "name": "ask", "label": "Kérdezze meg, hová", "type": "bool" },
+        { "key": "WFFileDestinationPath", "name": "path", "label": "Útvonal", "type": "text" },
+        { "key": "WFFolder", "name": "folder", "label": "Mappa", "type": "raw" },
+        { "key": "WFSaveFileOverwrite", "name": "overwrite", "label": "Felülírás", "type": "bool" }
+      ]
+    },
+    {
+      "id": "is.workflow.actions.file.append", "name": "Append to Text File", "dsl": "AppendToFile", "output": "Appended File",
+      "params": [
+        { "key": "WFInput", "name": "text", "label": "Szöveg", "type": "text" },
+        { "key": "WFFilePath", "name": "path", "label": "Útvonal", "type": "text" },
+        { "key": "WFAppendFileWriteMode", "name": "mode", "label": "Mód", "type": "enum", "options": [ "Append", "Prepend" ] }
+      ]
+    },
+    {
+      "id": "is.workflow.actions.file.delete", "name": "Delete Files", "dsl": "DeleteFiles",
+      "params": [
+        { "key": "WFInput", "name": "files", "label": "Fájlok", "type": "variable" },
+        { "key": "WFDeleteFileConfirmDeletion", "name": "confirm", "label": "Megerősítés", "type": "bool" },
+        { "key": "WFDeleteImmediatelyDelete", "name": "immediately", "label": "Azonnali törlés", "type": "bool" }
+      ]
+    },
+    {
+      "id": "is.workflow.actions.file.createfolder", "name": "Create Folder", "dsl": "CreateFolder", "output": "Folder",
+      "params": [
+        { "key": "WFFilePath", "name": "path", "label": "Útvonal", "type": "text" },
+        { "key": "WFFolder", "name": "folder", "label": "Szülő mappa", "type": "raw" }
+      ]
+    },
+    {
+      "id": "is.workflow.actions.file.getfoldercontents", "name": "Get Contents of Folder", "dsl": "GetFolderContents", "output": "Contents of Folder",
+      "params": [
+        { "key": "WFFolder", "name": "folder", "label": "Mappa", "type": "variable" },
+        { "key": "Recursive", "name": "recursive", "label": "Almappákkal", "type": "bool" }
+      ]
+    },
+    {
+      "id": "is.workflow.actions.file.rename", "name": "Rename File", "dsl": "RenameFile", "output": "Renamed Item",
+      "params": [
+        { "key": "WFFile", "name": "file", "label": "Fájl", "type": "variable" },
+        { "key": "WFNewFilename", "name": "name", "label": "Új név", "type": "text" }
+      ]
+    },
+    {
+      "id": "is.workflow.actions.file.move", "name": "Move File", "dsl": "MoveFile",
+      "params": [
+        { "key": "WFFile", "name": "file", "label": "Fájl", "type": "variable" },
+        { "key": "WFFolder", "name": "destination", "label": "Cél", "type": "raw" },
+        { "key": "WFReplaceExisting", "name": "replace", "label": "Felülírás", "type": "bool" }
+      ]
+    },
+    {
+      "id": "is.workflow.actions.file.reveal", "name": "Reveal Files in Finder", "dsl": "RevealInFinder", "macOnly": true,
+      "params": [ { "key": "WFFile", "name": "files", "label": "Fájlok", "type": "variable" } ]
+    },
+    {
+      "id": "is.workflow.actions.makezip", "name": "Make Archive", "dsl": "MakeArchive", "output": "Archive",
+      "params": [
+        { "key": "WFInput", "name": "files", "label": "Fájlok", "type": "variable" },
+        { "key": "WFZIPName", "name": "name", "label": "Név", "type": "text" },
+        { "key": "WFArchiveFormat", "name": "format", "label": "Formátum", "type": "enum", "options": [ ".zip", ".tar.gz", ".tar.bz2", ".tar.xz", ".tar", ".gz", ".cpio", ".iso" ] }
+      ]
+    },
+    {
+      "id": "is.workflow.actions.unzip", "name": "Extract Archive", "dsl": "ExtractArchive", "output": "Files",
+      "params": [ { "key": "WFArchive", "name": "archive", "label": "Archívum", "type": "variable" } ]
+    },
+    {
+      "id": "is.workflow.actions.makepdf", "name": "Make PDF", "dsl": "MakePdf", "output": "PDF",
+      "params": [
+        { "key": "WFInput", "name": "input", "label": "Bemenet", "type": "variable" },
+        { "key": "WFPDFIncludeMargin", "name": "margin", "label": "Margó", "type": "bool" },
+        { "key": "WFPDFIncludedPages", "name": "pages", "label": "Oldalak", "type": "enum", "options": [ "All Pages", "Single Page", "Page Range" ] }
+      ]
+    },
+    {
+      "id": "is.workflow.actions.gettextfrompdf", "name": "Get Text from PDF", "dsl": "GetTextFromPdf", "output": "Text from PDF",
+      "params": [
+        { "key": "WFInput", "name": "pdf", "label": "PDF", "type": "variable" },
+        { "key": "WFGetTextFromPDFTextType", "name": "type", "label": "Típus", "type": "enum", "options": [ "Text", "Rich Text" ] }
+      ]
+    },
+    {
+      "id": "is.workflow.actions.print", "name": "Print", "dsl": "Print",
+      "params": [ { "key": "WFInput", "name": "input", "label": "Bemenet", "type": "variable" } ]
+    },
+    {
+      "id": "is.workflow.actions.share", "name": "Share", "dsl": "Share",
+      "params": [ { "key": "WFInput", "name": "input", "label": "Bemenet", "type": "variable" } ]
+    },
+    {
+      "id": "is.workflow.actions.airdropdocument", "name": "AirDrop", "dsl": "AirDrop",
+      "params": [ { "key": "WFInput", "name": "input", "label": "Bemenet", "type": "variable" } ]
+    },
+    {
+      "id": "is.workflow.actions.openin", "name": "Open File", "dsl": "OpenFile",
+      "params": [
+        { "key": "WFInput", "name": "file", "label": "Fájl", "type": "variable" },
+        { "key": "WFOpenInAskWhenRun", "name": "ask", "label": "Kérdezze meg", "type": "bool" }
+      ]
+    },
+    {
+      "id": "is.workflow.actions.getclipboard", "name": "Get Clipboard", "dsl": "GetClipboard", "output": "Clipboard"
+    },
+    {
+      "id": "is.workflow.actions.setclipboard", "name": "Copy to Clipboard", "dsl": "CopyToClipboard",
+      "params": [
+        { "key": "WFInput", "name": "input", "label": "Bemenet", "type": "text" },
+        { "key": "WFLocalOnly", "name": "localOnly", "label": "Csak helyi", "type": "bool" },
+        { "key": "WFExpirationDate", "name": "expires", "label": "Lejárat", "type": "text" }
+      ]
+    },
+    {
+      "id": "is.workflow.actions.detect.images", "name": "Get Images from Input", "dsl": "GetImages", "output": "Images",
+      "params": [ { "key": "WFInput", "name": "input", "label": "Bemenet", "type": "variable" } ]
+    },
+    {
+      "id": "is.workflow.actions.properties.files", "name": "Get Details of Files", "dsl": "GetFileDetails", "output": "File Details",
+      "params": [
+        { "key": "WFInput", "name": "file", "label": "Fájl", "type": "variable" },
+        { "key": "WFContentItemPropertyName", "name": "property", "label": "Tulajdonság", "type": "enum", "options": [ "File Size", "File Extension", "Creation Date", "File Path", "Last Modified Date", "Name" ] }
+      ]
+    }
+  ]
+}

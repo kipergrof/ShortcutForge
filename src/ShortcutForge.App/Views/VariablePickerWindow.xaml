@@ -1,0 +1,51 @@
+<Window x:Class="ShortcutForge.App.Views.VariablePickerWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:l="clr-namespace:ShortcutForge.App.Services"
+        Title="{l:T 'Változó részletei', 'Variable details'}" Width="520" SizeToContent="Height" ResizeMode="NoResize"
+        WindowStartupLocation="CenterOwner" ShowInTaskbar="False"
+        Background="{DynamicResource WindowBg}" Foreground="{DynamicResource TextFg}" FontFamily="Segoe UI" FontSize="13">
+    <StackPanel Margin="16">
+        <TextBlock TextWrapping="Wrap" Foreground="{DynamicResource MutedText}" Margin="0,0,0,10"
+                   Text="{l:T 'Mint a Parancsok appban, amikor rákoppintasz egy változóra: kiválaszthatod, milyen típusként kérd le, és hogy melyik tulajdonságát vagy szótár-kulcsát használd.', 'Like tapping a variable in the Shortcuts app: choose which type to get it as, and which property or dictionary key to use.'}" />
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="150" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+
+            <TextBlock Text="{l:T 'Változó:', 'Variable:'}" VerticalAlignment="Center" />
+            <ComboBox x:Name="VariableBox" Grid.Column="1" IsEditable="True" Margin="0,4" FontFamily="Consolas" HorizontalAlignment="Stretch" />
+
+            <TextBlock Grid.Row="1" Text="{l:T 'Lekérés típusként:', 'Get as type:'}" VerticalAlignment="Center" />
+            <ComboBox x:Name="TypeBox" Grid.Row="1" Grid.Column="1" Margin="0,4" HorizontalAlignment="Stretch" SelectionChanged="TypeBox_SelectionChanged" />
+
+            <TextBlock Grid.Row="2" Text="{l:T 'Tulajdonság:', 'Property:'}" VerticalAlignment="Center" />
+            <ComboBox x:Name="PropertyBox" Grid.Row="2" Grid.Column="1" IsEditable="True" Margin="0,4" HorizontalAlignment="Stretch"
+                      ToolTip="{l:T 'Üresen hagyva maga az érték; pl. Fájl › Name, File Size', 'Leave empty for the value itself; e.g. File › Name, File Size'}" />
+
+            <TextBlock Grid.Row="3" Text="{l:T 'Szótár kulcs:', 'Dictionary key:'}" VerticalAlignment="Center" />
+            <TextBox x:Name="KeyBox" Grid.Row="3" Grid.Column="1" Margin="0,4"
+                     ToolTip="{l:T 'Szótár esetén a lekérendő kulcs (a tulajdonság helyett)', 'For dictionaries: the key to get (instead of a property)'}" />
+        </Grid>
+
+        <Border Background="{DynamicResource AccentSoft}" CornerRadius="6" Padding="10,6" Margin="0,10,0,0">
+            <StackPanel>
+                <TextBlock Text="{l:T 'Eredmény (szöveges nézetben így jelenik meg):', 'Result (as shown in the text view):'}" FontSize="11" Foreground="{DynamicResource MutedText}" />
+                <TextBlock x:Name="Preview" FontFamily="Consolas" TextWrapping="Wrap" Margin="0,2,0,0" />
+            </StackPanel>
+        </Border>
+        <TextBlock x:Name="ErrorText" Foreground="{DynamicResource ErrorBrush}" TextWrapping="Wrap" Margin="0,6,0,0" Visibility="Collapsed" />
+
+        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,14,0,0">
+            <Button x:Name="OkButton" Style="{StaticResource PrimaryButton}" IsDefault="True" Click="Ok_Click" MinWidth="80" Content="OK" />
+            <Button Style="{StaticResource ToolButton}" IsCancel="True" MinWidth="80" Content="{l:T 'Mégse', 'Cancel'}" />
+        </StackPanel>
+    </StackPanel>
+</Window>

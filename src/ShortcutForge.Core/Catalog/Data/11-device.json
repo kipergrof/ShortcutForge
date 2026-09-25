@@ -1,0 +1,110 @@
+{
+  "category": "Eszköz",
+  "actions": [
+    {
+      "id": "is.workflow.actions.getdevicedetails", "name": "Get Device Details", "dsl": "GetDeviceDetails", "output": "Device Details",
+      "params": [ { "key": "WFDeviceDetail", "name": "detail", "label": "Adat", "type": "enum", "options": [ "Device Name", "Device Hostname", "Device Model", "Device Is Watch", "System Version", "Screen Width", "Screen Height", "Current Volume", "Current Brightness", "Current Appearance" ] } ]
+    },
+    { "id": "is.workflow.actions.getbatterylevel", "name": "Get Battery Level", "dsl": "GetBatteryLevel", "output": "Battery Level" },
+    {
+      "id": "is.workflow.actions.setbrightness", "name": "Set Brightness", "dsl": "SetBrightness",
+      "params": [ { "key": "WFBrightness", "name": "level", "label": "Fényerő (0-1)", "type": "number" } ]
+    },
+    {
+      "id": "is.workflow.actions.setvolume", "name": "Set Volume", "dsl": "SetVolume",
+      "params": [ { "key": "WFVolume", "name": "level", "label": "Hangerő (0-1)", "type": "number" } ]
+    },
+    {
+      "id": "is.workflow.actions.flashlight", "name": "Set Flashlight", "dsl": "Flashlight",
+      "params": [
+        { "key": "WFFlashlightSetting", "name": "state", "label": "Állapot", "type": "enum", "options": [ "Turn", "Toggle" ] },
+        { "key": "state", "name": "on", "label": "Be", "type": "integer" },
+        { "key": "WFFlashlightLevel", "name": "level", "label": "Erősség", "type": "number" }
+      ]
+    },
+    {
+      "id": "is.workflow.actions.wifi.set", "name": "Set Wi-Fi", "dsl": "SetWifi",
+      "params": [ { "key": "OnValue", "name": "on", "label": "Be", "type": "bool" } ]
+    },
+    {
+      "id": "is.workflow.actions.bluetooth.set", "name": "Set Bluetooth", "dsl": "SetBluetooth",
+      "params": [ { "key": "OnValue", "name": "on", "label": "Be", "type": "bool" } ]
+    },
+    {
+      "id": "is.workflow.actions.cellulardata.set", "name": "Set Cellular Data", "dsl": "SetCellularData",
+      "params": [ { "key": "OnValue", "name": "on", "label": "Be", "type": "bool" } ]
+    },
+    {
+      "id": "is.workflow.actions.airplanemode.set", "name": "Set Airplane Mode", "dsl": "SetAirplaneMode",
+      "params": [ { "key": "OnValue", "name": "on", "label": "Be", "type": "bool" } ]
+    },
+    {
+      "id": "is.workflow.actions.lowpowermode.set", "name": "Set Low Power Mode", "dsl": "SetLowPowerMode",
+      "params": [ { "key": "OnValue", "name": "on", "label": "Be", "type": "bool" } ]
+    },
+    {
+      "id": "is.workflow.actions.dnd.set", "name": "Set Focus", "dsl": "SetFocus",
+      "params": [
+        { "key": "Enabled", "name": "on", "label": "Be", "type": "integer" },
+        { "key": "FocusModes", "name": "focus", "label": "Fókusz", "type": "raw" },
+        { "key": "AssertionType", "name": "until", "label": "Meddig", "type": "enum", "options": [ "Turned Off", "Time", "Event", "Location" ] }
+      ]
+    },
+    {
+      "id": "is.workflow.actions.appearance", "name": "Set Appearance", "dsl": "SetAppearance",
+      "params": [
+        { "key": "operation", "name": "operation", "label": "Művelet", "type": "enum", "options": [ "set", "toggle" ] },
+        { "key": "style", "name": "style", "label": "Stílus", "type": "enum", "options": [ "light", "dark" ] }
+      ]
+    },
+    {
+      "id": "is.workflow.actions.setwallpaper", "name": "Set Wallpaper", "dsl": "SetWallpaper",
+      "params": [
+        { "key": "WFInput", "name": "image", "label": "Kép", "type": "variable" },
+        { "key": "WFWallpaperLocation", "name": "location", "label": "Hely", "type": "raw" },
+        { "key": "WFWallpaperShowPreview", "name": "preview", "label": "Előnézet", "type": "bool" }
+      ]
+    },
+    { "id": "is.workflow.actions.lockscreen", "name": "Lock Screen", "dsl": "LockScreen" },
+    { "id": "is.workflow.actions.reboot", "name": "Shut Down", "dsl": "ShutDown",
+      "params": [ { "key": "WFShutdownMode", "name": "mode", "label": "Mód", "type": "enum", "options": [ "shutdown", "restart" ] } ] },
+    { "id": "is.workflow.actions.getcurrentlocation", "name": "Get Current Location", "dsl": "GetCurrentLocation", "output": "Current Location" },
+    {
+      "id": "is.workflow.actions.weather.currentconditions", "name": "Get Current Weather", "dsl": "GetCurrentWeather", "output": "Weather Conditions",
+      "params": [ { "key": "WFWeatherCustomLocation", "name": "location", "label": "Helyszín", "type": "raw" } ]
+    },
+    {
+      "id": "is.workflow.actions.weather.forecast", "name": "Get Weather Forecast", "dsl": "GetWeatherForecast", "output": "Weather Conditions",
+      "params": [
+        { "key": "WFWeatherCustomLocation", "name": "location", "label": "Helyszín", "type": "raw" },
+        { "key": "WFWeatherForecastType", "name": "type", "label": "Típus", "type": "enum", "options": [ "Daily", "Hourly" ] }
+      ]
+    },
+    {
+      "id": "is.workflow.actions.searchmaps", "name": "Show in Maps", "dsl": "ShowInMaps",
+      "params": [ { "key": "WFInput", "name": "location", "label": "Hely", "type": "text" } ]
+    },
+    {
+      "id": "is.workflow.actions.getdirections", "name": "Show Directions", "dsl": "ShowDirections",
+      "params": [
+        { "key": "WFDestination", "name": "destination", "label": "Cél", "type": "raw" },
+        { "key": "WFGetDirectionsActionMode", "name": "mode", "label": "Közlekedés", "type": "enum", "options": [ "Driving", "Walking", "Transit", "Cycling" ] }
+      ]
+    },
+    {
+      "id": "is.workflow.actions.gettraveltime", "name": "Get Travel Time", "dsl": "GetTravelTime", "output": "Travel Time",
+      "params": [
+        { "key": "WFDestination", "name": "destination", "label": "Cél", "type": "raw" },
+        { "key": "WFGetDirectionsActionMode", "name": "mode", "label": "Közlekedés", "type": "enum", "options": [ "Driving", "Walking", "Transit", "Cycling" ] }
+      ]
+    },
+    {
+      "id": "is.workflow.actions.health.quantity.log", "name": "Log Health Sample", "dsl": "LogHealthSample",
+      "params": [
+        { "key": "WFQuantitySampleType", "name": "type", "label": "Típus", "type": "string" },
+        { "key": "WFQuantitySampleQuantity", "name": "value", "label": "Érték", "type": "raw" },
+        { "key": "WFQuantitySampleDate", "name": "date", "label": "Dátum", "type": "text" }
+      ]
+    }
+  ]
+}

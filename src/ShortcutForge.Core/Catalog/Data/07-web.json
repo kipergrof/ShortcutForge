@@ -1,0 +1,104 @@
+{
+  "category": "Web",
+  "actions": [
+    {
+      "id": "is.workflow.actions.url", "name": "URL", "dsl": "Url", "output": "URL",
+      "params": [ { "key": "WFURLActionURL", "name": "url", "label": "URL", "type": "text" } ]
+    },
+    {
+      "id": "is.workflow.actions.downloadurl", "name": "Get Contents of URL", "dsl": "GetContentsOfUrl", "output": "Contents of URL",
+      "description": "HTTP kérés (GET/POST/PUT/PATCH/DELETE) fejlécekkel és törzzsel.", "descriptionEn": "HTTP request (GET/POST/PUT/PATCH/DELETE) with headers and body.",
+      "params": [
+        { "key": "WFURL", "name": "url", "label": "URL", "type": "text" },
+        { "key": "WFHTTPMethod", "name": "method", "label": "Metódus", "type": "enum", "options": [ "GET", "POST", "PUT", "PATCH", "DELETE" ] },
+        { "key": "ShowHeaders", "name": "showHeaders", "label": "Fejlécek", "type": "bool" },
+        { "key": "WFHTTPHeaders", "name": "headers", "label": "Fejlécek", "type": "dictionary" },
+        { "key": "WFHTTPBodyType", "name": "bodyType", "label": "Törzs típusa", "type": "enum", "options": [ "JSON", "Form", "File" ] },
+        { "key": "WFJSONValues", "name": "json", "label": "JSON törzs", "type": "dictionary" },
+        { "key": "WFFormValues", "name": "form", "label": "Űrlap törzs", "type": "dictionary" },
+        { "key": "WFRequestVariable", "name": "file", "label": "Fájl törzs", "type": "variable" }
+      ]
+    },
+    {
+      "id": "is.workflow.actions.openurl", "name": "Open URLs", "dsl": "OpenUrl",
+      "params": [ { "key": "WFInput", "name": "url", "label": "URL", "type": "text" } ]
+    },
+    {
+      "id": "is.workflow.actions.showwebpage", "name": "Show Web Page", "dsl": "ShowWebPage",
+      "params": [
+        { "key": "WFURL", "name": "url", "label": "URL", "type": "text" },
+        { "key": "WFEnterSafariReader", "name": "reader", "label": "Olvasó mód", "type": "bool" }
+      ]
+    },
+    {
+      "id": "is.workflow.actions.searchweb", "name": "Search Web", "dsl": "SearchWeb",
+      "params": [
+        { "key": "WFInputText", "name": "query", "label": "Keresés", "type": "text" },
+        { "key": "WFSearchWebDestination", "name": "engine", "label": "Kereső", "type": "enum", "options": [ "Amazon", "Bing", "DuckDuckGo", "eBay", "Google", "Reddit", "Twitter", "Yahoo!", "YouTube" ] }
+      ]
+    },
+    {
+      "id": "is.workflow.actions.url.expand", "name": "Expand URL", "dsl": "ExpandUrl", "output": "Expanded URL",
+      "params": [ { "key": "URL", "name": "url", "label": "URL", "type": "text" } ]
+    },
+    {
+      "id": "is.workflow.actions.geturlcomponent", "name": "Get Component of URL", "dsl": "GetUrlComponent", "output": "Component of URL",
+      "params": [
+        { "key": "WFURL", "name": "url", "label": "URL", "type": "text" },
+        { "key": "WFURLComponent", "name": "component", "label": "Rész", "type": "enum", "options": [ "Scheme", "User", "Password", "Host", "Port", "Path", "Query", "Fragment" ] }
+      ]
+    },
+    {
+      "id": "is.workflow.actions.detect.link", "name": "Get URLs from Input", "dsl": "GetUrls", "output": "URLs",
+      "params": [ { "key": "WFInput", "name": "input", "label": "Bemenet", "type": "variable" } ]
+    },
+    {
+      "id": "is.workflow.actions.getwebpagecontents", "name": "Get Contents of Web Page", "dsl": "GetWebPageContents", "output": "Contents of Web Page",
+      "params": [ { "key": "WFInput", "name": "url", "label": "URL", "type": "text" } ]
+    },
+    {
+      "id": "is.workflow.actions.runjavascriptonwebpage", "name": "Run JavaScript on Web Page", "dsl": "RunJavaScriptOnWebPage", "output": "JavaScript Result",
+      "params": [
+        { "key": "WFInput", "name": "page", "label": "Weboldal", "type": "variable" },
+        { "key": "WFJavaScript", "name": "script", "label": "JavaScript", "type": "text" }
+      ]
+    },
+    {
+      "id": "is.workflow.actions.getarticle", "name": "Get Article using Safari Reader", "dsl": "GetArticle", "output": "Article",
+      "params": [ { "key": "WFWebPage", "name": "page", "label": "Weboldal", "type": "variable" } ]
+    },
+    {
+      "id": "is.workflow.actions.readinglist", "name": "Add to Reading List", "dsl": "AddToReadingList",
+      "params": [ { "key": "WFURL", "name": "url", "label": "URL", "type": "text" } ]
+    },
+    {
+      "id": "is.workflow.actions.getcurrenturl", "name": "Get Current URL from Safari", "dsl": "GetCurrentUrl", "output": "Current URL"
+    },
+    {
+      "id": "is.workflow.actions.getipaddress", "name": "Get Current IP Address", "dsl": "GetIPAddress", "output": "Current IP Address",
+      "params": [
+        { "key": "WFIPAddressSourceOption", "name": "source", "label": "Forrás", "type": "enum", "options": [ "External", "Local" ] },
+        { "key": "WFIPAddressTypeOption", "name": "type", "label": "Típus", "type": "enum", "options": [ "IPv4", "IPv6" ] }
+      ]
+    },
+    {
+      "id": "is.workflow.actions.rss", "name": "Get Items from RSS Feed", "dsl": "GetRssItems", "output": "Items from RSS Feed",
+      "params": [
+        { "key": "WFURLs", "name": "url", "label": "Feed URL", "type": "text" },
+        { "key": "WFRSSItemQuantity", "name": "count", "label": "Darab", "type": "number" }
+      ]
+    },
+    {
+      "id": "is.workflow.actions.detect.address", "name": "Get Addresses from Input", "dsl": "GetAddresses", "output": "Addresses",
+      "params": [ { "key": "WFInput", "name": "input", "label": "Bemenet", "type": "variable" } ]
+    },
+    {
+      "id": "is.workflow.actions.detect.phonenumber", "name": "Get Phone Numbers from Input", "dsl": "GetPhoneNumbers", "output": "Phone Numbers",
+      "params": [ { "key": "WFInput", "name": "input", "label": "Bemenet", "type": "variable" } ]
+    },
+    {
+      "id": "is.workflow.actions.detect.emailaddress", "name": "Get Email Addresses from Input", "dsl": "GetEmailAddresses", "output": "Email Addresses",
+      "params": [ { "key": "WFInput", "name": "input", "label": "Bemenet", "type": "variable" } ]
+    }
+  ]
+}

@@ -1,0 +1,173 @@
+{
+  "category": "Média és fotók",
+  "actions": [
+    {
+      "id": "is.workflow.actions.takephoto", "name": "Take Photo", "dsl": "TakePhoto", "output": "Photo",
+      "params": [
+        { "key": "WFCameraCaptureShowPreview", "name": "preview", "label": "Előnézet", "type": "bool" },
+        { "key": "WFPhotoCount", "name": "count", "label": "Darab", "type": "number" },
+        { "key": "WFCameraCaptureDevice", "name": "camera", "label": "Kamera", "type": "enum", "options": [ "Front", "Back" ] }
+      ]
+    },
+    {
+      "id": "is.workflow.actions.takevideo", "name": "Take Video", "dsl": "TakeVideo", "output": "Video",
+      "params": [
+        { "key": "WFCameraCaptureDevice", "name": "camera", "label": "Kamera", "type": "enum", "options": [ "Front", "Back" ] },
+        { "key": "WFCameraCaptureQuality", "name": "quality", "label": "Minőség", "type": "enum", "options": [ "Low", "Medium", "High" ] },
+        { "key": "WFRecordingStart", "name": "start", "label": "Indítás", "type": "enum", "options": [ "On Tap", "Immediately" ] }
+      ]
+    },
+    {
+      "id": "is.workflow.actions.selectphoto", "name": "Select Photos", "dsl": "SelectPhotos", "output": "Photos",
+      "params": [ { "key": "WFSelectMultiplePhotos", "name": "multiple", "label": "Több fotó", "type": "bool" } ]
+    },
+    {
+      "id": "is.workflow.actions.getlatestphotos", "name": "Get Latest Photos", "dsl": "GetLatestPhotos", "output": "Latest Photos",
+      "params": [
+        { "key": "WFGetLatestPhotoCount", "name": "count", "label": "Darab", "type": "number" },
+        { "key": "WFGetLatestPhotosActionIncludeScreenshots", "name": "screenshots", "label": "Képernyőképekkel", "type": "bool" }
+      ]
+    },
+    {
+      "id": "is.workflow.actions.getlatestscreenshot", "name": "Get Latest Screenshots", "dsl": "GetLatestScreenshots", "output": "Latest Screenshots",
+      "params": [ { "key": "WFGetLatestPhotoCount", "name": "count", "label": "Darab", "type": "number" } ]
+    },
+    {
+      "id": "is.workflow.actions.savetocameraroll", "name": "Save to Photo Album", "dsl": "SaveToPhotos",
+      "params": [
+        { "key": "WFInput", "name": "input", "label": "Kép", "type": "variable" },
+        { "key": "WFCameraRollSelectedGroup", "name": "album", "label": "Album", "type": "string" }
+      ]
+    },
+    {
+      "id": "is.workflow.actions.deletephotos", "name": "Delete Photos", "dsl": "DeletePhotos",
+      "params": [ { "key": "photos", "name": "photos", "label": "Fotók", "type": "variable" } ]
+    },
+    {
+      "id": "is.workflow.actions.takescreenshot", "name": "Take Screenshot", "dsl": "TakeScreenshot", "output": "Screenshot"
+    },
+    {
+      "id": "is.workflow.actions.image.resize", "name": "Resize Image", "dsl": "ResizeImage", "output": "Resized Image",
+      "params": [
+        { "key": "WFImage", "name": "image", "label": "Kép", "type": "variable" },
+        { "key": "WFImageResizeWidth", "name": "width", "label": "Szélesség", "type": "text" },
+        { "key": "WFImageResizeHeight", "name": "height", "label": "Magasság", "type": "text" },
+        { "key": "WFImageResizeKey", "name": "by", "label": "Mi alapján", "type": "enum", "options": [ "Size", "Percentage", "Longest Edge" ] },
+        { "key": "WFImageResizePercentage", "name": "percentage", "label": "Százalék", "type": "text" }
+      ]
+    },
+    {
+      "id": "is.workflow.actions.image.convert", "name": "Convert Image", "dsl": "ConvertImage", "output": "Converted Image",
+      "params": [
+        { "key": "WFInput", "name": "image", "label": "Kép", "type": "variable" },
+        { "key": "WFImageFormat", "name": "format", "label": "Formátum", "type": "enum", "options": [ "JPEG", "PNG", "TIFF", "GIF", "HEIF", "BMP", "PDF", "JPEG-2000", "Match Input" ] },
+        { "key": "WFImageCompressionQuality", "name": "quality", "label": "Minőség", "type": "number" },
+        { "key": "WFImagePreserveMetadata", "name": "keepMetadata", "label": "Metaadatok megtartása", "type": "bool" }
+      ]
+    },
+    {
+      "id": "is.workflow.actions.image.crop", "name": "Crop Image", "dsl": "CropImage", "output": "Cropped Image",
+      "params": [
+        { "key": "WFInput", "name": "image", "label": "Kép", "type": "variable" },
+        { "key": "WFImageCropPosition", "name": "position", "label": "Pozíció", "type": "enum", "options": [ "Center", "Top Left", "Top Right", "Bottom Left", "Bottom Right", "Custom" ] },
+        { "key": "WFImageCropWidth", "name": "width", "label": "Szélesség", "type": "text" },
+        { "key": "WFImageCropHeight", "name": "height", "label": "Magasság", "type": "text" },
+        { "key": "WFImageCropX", "name": "x", "label": "X", "type": "text" },
+        { "key": "WFImageCropY", "name": "y", "label": "Y", "type": "text" }
+      ]
+    },
+    {
+      "id": "is.workflow.actions.image.flip", "name": "Flip Image", "dsl": "FlipImage", "output": "Flipped Image",
+      "params": [
+        { "key": "WFInput", "name": "image", "label": "Kép", "type": "variable" },
+        { "key": "WFImageFlipDirection", "name": "direction", "label": "Irány", "type": "enum", "options": [ "Horizontal", "Vertical" ] }
+      ]
+    },
+    {
+      "id": "is.workflow.actions.image.rotate", "name": "Rotate Image/Video", "dsl": "RotateImage", "output": "Rotated Image",
+      "params": [
+        { "key": "WFImage", "name": "image", "label": "Kép", "type": "variable" },
+        { "key": "WFImageRotateAmount", "name": "degrees", "label": "Fok", "type": "number" }
+      ]
+    },
+    {
+      "id": "is.workflow.actions.image.combine", "name": "Combine Images", "dsl": "CombineImages", "output": "Combined Image",
+      "params": [
+        { "key": "WFInput", "name": "images", "label": "Képek", "type": "variable" },
+        { "key": "WFImageCombineMode", "name": "mode", "label": "Mód", "type": "enum", "options": [ "Horizontally", "Vertically", "In a Grid" ] },
+        { "key": "WFImageCombineSpacing", "name": "spacing", "label": "Térköz", "type": "number" }
+      ]
+    },
+    {
+      "id": "is.workflow.actions.image.mask", "name": "Mask Image", "dsl": "MaskImage", "output": "Masked Image",
+      "params": [
+        { "key": "WFInput", "name": "image", "label": "Kép", "type": "variable" },
+        { "key": "WFMaskType", "name": "type", "label": "Maszk", "type": "enum", "options": [ "Rounded Rectangle", "Ellipse", "Icon", "Custom Image" ] },
+        { "key": "WFMaskCornerRadius", "name": "radius", "label": "Sugár", "type": "text" }
+      ]
+    },
+    {
+      "id": "is.workflow.actions.image.removebackground", "name": "Remove Background", "dsl": "RemoveBackground", "output": "Image without Background",
+      "params": [ { "key": "WFInput", "name": "image", "label": "Kép", "type": "variable" } ]
+    },
+    {
+      "id": "is.workflow.actions.overlayimageonimage", "name": "Overlay Image", "dsl": "OverlayImage", "output": "Overlaid Image",
+      "params": [
+        { "key": "WFInput", "name": "background", "label": "Háttér", "type": "variable" },
+        { "key": "WFImage", "name": "image", "label": "Kép", "type": "variable" },
+        { "key": "WFShouldShowImageEditor", "name": "editor", "label": "Szerkesztő", "type": "bool" }
+      ]
+    },
+    {
+      "id": "is.workflow.actions.extracttextfromimage", "name": "Extract Text from Image", "dsl": "ExtractTextFromImage", "output": "Text from Image",
+      "params": [ { "key": "WFImage", "name": "image", "label": "Kép", "type": "variable" } ]
+    },
+    {
+      "id": "is.workflow.actions.encodemedia", "name": "Encode Media", "dsl": "EncodeMedia", "output": "Encoded Media",
+      "params": [
+        { "key": "WFMedia", "name": "media", "label": "Média", "type": "variable" },
+        { "key": "WFMediaAudioOnly", "name": "audioOnly", "label": "Csak hang", "type": "bool" },
+        { "key": "WFMediaSize", "name": "size", "label": "Méret", "type": "string" }
+      ]
+    },
+    {
+      "id": "is.workflow.actions.trimvideo", "name": "Trim Media", "dsl": "TrimMedia", "output": "Trimmed Media",
+      "params": [ { "key": "WFInputMedia", "name": "media", "label": "Média", "type": "variable" } ]
+    },
+    {
+      "id": "is.workflow.actions.recordaudio", "name": "Record Audio", "dsl": "RecordAudio", "output": "Recorded Audio",
+      "params": [
+        { "key": "WFRecordingCompression", "name": "quality", "label": "Minőség", "type": "enum", "options": [ "Normal", "Very High" ] },
+        { "key": "WFRecordingStart", "name": "start", "label": "Indítás", "type": "enum", "options": [ "On Tap", "Immediately" ] }
+      ]
+    },
+    {
+      "id": "is.workflow.actions.playmusic", "name": "Play Music", "dsl": "PlayMusic",
+      "params": [
+        { "key": "WFMediaItems", "name": "music", "label": "Zene", "type": "variable" },
+        { "key": "WFPlayMusicActionShuffle", "name": "shuffle", "label": "Keverés", "type": "enum", "options": [ "Off", "Songs" ] },
+        { "key": "WFPlayMusicActionRepeat", "name": "repeat", "label": "Ismétlés", "type": "enum", "options": [ "None", "One", "All" ] }
+      ]
+    },
+    {
+      "id": "is.workflow.actions.pausemusic", "name": "Play/Pause", "dsl": "PlayPause",
+      "params": [ { "key": "WFPlayPauseBehavior", "name": "behavior", "label": "Művelet", "type": "enum", "options": [ "Play/Pause", "Play", "Pause" ] } ]
+    },
+    { "id": "is.workflow.actions.skipforward", "name": "Skip Forward", "dsl": "SkipForward" },
+    {
+      "id": "is.workflow.actions.skipback", "name": "Skip Back", "dsl": "SkipBack",
+      "params": [ { "key": "WFSkipBackBehavior", "name": "behavior", "label": "Viselkedés", "type": "enum", "options": [ "Beginning", "Previous Song" ] } ]
+    },
+    { "id": "is.workflow.actions.getcurrentsong", "name": "Get Current Song", "dsl": "GetCurrentSong", "output": "Current Song" },
+    {
+      "id": "is.workflow.actions.addtoplaylist", "name": "Add to Playlist", "dsl": "AddToPlaylist",
+      "params": [
+        { "key": "WFInput", "name": "music", "label": "Zene", "type": "variable" },
+        { "key": "WFPlaylistName", "name": "playlist", "label": "Lejátszási lista", "type": "string" }
+      ]
+    },
+    {
+      "id": "is.workflow.actions.shazamMedia", "name": "Find Music with Shazam", "dsl": "Shazam", "output": "Shazam Media"
+    }
+  ]
+}

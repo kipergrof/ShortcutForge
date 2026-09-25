@@ -1,0 +1,527 @@
+<Window x:Class="ShortcutForge.App.Views.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="clr-namespace:ShortcutForge.App.ViewModels"
+        xmlns:l="clr-namespace:ShortcutForge.App.Services"
+        xmlns:avalon="http://icsharpcode.net/sharpdevelop/avalonedit"
+        xmlns:catalog="clr-namespace:ShortcutForge.Core.Catalog;assembly=ShortcutForge.Core"
+        Title="{Binding WindowTitle}" Height="860" Width="1400" MinWidth="900" MinHeight="600"
+        Background="{DynamicResource WindowBg}" Foreground="{DynamicResource TextFg}"
+        FontFamily="Segoe UI" FontSize="13" WindowStartupLocation="CenterScreen">
+
+    <Window.InputBindings>
+        <KeyBinding Key="N" Modifiers="Control" Command="{Binding NewCommand}" />
+        <KeyBinding Key="O" Modifiers="Control" Command="{Binding OpenCommand}" />
+        <KeyBinding Key="S" Modifiers="Control" Command="{Binding SaveFileCommand}" />
+        <KeyBinding Key="S" Modifiers="Control+Shift" Command="{Binding SaveFileAsCommand}" />
+        <KeyBinding Key="E" Modifiers="Control" Command="{Binding ExportCommand}" />
+        <KeyBinding Key="F1" Command="{x:Static vm:AppCommands.Help}" />
+    </Window.InputBindings>
+
+    <Window.Resources>
+        <!-- Parameter editor: one of several controls depending on the editor kind -->
+        <DataTemplate x:Key="ParamRowTemplate" DataType="{x:Type vm:ParamViewModel}">
+            <Grid Margin="0,3">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="160" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+                <TextBlock Text="{Binding Label}" ToolTip="{Binding ToolTip}" VerticalAlignment="Top" Margin="0,7,8,0"
+                           Foreground="{DynamicResource MutedText}" TextTrimming="CharacterEllipsis" />
+                <StackPanel Grid.Column="1">
+                    <DockPanel>
+                    <Button x:Name="InsertVariableButton" DockPanel.Dock="Right" Style="{StaticResource CardIconButton}" Margin="4,0,0,0"
+                            Content="{}{x}" FontFamily="Consolas" Visibility="Collapsed" Click="InsertVariable_Click"
+                            Tag="{Binding ElementName=TextEditor}"
+                            ToolTip="{l:T 'Változó beszúrása (típus, tulajdonság, szótár kulcs)', 'Insert variable (type, property, dictionary key)'}" />
+                    <Button x:Name="VariableDetailsButton" DockPanel.Dock="Right" Style="{StaticResource CardIconButton}" Margin="4,0,0,0"
+                            Content="⋯" Visibility="Collapsed" Click="VariableDetails_Click"
+                            Tag="{Binding ElementName=VariableEditor}"
+                            ToolTip="{l:T 'Változó részletei: típus, tulajdonság, szótár kulcs', 'Variable details: type, property, dictionary key'}" />
+                    <Grid>
+                        <!-- Template / expression / plain text -->
+                        <TextBox x:Name="TextEditor"
+                                 Text="{Binding Text, UpdateSourceTrigger=LostFocus}"
+                                 TextWrapping="Wrap" AcceptsReturn="{Binding IsMultiline}"
+                                 FontFamily="Consolas" Visibility="Collapsed" />
+                        <!-- Variable -->
+                        <ComboBox x:Name="VariableEditor" IsEditable="True" Visibility="Collapsed" HorizontalAlignment="Stretch"
+                                  ItemsSource="{Binding VariableSuggestions}"
+                                  Text="{Binding Text, UpdateSourceTrigger=LostFocus}" FontFamily="Consolas" />
+                        <!-- Enum -->
+                        <ComboBox x:Name="EnumEditor" IsEditable="True" Visibility="Collapsed" HorizontalAlignment="Stretch"
+                                  ItemsSource="{Binding Options}"
+                                  Text="{Binding Text, UpdateSourceTrigger=LostFocus}" />
+                        <!-- Bool -->
+                        <CheckBox x:Name="BoolEditor" IsThreeState="True" IsChecked="{Binding Flag}" Visibility="Collapsed"
+                                  VerticalAlignment="Center" Content="{l:T 'igen', 'yes'}"
+                                  ToolTip="{l:T 'Bejelölve: igen · üres: nem · kitöltött négyzet: alapértelmezett (nincs megadva)', 'Checked: yes · empty: no · filled square: default (not set)'}" />
+                        <TextBlock Text="{Binding Placeholder}" IsHitTestVisible="False" Margin="12,7,0,0"
+                                   Foreground="{DynamicResource SubtleText}" FontStyle="Italic" x:Name="PlaceholderText" Visibility="Collapsed" />
+                    </Grid>
+                    </DockPanel>
+                    <TextBlock Text="{Binding Error}" Foreground="{DynamicResource ErrorBrush}" TextWrapping="Wrap" FontSize="11.5"
+                               Visibility="{Binding Error, Converter={StaticResource NullToCollapsed}}" Margin="0,2,0,0" />
+                </StackPanel>
+            </Grid>
+            <DataTemplate.Triggers>
+                <DataTrigger Binding="{Binding Editor}" Value="{x:Static vm:EditorKind.Template}">
+                    <Setter TargetName="TextEditor" Property="Visibility" Value="Visible" />
+                    <Setter TargetName="InsertVariableButton" Property="Visibility" Value="Visible" />
+                    <Setter TargetName="TextEditor" Property="AcceptsReturn" Value="True" />
+                    <Setter TargetName="TextEditor" Property="FontFamily" Value="Segoe UI" />
+                </DataTrigger>
+                <DataTrigger Binding="{Binding Editor}" Value="{x:Static vm:EditorKind.Plain}">
+                    <Setter TargetName="TextEditor" Property="Visibility" Value="Visible" />
+                    <Setter TargetName="TextEditor" Property="AcceptsReturn" Value="True" />
+                    <Setter TargetName="TextEditor" Property="FontFamily" Value="Segoe UI" />
+                </DataTrigger>
+                <DataTrigger Binding="{Binding Editor}" Value="{x:Static vm:EditorKind.Expression}">
+                    <Setter TargetName="TextEditor" Property="Visibility" Value="Visible" />
+                </DataTrigger>
+                <DataTrigger Binding="{Binding Editor}" Value="{x:Static vm:EditorKind.Variable}">
+                    <Setter TargetName="VariableEditor" Property="Visibility" Value="Visible" />
+                    <Setter TargetName="VariableDetailsButton" Property="Visibility" Value="Visible" />
+                </DataTrigger>
+                <DataTrigger Binding="{Binding Editor}" Value="{x:Static vm:EditorKind.Enum}">
+                    <Setter TargetName="EnumEditor" Property="Visibility" Value="Visible" />
+                </DataTrigger>
+                <DataTrigger Binding="{Binding Editor}" Value="{x:Static vm:EditorKind.Bool}">
+                    <Setter TargetName="BoolEditor" Property="Visibility" Value="Visible" />
+                </DataTrigger>
+                <MultiDataTrigger>
+                    <MultiDataTrigger.Conditions>
+                        <Condition Binding="{Binding Text}" Value="" />
+                        <Condition Binding="{Binding IsKeyboardFocusWithin, ElementName=TextEditor}" Value="False" />
+                        <Condition Binding="{Binding Visibility, ElementName=TextEditor}" Value="Visible" />
+                    </MultiDataTrigger.Conditions>
+                    <Setter TargetName="PlaceholderText" Property="Visibility" Value="Visible" />
+                </MultiDataTrigger>
+            </DataTemplate.Triggers>
+        </DataTemplate>
+
+        <!-- Action card -->
+        <DataTemplate x:Key="CardTemplate" DataType="{x:Type vm:ActionCardViewModel}">
+            <DockPanel Margin="0,3">
+                <Rectangle DockPanel.Dock="Left" Width="{Binding IndentWidth}" />
+                <Border x:Name="Card" Background="{DynamicResource CardBg}" BorderBrush="{DynamicResource CardBorder}"
+                        BorderThickness="1" CornerRadius="10">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="5" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+                        <Border CornerRadius="10,0,0,10" Background="{Binding CategoryColor, Converter={StaticResource HexToBrush}}" />
+                        <StackPanel Grid.Column="1" Margin="10,6,8,8">
+                            <!-- Header: drag handle, title, buttons -->
+                            <DockPanel Tag="DragHandle" Background="Transparent" Cursor="SizeAll">
+                                <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" Cursor="Arrow">
+                                    <Button Style="{StaticResource CardIconButton}" Content="{l:T '+ Egyébként', '+ Otherwise'}"
+                                            Command="{Binding DataContext.AddElseCommand, RelativeSource={RelativeSource AncestorType=ListBox}}"
+                                            CommandParameter="{Binding}" Visibility="{Binding IsIfStart, Converter={StaticResource BoolToVis}}" />
+                                    <Button Style="{StaticResource CardIconButton}" Content="{l:T '+ Menüpont', '+ Menu item'}"
+                                            Command="{Binding DataContext.AddMenuCaseCommand, RelativeSource={RelativeSource AncestorType=ListBox}}"
+                                            CommandParameter="{Binding}" Visibility="{Binding IsMenuStart, Converter={StaticResource BoolToVis}}" />
+                                    <Button Style="{StaticResource CardIconButton}" Content="▲" ToolTip="{l:T 'Fel (Alt+↑)', 'Up (Alt+↑)'}"
+                                            Command="{Binding DataContext.MoveUpCommand, RelativeSource={RelativeSource AncestorType=ListBox}}" CommandParameter="{Binding}" />
+                                    <Button Style="{StaticResource CardIconButton}" Content="▼" ToolTip="{l:T 'Le (Alt+↓)', 'Down (Alt+↓)'}"
+                                            Command="{Binding DataContext.MoveDownCommand, RelativeSource={RelativeSource AncestorType=ListBox}}" CommandParameter="{Binding}" />
+                                    <Button Style="{StaticResource CardIconButton}" Content="⧉" ToolTip="{l:T 'Duplikálás (Ctrl+D)', 'Duplicate (Ctrl+D)'}"
+                                            Command="{Binding DataContext.DuplicateCardCommand, RelativeSource={RelativeSource AncestorType=ListBox}}" CommandParameter="{Binding}" />
+                                    <Button Style="{StaticResource CardIconButton}" Content="✕" ToolTip="{l:T 'Törlés (Del)', 'Delete (Del)'}"
+                                            Command="{Binding DataContext.DeleteCardCommand, RelativeSource={RelativeSource AncestorType=ListBox}}" CommandParameter="{Binding}" />
+                                </StackPanel>
+                                <StackPanel Orientation="Horizontal" VerticalAlignment="Center" ToolTip="{Binding Description}">
+                                    <TextBlock Text="⠿" Foreground="{DynamicResource HandleText}" Margin="0,0,6,0" VerticalAlignment="Center" />
+                                    <TextBlock Text="{Binding Title}" FontWeight="SemiBold" FontSize="14" VerticalAlignment="Center" />
+                                    <TextBlock Text="{Binding Subtitle}" Foreground="{DynamicResource MutedText}" FontSize="11"
+                                               Margin="8,1,0,0" VerticalAlignment="Center" />
+                                    <Border Background="{DynamicResource BadgeBg}" CornerRadius="4" Padding="4,0" Margin="8,0,0,0"
+                                            Visibility="{Binding IsMacOnly, Converter={StaticResource BoolToVis}}">
+                                        <TextBlock Text="{l:T 'csak Mac', 'Mac only'}" FontSize="10.5" Foreground="{DynamicResource BadgeFg}" />
+                                    </Border>
+                                    <Border Background="{DynamicResource AccentSoft}" CornerRadius="4" Padding="5,0" Margin="8,0,0,0"
+                                            Visibility="{Binding HasOutput, Converter={StaticResource BoolToVis}}" Cursor="Hand"
+                                            MouseLeftButtonUp="OutputBadge_Click"
+                                            ToolTip="{l:T 'A kimenet ezen a néven hivatkozható: {név}. Kattints az átnevezéshez.', 'The output can be referenced by this name: {name}. Click to rename.'}">
+                                        <TextBlock FontSize="11" Foreground="{DynamicResource Accent}" FontFamily="Consolas">
+                                            <Run Text="→" /><Run Text="{Binding OutputName, Mode=OneWay}" />
+                                        </TextBlock>
+                                    </Border>
+                                </StackPanel>
+                            </DockPanel>
+
+                            <!-- If condition -->
+                            <StackPanel Visibility="{Binding IsIfStart, Converter={StaticResource BoolToVis}}" Margin="0,6,0,0">
+                                <WrapPanel>
+                                    <ComboBox x:Name="ConditionInputBox" IsEditable="True" MinWidth="170" Margin="0,0,2,4" FontFamily="Consolas"
+                                              ItemsSource="{Binding Main.VariableSuggestions}"
+                                              Text="{Binding ConditionInput, UpdateSourceTrigger=LostFocus}"
+                                              ToolTip="{l:T 'A vizsgált változó', 'The variable to test'}" />
+                                    <Button Style="{StaticResource CardIconButton}" Content="⋯" Margin="0,0,6,4" Click="VariableDetails_Click"
+                                            Tag="{Binding ElementName=ConditionInputBox}"
+                                            ToolTip="{l:T 'Változó részletei: típus, tulajdonság, szótár kulcs', 'Variable details: type, property, dictionary key'}" />
+                                    <ComboBox MinWidth="170" Margin="0,0,6,4" ItemsSource="{Binding Source={x:Static vm:ActionCardViewModel.ConditionOptions}}"
+                                              SelectedItem="{Binding ConditionOperator}" />
+                                    <TextBox MinWidth="170" Margin="0,0,6,4"
+                                             Text="{Binding ConditionValue, UpdateSourceTrigger=LostFocus}"
+                                             Visibility="{Binding ConditionNeedsValue, Converter={StaticResource BoolToVis}}"
+                                             ToolTip="{l:T 'Összehasonlított érték; változó: {név}', 'Value to compare; variable: {name}'}" />
+                                    <TextBlock Text="{l:T 'és', 'and'}" VerticalAlignment="Center" Margin="0,0,6,4"
+                                               Visibility="{Binding ConditionIsBetween, Converter={StaticResource BoolToVis}}" />
+                                    <TextBox MinWidth="90" Margin="0,0,0,4"
+                                             Text="{Binding ConditionValue2, UpdateSourceTrigger=LostFocus}"
+                                             Visibility="{Binding ConditionIsBetween, Converter={StaticResource BoolToVis}}" />
+                                </WrapPanel>
+                                <TextBlock Text="{Binding ConditionError}" Foreground="{DynamicResource ErrorBrush}"
+                                           Visibility="{Binding ConditionError, Converter={StaticResource NullToCollapsed}}" />
+                            </StackPanel>
+
+                            <!-- Menu case title -->
+                            <TextBox Margin="0,6,0,0"
+                                     Visibility="{Binding IsMenuCase, Converter={StaticResource BoolToVis}}"
+                                     Text="{Binding CaseTitle, UpdateSourceTrigger=LostFocus}"
+                                     ToolTip="{l:T 'A menüpont felirata', 'Title of the menu item'}" />
+
+                            <!-- Parameters -->
+                            <ItemsControl ItemsSource="{Binding Params}" ItemTemplate="{StaticResource ParamRowTemplate}" Margin="0,4,0,0"
+                                          Visibility="{Binding HasParams, Converter={StaticResource BoolToVis}}" />
+                        </StackPanel>
+                    </Grid>
+                </Border>
+            </DockPanel>
+            <DataTemplate.Triggers>
+                <DataTrigger Binding="{Binding IsMarker}" Value="True">
+                    <Setter TargetName="Card" Property="Background" Value="{DynamicResource MarkerCardBg}" />
+                </DataTrigger>
+                <DataTrigger Binding="{Binding IsUnknown}" Value="True">
+                    <Setter TargetName="Card" Property="BorderBrush" Value="{DynamicResource UnknownBorder}" />
+                </DataTrigger>
+                <DataTrigger Binding="{Binding IsSelected, RelativeSource={RelativeSource AncestorType=ListBoxItem}}" Value="True">
+                    <Setter TargetName="Card" Property="BorderBrush" Value="{DynamicResource Accent}" />
+                    <Setter TargetName="Card" Property="BorderThickness" Value="2" />
+                </DataTrigger>
+            </DataTemplate.Triggers>
+        </DataTemplate>
+    </Window.Resources>
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <!-- Menu -->
+        <Menu Background="{DynamicResource PanelBg}" Padding="4,2">
+            <MenuItem Header="{l:T '_Fájl', '_File'}">
+                <MenuItem Header="{l:T 'Ú_j', '_New'}" InputGestureText="Ctrl+N" Command="{Binding NewCommand}" />
+                <MenuItem Header="{l:T '_Megnyitás…', '_Open…'}" InputGestureText="Ctrl+O" Command="{Binding OpenCommand}" />
+                <MenuItem Header="{l:T '_Legutóbbiak', '_Recent files'}" ItemsSource="{Binding RecentFiles}">
+                    <MenuItem.ItemContainerStyle>
+                        <Style TargetType="MenuItem" BasedOn="{StaticResource {x:Type MenuItem}}">
+                            <Setter Property="Header" Value="{Binding}" />
+                            <Setter Property="Command" Value="{Binding DataContext.OpenRecentCommand, RelativeSource={RelativeSource AncestorType=Window}}" />
+                            <Setter Property="CommandParameter" Value="{Binding}" />
+                        </Style>
+                    </MenuItem.ItemContainerStyle>
+                </MenuItem>
+                <Separator />
+                <MenuItem Header="{l:T '_Mentés', '_Save'}" InputGestureText="Ctrl+S" Command="{Binding SaveFileCommand}" />
+                <MenuItem Header="{l:T 'Mentés _másként…', 'Save _As…'}" InputGestureText="Ctrl+Shift+S" Command="{Binding SaveFileAsCommand}" />
+                <Separator />
+                <MenuItem Header="{l:T '_Exportálás .shortcut fájlba…', '_Export to .shortcut file…'}" InputGestureText="Ctrl+E" Command="{Binding ExportCommand}" />
+                <MenuItem Header="{l:T 'Importálás _iCloud linkről…', 'Import from _iCloud link…'}" Command="{Binding ImportICloudCommand}" />
+                <Separator />
+                <MenuItem Header="{l:T '_Kilépés', 'E_xit'}" Click="Exit_Click" />
+            </MenuItem>
+            <MenuItem Header="{l:T '_Szerkesztés', '_Edit'}">
+                <MenuItem Header="{l:T '_Visszavonás', '_Undo'}" InputGestureText="Ctrl+Z" Command="{Binding UndoCommand}" />
+                <MenuItem Header="{l:T '_Mégis', '_Redo'}" InputGestureText="Ctrl+Y" Command="{Binding RedoCommand}" />
+                <Separator />
+                <MenuItem Header="{l:T '_Duplikálás', '_Duplicate'}" InputGestureText="Ctrl+D" Command="{Binding DuplicateCardCommand}" />
+                <MenuItem Header="{l:T '_Törlés', 'De_lete'}" InputGestureText="Del" Command="{Binding DeleteCardCommand}" />
+                <MenuItem Header="{l:T 'Mozgatás _fel', 'Move _up'}" InputGestureText="Alt+↑" Command="{Binding MoveUpCommand}" />
+                <MenuItem Header="{l:T 'Mozgatás _le', 'Move d_own'}" InputGestureText="Alt+↓" Command="{Binding MoveDownCommand}" />
+            </MenuItem>
+            <MenuItem Header="{l:T '_Nézet', '_View'}">
+                <MenuItem Header="{l:T '_Téma', '_Theme'}">
+                    <MenuItem Header="{l:T 'A _rendszer szerint', 'Follow _system'}" IsCheckable="True" IsChecked="{Binding IsThemeSystem, Mode=OneWay}"
+                              Command="{Binding SetThemeCommand}" CommandParameter="System" />
+                    <MenuItem Header="{l:T '_Világos', '_Light'}" IsCheckable="True" IsChecked="{Binding IsThemeLight, Mode=OneWay}"
+                              Command="{Binding SetThemeCommand}" CommandParameter="Light" />
+                    <MenuItem Header="{l:T '_Sötét', '_Dark'}" IsCheckable="True" IsChecked="{Binding IsThemeDark, Mode=OneWay}"
+                              Command="{Binding SetThemeCommand}" CommandParameter="Dark" />
+                </MenuItem>
+                <MenuItem Header="{l:T '_Nyelv / Language', '_Language / Nyelv'}">
+                    <MenuItem Header="Magyar" IsCheckable="True" IsChecked="{Binding IsHungarian, Mode=OneWay}"
+                              Command="{Binding SetLanguageCommand}" CommandParameter="hu" />
+                    <MenuItem Header="English" IsCheckable="True" IsChecked="{Binding IsEnglish, Mode=OneWay}"
+                              Command="{Binding SetLanguageCommand}" CommandParameter="en" />
+                </MenuItem>
+            </MenuItem>
+            <MenuItem Header="{l:T '_Eszközök', '_Tools'}">
+                <MenuItem Header="{l:T '_Beállítások (aláírás)…', '_Settings (signing)…'}" Command="{Binding OpenSettingsCommand}" />
+                <MenuItem Header="{l:T 'Plist _XML másolása a vágólapra', 'Copy plist _XML to clipboard'}" Command="{Binding CopyPlistXmlCommand}" />
+            </MenuItem>
+            <MenuItem Header="{l:T '_Súgó', '_Help'}">
+                <MenuItem Header="{l:T '_Szöveges nyelv (DSL) súgó', '_Text language (DSL) help'}" InputGestureText="F1" Command="{x:Static vm:AppCommands.Help}" />
+                <MenuItem Header="{l:T '_Névjegy', '_About'}" Click="About_Click" />
+            </MenuItem>
+        </Menu>
+
+        <!-- Toolbar -->
+        <Border Grid.Row="1" Background="{DynamicResource PanelBg}" BorderBrush="{DynamicResource CardBorder}" BorderThickness="0,0,0,1" Padding="8,6">
+            <DockPanel>
+                <StackPanel Orientation="Horizontal">
+                    <Button Style="{StaticResource ToolButton}" Command="{Binding NewCommand}" Content="{l:T '📄 Új', '📄 New'}" ToolTip="Ctrl+N" />
+                    <Button Style="{StaticResource ToolButton}" Command="{Binding OpenCommand}" Content="{l:T '📂 Megnyitás', '📂 Open'}" ToolTip="Ctrl+O" />
+                    <Button Style="{StaticResource ToolButton}" Command="{Binding SaveFileCommand}" Content="{l:T '💾 Mentés', '💾 Save'}" ToolTip="Ctrl+S" />
+                    <Rectangle Width="1" Fill="{DynamicResource CardBorder}" Margin="6,2" />
+                    <Button Style="{StaticResource ToolButton}" Command="{Binding UndoCommand}" ToolTip="{l:T 'Visszavonás (Ctrl+Z)', 'Undo (Ctrl+Z)'}">↶</Button>
+                    <Button Style="{StaticResource ToolButton}" Command="{Binding RedoCommand}" ToolTip="{l:T 'Mégis (Ctrl+Y)', 'Redo (Ctrl+Y)'}">↷</Button>
+                    <Rectangle Width="1" Fill="{DynamicResource CardBorder}" Margin="6,2" />
+                    <Button Style="{StaticResource ToolButton}" Command="{Binding ImportICloudCommand}" Content="{l:T '☁ iCloud import', '☁ iCloud import'}"
+                            ToolTip="{l:T 'Megosztott parancs letöltése iCloud linkről', 'Download a shared shortcut from an iCloud link'}" />
+                    <Button Style="{StaticResource ToolButton}" Command="{Binding OpenSettingsCommand}" Content="{l:T '⚙ Beállítások', '⚙ Settings'}" />
+                    <Button Style="{StaticResource ToolButton}" Command="{Binding SetThemeCommand}" CommandParameter="{Binding NextTheme}"
+                            Content="{Binding ThemeButtonText}" ToolTip="{l:T 'Téma váltása', 'Switch theme'}" />
+                    <Button Style="{StaticResource ToolButton}" Command="{Binding SetLanguageCommand}" CommandParameter="{Binding OtherLanguage}"
+                            Content="{l:T '🌐 English', '🌐 Magyar'}" ToolTip="{l:T 'Nyelv váltása', 'Switch language'}" />
+                </StackPanel>
+                <Button DockPanel.Dock="Right" HorizontalAlignment="Right" Style="{StaticResource PrimaryButton}"
+                        Command="{Binding ExportCommand}" Content="{l:T '⇪ Exportálás .shortcut', '⇪ Export .shortcut'}" ToolTip="Ctrl+E" />
+            </DockPanel>
+        </Border>
+
+        <!-- Main area -->
+        <Grid Grid.Row="2">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="280" MinWidth="180" />
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="*" MinWidth="380" />
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="300" MinWidth="200" />
+            </Grid.ColumnDefinitions>
+
+            <!-- Library -->
+            <DockPanel Background="{DynamicResource PanelBg}">
+                <StackPanel DockPanel.Dock="Top" Margin="10,10,10,6">
+                    <TextBlock FontWeight="SemiBold" FontSize="14">
+                        <Run Text="{l:T 'Akciók', 'Actions'}" /><Run Text=" (" Foreground="{DynamicResource MutedText}" /><Run Text="{Binding CatalogCount, Mode=OneWay}" Foreground="{DynamicResource MutedText}" /><Run Text=")" Foreground="{DynamicResource MutedText}" />
+                    </TextBlock>
+                    <Grid Margin="0,6,0,0">
+                        <TextBox x:Name="SearchBox" Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}" />
+                        <TextBlock Text="{l:T '🔍 Keresés…', '🔍 Search…'}" IsHitTestVisible="False" Margin="12,6,0,0" Foreground="{DynamicResource SubtleText}">
+                            <TextBlock.Style>
+                                <Style TargetType="TextBlock">
+                                    <Setter Property="Visibility" Value="Collapsed" />
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding Text, ElementName=SearchBox}" Value="">
+                                            <Setter Property="Visibility" Value="Visible" />
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </TextBlock.Style>
+                        </TextBlock>
+                    </Grid>
+                    <TextBlock Text="{l:T 'Dupla kattintás vagy húzás a szerkesztőbe.', 'Double-click or drag into the editor.'}"
+                               Foreground="{DynamicResource MutedText}" FontSize="11" Margin="0,4,0,0" />
+                </StackPanel>
+                <ListBox x:Name="LibraryList" ItemsSource="{Binding Library}" BorderThickness="0" Background="Transparent"
+                         ScrollViewer.HorizontalScrollBarVisibility="Disabled" VirtualizingPanel.IsVirtualizingWhenGrouping="True"
+                         MouseDoubleClick="LibraryList_MouseDoubleClick"
+                         PreviewMouseLeftButtonDown="LibraryList_PreviewMouseLeftButtonDown" PreviewMouseMove="LibraryList_PreviewMouseMove">
+                    <ListBox.GroupStyle>
+                        <GroupStyle>
+                            <GroupStyle.HeaderTemplate>
+                                <DataTemplate>
+                                    <TextBlock Text="{Binding Name}" Style="{StaticResource SectionHeader}" Margin="6,10,0,2" />
+                                </DataTemplate>
+                            </GroupStyle.HeaderTemplate>
+                        </GroupStyle>
+                    </ListBox.GroupStyle>
+                    <ListBox.ItemContainerStyle>
+                        <Style TargetType="ListBoxItem" BasedOn="{StaticResource {x:Type ListBoxItem}}">
+                            <Setter Property="Padding" Value="10,3" />
+                            <Setter Property="MinHeight" Value="0" />
+                            <Setter Property="Margin" Value="4,0" />
+                        </Style>
+                    </ListBox.ItemContainerStyle>
+                    <ListBox.ItemTemplate>
+                        <DataTemplate DataType="{x:Type catalog:ActionDefinition}">
+                            <StackPanel Margin="0,1" ToolTip="{Binding DisplayDescription}">
+                                <TextBlock Text="{Binding Name}" FontWeight="SemiBold" />
+                                <TextBlock Text="{Binding Dsl}" Foreground="{DynamicResource MutedText}" FontSize="11" FontFamily="Consolas" />
+                            </StackPanel>
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+                </ListBox>
+            </DockPanel>
+
+            <GridSplitter Grid.Column="1" Width="4" HorizontalAlignment="Stretch" Background="{DynamicResource CardBorder}" />
+
+            <!-- Editor tabs -->
+            <TabControl x:Name="Tabs" Grid.Column="2" Margin="8" SelectionChanged="Tabs_SelectionChanged" Background="Transparent" BorderThickness="0">
+                <TabItem Header="{l:T 'Vizuális szerkesztő', 'Visual editor'}" x:Name="VisualTab">
+                    <DockPanel>
+                        <Border DockPanel.Dock="Top" Background="{DynamicResource WarningBg}" CornerRadius="6" Padding="10,6" Margin="0,6,0,0"
+                                Visibility="{Binding StructureWarning, Converter={StaticResource NullToCollapsed}}">
+                            <TextBlock Text="{Binding StructureWarning}" TextWrapping="Wrap" />
+                        </Border>
+                        <TextBlock DockPanel.Dock="Top" Margin="2,8,0,4" Foreground="{DynamicResource MutedText}" FontSize="11.5" TextWrapping="Wrap"
+                                   Text="{l:T 'Szöveges mezőkben a változókat kapcsos zárójelbe írd: {név}. Kifejezés mezőkben: szám, &quot;szöveg&quot;, változónév, { &quot;kulcs&quot;: &quot;érték&quot; }. A kártyák a fogónál (⠿) húzhatók.', 'In text fields put variables in braces: {name}. In expression fields: number, &quot;text&quot;, variable name, { &quot;key&quot;: &quot;value&quot; }. Drag cards by the handle (⠿).'}" />
+                        <Grid>
+                            <ListBox x:Name="CardsList" ItemsSource="{Binding Cards}" SelectedItem="{Binding SelectedCard}"
+                                     ItemTemplate="{StaticResource CardTemplate}" Background="Transparent" BorderThickness="0"
+                                     HorizontalContentAlignment="Stretch" ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                                     VirtualizingPanel.ScrollUnit="Pixel" AllowDrop="True"
+                                     PreviewMouseLeftButtonDown="CardsList_PreviewMouseLeftButtonDown" PreviewMouseMove="CardsList_PreviewMouseMove"
+                                     DragOver="CardsList_DragOver" Drop="CardsList_Drop" DragLeave="CardsList_DragLeave">
+                                <ListBox.InputBindings>
+                                    <KeyBinding Key="Delete" Command="{Binding DeleteCardCommand}" />
+                                    <KeyBinding Key="D" Modifiers="Control" Command="{Binding DuplicateCardCommand}" />
+                                    <KeyBinding Key="Up" Modifiers="Alt" Command="{Binding MoveUpCommand}" />
+                                    <KeyBinding Key="Down" Modifiers="Alt" Command="{Binding MoveDownCommand}" />
+                                </ListBox.InputBindings>
+                                <ListBox.ItemContainerStyle>
+                                    <Style TargetType="ListBoxItem">
+                                        <Setter Property="Padding" Value="0" />
+                                        <Setter Property="Margin" Value="0,0,6,0" />
+                                        <Setter Property="Template">
+                                            <Setter.Value>
+                                                <ControlTemplate TargetType="ListBoxItem">
+                                                    <Border x:Name="DropLine" BorderBrush="Transparent" BorderThickness="0,2,0,2">
+                                                        <ContentPresenter />
+                                                    </Border>
+                                                </ControlTemplate>
+                                            </Setter.Value>
+                                        </Setter>
+                                    </Style>
+                                </ListBox.ItemContainerStyle>
+                            </ListBox>
+                            <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center" IsHitTestVisible="False">
+                                <StackPanel.Style>
+                                    <Style TargetType="StackPanel">
+                                        <Setter Property="Visibility" Value="Collapsed" />
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding Cards.Count}" Value="0">
+                                                <Setter Property="Visibility" Value="Visible" />
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </StackPanel.Style>
+                                <TextBlock Text="{l:T 'Még nincs akció', 'No actions yet'}" FontSize="18" HorizontalAlignment="Center" Foreground="{DynamicResource MutedText}" />
+                                <TextBlock Text="{l:T 'Húzz ide egy akciót a bal oldali listából, vagy kattints rá duplán.', 'Drag an action here from the list on the left, or double-click it.'}"
+                                           HorizontalAlignment="Center" Foreground="{DynamicResource MutedText}" />
+                            </StackPanel>
+                        </Grid>
+                    </DockPanel>
+                </TabItem>
+                <TabItem Header="{l:T 'Szöveges nézet (DSL)', 'Text view (DSL)'}" x:Name="DslTab">
+                    <DockPanel Margin="0,6,0,0">
+                        <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Margin="0,0,0,6">
+                            <Button Style="{StaticResource PrimaryButton}" Command="{Binding ApplyDslCommand}" Content="{l:T '✓ Alkalmazás', '✓ Apply'}"
+                                    ToolTip="{l:T 'A szöveg alkalmazása a parancsra (fülváltáskor automatikus)', 'Apply the text to the shortcut (automatic when switching tabs)'}" />
+                            <Button Style="{StaticResource ToolButton}" Command="{Binding FormatDslCommand}" Content="{l:T '⟲ Formázás', '⟲ Format'}"
+                                    ToolTip="{l:T 'Alkalmazás és újraformázás', 'Apply and reformat'}" />
+                            <Button Style="{StaticResource ToolButton}" Command="{x:Static vm:AppCommands.Help}" Content="{l:T '? Nyelvi súgó', '? Language help'}" />
+                            <TextBlock Text="{l:T 'Ctrl+Szóköz: kiegészítés', 'Ctrl+Space: completion'}" VerticalAlignment="Center" Margin="12,0,0,0"
+                                       Foreground="{DynamicResource MutedText}" FontSize="11" />
+                        </StackPanel>
+                        <Border DockPanel.Dock="Bottom" Background="{DynamicResource ErrorPanelBg}" CornerRadius="6" Padding="10,6" Margin="0,6,0,0" Cursor="Hand"
+                                MouseLeftButtonUp="DslError_Click" ToolTip="{l:T 'Kattints a hibára ugráshoz', 'Click to jump to the error'}"
+                                Visibility="{Binding DslError, Converter={StaticResource NullToCollapsed}}">
+                            <TextBlock TextWrapping="Wrap" Foreground="{DynamicResource ErrorPanelFg}">
+                                <Run Text="⚠ " /><Run Text="{Binding DslError, Mode=OneWay}" />
+                            </TextBlock>
+                        </Border>
+                        <Border BorderBrush="{DynamicResource CardBorder}" BorderThickness="1" CornerRadius="6" Background="{DynamicResource EditorBg}">
+                            <avalon:TextEditor x:Name="DslEditor" FontFamily="Cascadia Mono, Consolas" FontSize="13.5"
+                                               ShowLineNumbers="True" Padding="4"
+                                               HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto" />
+                        </Border>
+                    </DockPanel>
+                </TabItem>
+            </TabControl>
+
+            <GridSplitter Grid.Column="3" Width="4" HorizontalAlignment="Stretch" Background="{DynamicResource CardBorder}" />
+
+            <!-- Shortcut settings -->
+            <ScrollViewer Grid.Column="4" Background="{DynamicResource PanelBg}" VerticalScrollBarVisibility="Auto">
+                <StackPanel Margin="12,10">
+                    <TextBlock Text="{l:T 'Parancs beállításai', 'Shortcut settings'}" FontWeight="SemiBold" FontSize="14" />
+
+                    <TextBlock Text="{l:T 'NÉV', 'NAME'}" Style="{StaticResource SectionHeader}" />
+                    <TextBox Text="{Binding ShortcutName, UpdateSourceTrigger=LostFocus}" />
+
+                    <TextBlock Text="{l:T 'IKON', 'ICON'}" Style="{StaticResource SectionHeader}" />
+                    <DockPanel>
+                        <Border DockPanel.Dock="Left" Width="48" Height="48" CornerRadius="11" Margin="0,0,8,0"
+                                Background="{Binding SelectedColor.Brush}">
+                            <TextBlock Text="⌘" Foreground="White" FontSize="22" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                        </Border>
+                        <StackPanel>
+                            <ComboBox ItemsSource="{Binding ColorOptions}" SelectedItem="{Binding SelectedColor}" HorizontalAlignment="Stretch">
+                                <ComboBox.ItemTemplate>
+                                    <DataTemplate>
+                                        <StackPanel Orientation="Horizontal">
+                                            <Border Width="14" Height="14" CornerRadius="3" Background="{Binding Brush}" Margin="0,0,6,0" />
+                                            <TextBlock Text="{Binding Name}" />
+                                        </StackPanel>
+                                    </DataTemplate>
+                                </ComboBox.ItemTemplate>
+                            </ComboBox>
+                            <DockPanel Margin="0,4,0,0">
+                                <TextBlock Text="{l:T 'Glyph szám:', 'Glyph number:'}" VerticalAlignment="Center" Margin="0,0,6,0" Foreground="{DynamicResource MutedText}" />
+                                <TextBox Text="{Binding GlyphNumber, UpdateSourceTrigger=LostFocus}"
+                                         ToolTip="{l:T 'Az ikon SF Symbol azonosítója (pl. 59511). A Parancsok appban módosítható kényelmesebben.', 'SF Symbol id of the icon (e.g. 59511). Easier to change in the Shortcuts app.'}" />
+                            </DockPanel>
+                        </StackPanel>
+                    </DockPanel>
+
+                    <TextBlock Text="{l:T 'MEGJELENÉS', 'SHOW IN'}" Style="{StaticResource SectionHeader}" />
+                    <ItemsControl ItemsSource="{Binding TypeOptions}">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <CheckBox Content="{Binding Label}" IsChecked="{Binding IsChecked}" ToolTip="{Binding Key}" MinHeight="26" />
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+
+                    <TextBlock Text="{l:T 'ELFOGADOTT BEMENETEK', 'ACCEPTED INPUT'}" Style="{StaticResource SectionHeader}" />
+                    <TextBlock Text="{l:T 'Pl. megosztási lapról vagy más parancsból érkező adat típusa.', 'Types of data received e.g. from the share sheet or another shortcut.'}"
+                               Foreground="{DynamicResource MutedText}" FontSize="11" TextWrapping="Wrap" />
+                    <ItemsControl ItemsSource="{Binding InputClassOptions}" Margin="0,4,0,0">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <CheckBox Content="{Binding Label}" IsChecked="{Binding IsChecked}" ToolTip="{Binding Key}" MinHeight="26" />
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+
+                    <TextBlock Text="{l:T 'ALÁÍRÁS', 'SIGNING'}" Style="{StaticResource SectionHeader}" />
+                    <Border Background="{DynamicResource AccentSoft}" CornerRadius="8" Padding="10,8">
+                        <StackPanel>
+                            <TextBlock TextWrapping="Wrap" FontSize="12"
+                                       Text="{l:T 'iOS 15 óta csak aláírt parancs importálható. Aláírni Macen lehet (shortcuts sign), ezt az alkalmazás SSH-n keresztül automatikusan is el tudja végezni.', 'Since iOS 15 only signed shortcuts can be imported. Signing is done on a Mac (shortcuts sign); the app can do it automatically over SSH.'}" />
+                            <Button Style="{StaticResource ToolButton}" HorizontalAlignment="Left" Margin="-6,6,0,0" Command="{Binding OpenSettingsCommand}"
+                                    Content="{l:T '⚙ Aláírás beállítása…', '⚙ Set up signing…'}" />
+                        </StackPanel>
+                    </Border>
+                </StackPanel>
+            </ScrollViewer>
+        </Grid>
+
+        <!-- Status bar -->
+        <Border Grid.Row="3" Background="{DynamicResource PanelBg}" BorderBrush="{DynamicResource CardBorder}" BorderThickness="0,1,0,0" Padding="10,4">
+            <DockPanel>
+                <TextBlock DockPanel.Dock="Right" Text="{Binding ActionCountText}" Foreground="{DynamicResource MutedText}" />
+                <ProgressBar DockPanel.Dock="Right" Width="100" Height="10" Margin="0,0,12,0" IsIndeterminate="True"
+                             Visibility="{Binding IsBusy, Converter={StaticResource BoolToVis}}" />
+                <TextBlock Text="{Binding Status}" TextTrimming="CharacterEllipsis" />
+            </DockPanel>
+        </Border>
+    </Grid>
+</Window>

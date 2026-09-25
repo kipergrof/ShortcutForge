@@ -1,0 +1,26 @@
+{
+  "category": "Változók",
+  "actions": [
+    {
+      "id": "is.workflow.actions.setvariable", "name": "Set Variable", "dsl": "SetVariable",
+      "description": "Elmenti a bemenetet egy elnevezett változóba.", "descriptionEn": "Stores the input in a named variable.",
+      "params": [
+        { "key": "WFVariableName", "name": "name", "label": "Változó neve", "type": "string" },
+        { "key": "WFInput", "name": "input", "label": "Érték", "type": "variable" }
+      ]
+    },
+    {
+      "id": "is.workflow.actions.appendvariable", "name": "Add to Variable", "dsl": "AddToVariable",
+      "description": "Hozzáfűzi a bemenetet egy elnevezett változóhoz (lista).", "descriptionEn": "Appends the input to a named variable (list).",
+      "params": [
+        { "key": "WFVariableName", "name": "name", "label": "Változó neve", "type": "string" },
+        { "key": "WFInput", "name": "input", "label": "Érték", "type": "variable" }
+      ]
+    },
+    {
+      "id": "is.workflow.actions.getvariable", "name": "Get Variable", "dsl": "GetVariable", "output": "Variable",
+      "description": "Visszaadja egy változó értékét.", "descriptionEn": "Returns the value of a variable.",
+      "params": [ { "key": "WFVariable", "name": "variable", "label": "Változó", "type": "variable" } ]
+    }
+  ]
+}

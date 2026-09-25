@@ -1,0 +1,79 @@
+{
+  "category": "Számok és matek",
+  "actions": [
+    {
+      "id": "is.workflow.actions.number", "name": "Number", "dsl": "Number", "output": "Number",
+      "params": [ { "key": "WFNumberActionNumber", "name": "number", "label": "Szám", "type": "number" } ]
+    },
+    {
+      "id": "is.workflow.actions.math", "name": "Calculate", "dsl": "Calculate", "output": "Calculation Result",
+      "description": "Alapműveletek két számmal.", "descriptionEn": "Basic arithmetic with two numbers.",
+      "params": [
+        { "key": "WFInput", "name": "input", "label": "Szám", "type": "variable" },
+        { "key": "WFMathOperation", "name": "operation", "label": "Művelet", "type": "enum", "options": [ "+", "-", "×", "÷", "…" ] },
+        { "key": "WFScientificMathOperation", "name": "scientific", "label": "Tudományos művelet", "type": "enum", "options": [ "Modulus", "x^2", "x^3", "x^y", "e^x", "10^x", "ln(x)", "log(x)", "√x", "∛x", "x!", "sin(x)", "cos(x)", "tan(x)", "abs(x)" ] },
+        { "key": "WFMathOperand", "name": "operand", "label": "Operandus", "type": "number" },
+        { "key": "WFScientificMathOperand", "name": "scientificOperand", "label": "Tudományos operandus", "type": "number" }
+      ]
+    },
+    {
+      "id": "is.workflow.actions.calculateexpression", "name": "Calculate Expression", "dsl": "CalculateExpression", "output": "Calculation Result",
+      "params": [ { "key": "Input", "name": "expression", "label": "Kifejezés", "type": "text" } ]
+    },
+    {
+      "id": "is.workflow.actions.round", "name": "Round Number", "dsl": "Round", "output": "Rounded Number",
+      "params": [
+        { "key": "WFInput", "name": "number", "label": "Szám", "type": "variable" },
+        { "key": "WFRoundMode", "name": "mode", "label": "Mód", "type": "enum", "options": [ "Normal", "Always Round Up", "Always Round Down" ] },
+        { "key": "WFRoundTo", "name": "to", "label": "Pontosság", "type": "enum", "options": [ "Ones Place", "Tenths", "Hundredths", "Thousandths", "Ten Thousandths", "Hundred Thousandths", "Millionths", "Tens", "Hundreds", "Thousands", "Ten Thousands", "Hundred Thousands", "Millions" ] }
+      ]
+    },
+    {
+      "id": "is.workflow.actions.number.random", "name": "Random Number", "dsl": "RandomNumber", "output": "Random Number",
+      "params": [
+        { "key": "WFRandomNumberMinimum", "name": "min", "label": "Minimum", "type": "number" },
+        { "key": "WFRandomNumberMaximum", "name": "max", "label": "Maximum", "type": "number" }
+      ]
+    },
+    {
+      "id": "is.workflow.actions.statistics", "name": "Calculate Statistics", "dsl": "Statistics", "output": "Statistics",
+      "params": [
+        { "key": "Input", "name": "input", "label": "Számok", "type": "variable" },
+        { "key": "WFStatisticsOperation", "name": "operation", "label": "Művelet", "type": "enum", "options": [ "Average", "Minimum", "Maximum", "Sum", "Median", "Mode", "Range", "Standard Deviation" ] }
+      ]
+    },
+    {
+      "id": "is.workflow.actions.format.number", "name": "Format Number", "dsl": "FormatNumber", "output": "Formatted Number",
+      "params": [
+        { "key": "WFNumber", "name": "number", "label": "Szám", "type": "number" },
+        { "key": "WFNumberFormatDecimalPlaces", "name": "decimals", "label": "Tizedesjegyek", "type": "number" }
+      ]
+    },
+    {
+      "id": "is.workflow.actions.format.filesize", "name": "Format File Size", "dsl": "FormatFileSize", "output": "Formatted File Size",
+      "params": [
+        { "key": "WFFileSize", "name": "size", "label": "Méret", "type": "number" },
+        { "key": "WFFileSizeFormat", "name": "format", "label": "Formátum", "type": "enum", "options": [ "Closest Unit", "Bytes", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB or Higher" ] }
+      ]
+    },
+    {
+      "id": "is.workflow.actions.detect.number", "name": "Get Numbers from Input", "dsl": "GetNumbers", "output": "Numbers",
+      "params": [ { "key": "WFInput", "name": "input", "label": "Bemenet", "type": "variable" } ]
+    },
+    {
+      "id": "is.workflow.actions.measurement.create", "name": "Measurement", "dsl": "Measurement", "output": "Measurement",
+      "params": [
+        { "key": "WFMeasurementUnit", "name": "value", "label": "Érték", "type": "raw" },
+        { "key": "WFMeasurementUnitType", "name": "unitType", "label": "Mértékegység típus", "type": "string" }
+      ]
+    },
+    {
+      "id": "is.workflow.actions.measurement.convert", "name": "Convert Measurement", "dsl": "ConvertMeasurement", "output": "Converted Measurement",
+      "params": [
+        { "key": "WFInput", "name": "input", "label": "Mérés", "type": "variable" },
+        { "key": "WFMeasurementUnitType", "name": "unitType", "label": "Mértékegység típus", "type": "string" },
+        { "key": "WFMeasurementUnit", "name": "unit", "label": "Mértékegység", "type": "string" }
+      ]
+    }
+  ]
+}

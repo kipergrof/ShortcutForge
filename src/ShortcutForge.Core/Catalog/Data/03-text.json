@@ -1,0 +1,170 @@
+{
+  "category": "Szöveg",
+  "actions": [
+    {
+      "id": "is.workflow.actions.gettext", "name": "Text", "dsl": "Text", "output": "Text",
+      "description": "Szöveget ad át a következő akciónak.", "descriptionEn": "Passes text to the next action.",
+      "params": [ { "key": "WFTextActionText", "name": "text", "label": "Szöveg", "type": "text" } ]
+    },
+    {
+      "id": "is.workflow.actions.text.replace", "name": "Replace Text", "dsl": "ReplaceText", "output": "Updated Text",
+      "description": "Szövegrészt cserél, akár reguláris kifejezéssel.", "descriptionEn": "Replaces text, optionally with a regular expression.",
+      "params": [
+        { "key": "WFInput", "name": "input", "label": "Szöveg", "type": "text" },
+        { "key": "WFReplaceTextFind", "name": "find", "label": "Keresett", "type": "text" },
+        { "key": "WFReplaceTextReplace", "name": "replace", "label": "Csere", "type": "text" },
+        { "key": "WFReplaceTextCaseSensitive", "name": "caseSensitive", "label": "Kis/nagybetű érzékeny", "type": "bool" },
+        { "key": "WFReplaceTextRegularExpression", "name": "regex", "label": "Reguláris kifejezés", "type": "bool" }
+      ]
+    },
+    {
+      "id": "is.workflow.actions.text.split", "name": "Split Text", "dsl": "SplitText", "output": "Split Text",
+      "description": "Szöveget listává bont.", "descriptionEn": "Splits text into a list.",
+      "params": [
+        { "key": "text", "name": "text", "label": "Szöveg", "type": "text" },
+        { "key": "WFTextSeparator", "name": "separator", "label": "Elválasztó", "type": "enum", "options": [ "New Lines", "Spaces", "Every Character", "Custom" ] },
+        { "key": "WFTextCustomSeparator", "name": "custom", "label": "Egyéni elválasztó", "type": "text" }
+      ]
+    },
+    {
+      "id": "is.workflow.actions.text.combine", "name": "Combine Text", "dsl": "CombineText", "output": "Combined Text",
+      "description": "Lista elemeit egy szöveggé fűzi.", "descriptionEn": "Joins list items into one text.",
+      "params": [
+        { "key": "text", "name": "list", "label": "Lista", "type": "variable" },
+        { "key": "WFTextSeparator", "name": "separator", "label": "Elválasztó", "type": "enum", "options": [ "New Lines", "Spaces", "Custom" ] },
+        { "key": "WFTextCustomSeparator", "name": "custom", "label": "Egyéni elválasztó", "type": "text" }
+      ]
+    },
+    {
+      "id": "is.workflow.actions.text.changecase", "name": "Change Case", "dsl": "ChangeCase", "output": "Updated Text",
+      "description": "Kis- és nagybetűk átalakítása.", "descriptionEn": "Changes upper / lower case.",
+      "params": [
+        { "key": "text", "name": "text", "label": "Szöveg", "type": "text" },
+        { "key": "WFCaseType", "name": "case", "label": "Formátum", "type": "enum", "options": [ "UPPERCASE", "lowercase", "Capitalize Every Word", "Capitalize with Title Case", "Capitalize with sentence case.", "cApItAlIzE wItH aLtErNaTiNg cAsE." ] }
+      ]
+    },
+    {
+      "id": "is.workflow.actions.text.match", "name": "Match Text", "dsl": "MatchText", "output": "Matches",
+      "description": "Reguláris kifejezés találatai.", "descriptionEn": "Matches of a regular expression.",
+      "params": [
+        { "key": "text", "name": "text", "label": "Szöveg", "type": "text" },
+        { "key": "WFMatchTextPattern", "name": "pattern", "label": "Minta", "type": "text" },
+        { "key": "WFMatchTextCaseSensitive", "name": "caseSensitive", "label": "Kis/nagybetű érzékeny", "type": "bool" }
+      ]
+    },
+    {
+      "id": "is.workflow.actions.text.match.getgroup", "name": "Get Group from Matched Text", "dsl": "GetMatchGroup", "output": "Group",
+      "description": "Egy regex csoport értéke.", "descriptionEn": "The value of a regex group.",
+      "params": [
+        { "key": "matches", "name": "matches", "label": "Találatok", "type": "variable" },
+        { "key": "WFGetGroupType", "name": "which", "label": "Mit", "type": "enum", "options": [ "Group At Index", "All Groups" ] },
+        { "key": "WFGroupIndex", "name": "index", "label": "Index", "type": "number" }
+      ]
+    },
+    {
+      "id": "is.workflow.actions.text.trimwhitespace", "name": "Trim Whitespace", "dsl": "TrimWhitespace", "output": "Updated Text",
+      "description": "Levágja a szöveg elejéről és végéről a szóközöket.", "descriptionEn": "Removes whitespace from the start and end of text.",
+      "params": [ { "key": "WFInput", "name": "text", "label": "Szöveg", "type": "text" } ]
+    },
+    {
+      "id": "is.workflow.actions.detect.text", "name": "Get Text from Input", "dsl": "GetTextFromInput", "output": "Text",
+      "description": "Szöveggé alakítja a bemenetet.", "descriptionEn": "Converts the input to text.",
+      "params": [ { "key": "WFInput", "name": "input", "label": "Bemenet", "type": "variable" } ]
+    },
+    {
+      "id": "is.workflow.actions.showresult", "name": "Show Result", "dsl": "ShowResult",
+      "description": "Megjeleníti az eredményt.", "descriptionEn": "Shows the result.",
+      "params": [ { "key": "Text", "name": "text", "label": "Szöveg", "type": "text" } ]
+    },
+    {
+      "id": "is.workflow.actions.speaktext", "name": "Speak Text", "dsl": "SpeakText",
+      "description": "Felolvassa a szöveget.", "descriptionEn": "Speaks the text aloud.",
+      "params": [
+        { "key": "WFText", "name": "text", "label": "Szöveg", "type": "text" },
+        { "key": "WFSpeakTextWait", "name": "wait", "label": "Várjon a befejezésig", "type": "bool" },
+        { "key": "WFSpeakTextRate", "name": "rate", "label": "Sebesség", "type": "number" },
+        { "key": "WFSpeakTextPitch", "name": "pitch", "label": "Hangmagasság", "type": "number" },
+        { "key": "WFSpeakTextLanguage", "name": "language", "label": "Nyelv", "type": "string" },
+        { "key": "WFSpeakTextVoice", "name": "voice", "label": "Hang", "type": "string" }
+      ]
+    },
+    {
+      "id": "is.workflow.actions.dictatetext", "name": "Dictate Text", "dsl": "DictateText", "output": "Dictated Text",
+      "description": "Diktálás szöveggé.", "descriptionEn": "Dictation to text.",
+      "params": [
+        { "key": "WFSpeechLanguage", "name": "language", "label": "Nyelv", "type": "string" },
+        { "key": "WFDictateTextStopListening", "name": "stop", "label": "Befejezés", "type": "enum", "options": [ "After Pause", "After Short Pause", "On Tap" ] }
+      ]
+    },
+    {
+      "id": "is.workflow.actions.getrichtextfromhtml", "name": "Make Rich Text from HTML", "dsl": "RichTextFromHtml", "output": "Rich Text from HTML",
+      "params": [ { "key": "WFHTML", "name": "html", "label": "HTML", "type": "text" } ]
+    },
+    {
+      "id": "is.workflow.actions.gethtmlfromrichtext", "name": "Make HTML from Rich Text", "dsl": "HtmlFromRichText", "output": "HTML from Rich Text",
+      "params": [
+        { "key": "WFInput", "name": "input", "label": "Bemenet", "type": "variable" },
+        { "key": "WFMakeFullDocument", "name": "fullDocument", "label": "Teljes dokumentum", "type": "bool" }
+      ]
+    },
+    {
+      "id": "is.workflow.actions.getmarkdownfromrichtext", "name": "Make Markdown from Rich Text", "dsl": "MarkdownFromRichText", "output": "Markdown from Rich Text",
+      "params": [ { "key": "WFInput", "name": "input", "label": "Bemenet", "type": "variable" } ]
+    },
+    {
+      "id": "is.workflow.actions.getrichtextfrommarkdown", "name": "Make Rich Text from Markdown", "dsl": "RichTextFromMarkdown", "output": "Rich Text from Markdown",
+      "params": [ { "key": "WFInput", "name": "markdown", "label": "Markdown", "type": "text" } ]
+    },
+    {
+      "id": "is.workflow.actions.base64encode", "name": "Base64 Encode", "dsl": "Base64", "output": "Base64 Encoded",
+      "description": "Base64 kódolás / dekódolás.", "descriptionEn": "Base64 encode / decode.",
+      "params": [
+        { "key": "WFInput", "name": "input", "label": "Bemenet", "type": "variable" },
+        { "key": "WFEncodeMode", "name": "mode", "label": "Mód", "type": "enum", "options": [ "Encode", "Decode" ] },
+        { "key": "WFBase64LineBreakMode", "name": "lineBreaks", "label": "Sortörés", "type": "enum", "options": [ "None", "Every 64 Characters", "Every 76 Characters" ] }
+      ]
+    },
+    {
+      "id": "is.workflow.actions.urlencode", "name": "URL Encode", "dsl": "UrlEncode", "output": "URL Encoded Text",
+      "params": [
+        { "key": "WFInput", "name": "input", "label": "Bemenet", "type": "text" },
+        { "key": "WFEncodeMode", "name": "mode", "label": "Mód", "type": "enum", "options": [ "Encode", "Decode" ] }
+      ]
+    },
+    {
+      "id": "is.workflow.actions.hash", "name": "Generate Hash", "dsl": "Hash", "output": "Hash",
+      "params": [
+        { "key": "WFInput", "name": "input", "label": "Bemenet", "type": "variable" },
+        { "key": "WFHashType", "name": "type", "label": "Típus", "type": "enum", "options": [ "MD5", "SHA1", "SHA256", "SHA512" ] }
+      ]
+    },
+    {
+      "id": "is.workflow.actions.text.translate", "name": "Translate Text", "dsl": "TranslateText", "output": "Translated Text",
+      "params": [
+        { "key": "WFInputText", "name": "text", "label": "Szöveg", "type": "text" },
+        { "key": "WFSelectedFromLanguage", "name": "from", "label": "Forrásnyelv", "type": "string" },
+        { "key": "WFSelectedLanguage", "name": "to", "label": "Célnyelv", "type": "string" }
+      ]
+    },
+    {
+      "id": "is.workflow.actions.detectlanguage", "name": "Detect Language", "dsl": "DetectLanguage", "output": "Language",
+      "params": [ { "key": "WFInput", "name": "text", "label": "Szöveg", "type": "text" } ]
+    },
+    {
+      "id": "is.workflow.actions.correctspelling", "name": "Correct Spelling", "dsl": "CorrectSpelling", "output": "Corrected Text",
+      "params": [ { "key": "text", "name": "text", "label": "Szöveg", "type": "text" } ]
+    },
+    {
+      "id": "is.workflow.actions.showdefinition", "name": "Show Definition", "dsl": "ShowDefinition",
+      "params": [ { "key": "Word", "name": "word", "label": "Szó", "type": "text" } ]
+    },
+    {
+      "id": "is.workflow.actions.generatebarcode", "name": "Generate QR Code", "dsl": "GenerateQRCode", "output": "QR Code",
+      "params": [
+        { "key": "WFText", "name": "text", "label": "Szöveg", "type": "text" },
+        { "key": "WFQRErrorCorrectionLevel", "name": "correction", "label": "Hibajavítás", "type": "enum", "options": [ "Low", "Medium", "Quartile", "High" ] }
+      ]
+    },
+    { "id": "is.workflow.actions.scanbarcode", "name": "Scan QR or Barcode", "dsl": "ScanBarcode", "output": "QR/Barcode" }
+  ]
+}

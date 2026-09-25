@@ -1,0 +1,90 @@
+{
+  "category": "Dátum és idő",
+  "actions": [
+    {
+      "id": "is.workflow.actions.date", "name": "Date", "dsl": "Date", "output": "Date",
+      "params": [
+        { "key": "WFDateActionMode", "name": "mode", "label": "Mód", "type": "enum", "options": [ "Current Date", "Specified Date" ] },
+        { "key": "WFDateActionDate", "name": "date", "label": "Dátum", "type": "text" }
+      ]
+    },
+    {
+      "id": "is.workflow.actions.format.date", "name": "Format Date", "dsl": "FormatDate", "output": "Formatted Date",
+      "params": [
+        { "key": "WFDate", "name": "date", "label": "Dátum", "type": "text" },
+        { "key": "WFDateFormatStyle", "name": "dateFormat", "label": "Dátum formátum", "type": "enum", "options": [ "None", "Short", "Medium", "Long", "Relative", "RFC 2822", "ISO 8601", "Custom" ] },
+        { "key": "WFTimeFormatStyle", "name": "timeFormat", "label": "Idő formátum", "type": "enum", "options": [ "None", "Short", "Medium", "Long", "Relative" ] },
+        { "key": "WFDateFormat", "name": "custom", "label": "Egyéni formátum", "type": "text" },
+        { "key": "WFISO8601IncludeTime", "name": "includeTime", "label": "Idővel együtt (ISO)", "type": "bool" }
+      ]
+    },
+    {
+      "id": "is.workflow.actions.adjustdate", "name": "Adjust Date", "dsl": "AdjustDate", "output": "Adjusted Date",
+      "params": [
+        { "key": "WFDate", "name": "date", "label": "Dátum", "type": "text" },
+        { "key": "WFAdjustOperation", "name": "operation", "label": "Művelet", "type": "enum", "options": [ "Add", "Subtract", "Get Start of Minute", "Get Start of Hour", "Get Start of Day", "Get Start of Week", "Get Start of Month", "Get Start of Year" ] },
+        { "key": "WFDuration", "name": "duration", "label": "Időtartam", "type": "raw" }
+      ]
+    },
+    {
+      "id": "is.workflow.actions.gettimebetweendates", "name": "Get Time Between Dates", "dsl": "TimeBetweenDates", "output": "Time Between Dates",
+      "params": [
+        { "key": "WFInput", "name": "date", "label": "Dátum", "type": "text" },
+        { "key": "WFTimeUntilFromDate", "name": "from", "label": "Ettől", "type": "text" },
+        { "key": "WFTimeUntilUnit", "name": "unit", "label": "Egység", "type": "enum", "options": [ "Total Time", "Seconds", "Minutes", "Hours", "Days", "Weeks", "Months", "Years" ] }
+      ]
+    },
+    {
+      "id": "is.workflow.actions.detect.date", "name": "Get Dates from Input", "dsl": "GetDates", "output": "Dates",
+      "params": [ { "key": "WFInput", "name": "input", "label": "Bemenet", "type": "variable" } ]
+    },
+    {
+      "id": "is.workflow.actions.addnewevent", "name": "Add New Event", "dsl": "AddEvent", "output": "New Event",
+      "params": [
+        { "key": "WFCalendarItemTitle", "name": "title", "label": "Cím", "type": "text" },
+        { "key": "WFCalendarItemLocation", "name": "location", "label": "Helyszín", "type": "text" },
+        { "key": "WFCalendarItemStartDate", "name": "start", "label": "Kezdés", "type": "text" },
+        { "key": "WFCalendarItemEndDate", "name": "end", "label": "Befejezés", "type": "text" },
+        { "key": "WFCalendarItemAllDay", "name": "allDay", "label": "Egész napos", "type": "bool" },
+        { "key": "WFCalendarItemNotes", "name": "notes", "label": "Jegyzet", "type": "text" },
+        { "key": "WFCalendarItemCalendar", "name": "calendar", "label": "Naptár", "type": "string" },
+        { "key": "ShowWhenRun", "name": "showWhenRun", "label": "Megjelenítés futáskor", "type": "bool" }
+      ]
+    },
+    {
+      "id": "is.workflow.actions.addnewreminder", "name": "Add New Reminder", "dsl": "AddReminder", "output": "New Reminder",
+      "params": [
+        { "key": "WFCalendarItemTitle", "name": "title", "label": "Cím", "type": "text" },
+        { "key": "WFCalendarItemNotes", "name": "notes", "label": "Jegyzet", "type": "text" },
+        { "key": "WFCalendarItemCalendar", "name": "list", "label": "Lista", "type": "string" },
+        { "key": "WFAlertEnabled", "name": "alert", "label": "Emlékeztető", "type": "enum", "options": [ "No Alert", "Alert" ] },
+        { "key": "WFAlertCustomTime", "name": "alertTime", "label": "Időpont", "type": "text" }
+      ]
+    },
+    {
+      "id": "is.workflow.actions.getupcomingevents", "name": "Get Upcoming Events", "dsl": "GetUpcomingEvents", "output": "Upcoming Events",
+      "params": [
+        { "key": "WFGetUpcomingItemCount", "name": "count", "label": "Darab", "type": "number" },
+        { "key": "WFGetUpcomingItemCalendar", "name": "calendar", "label": "Naptár", "type": "string" }
+      ]
+    },
+    {
+      "id": "is.workflow.actions.getupcomingreminders", "name": "Get Upcoming Reminders", "dsl": "GetUpcomingReminders", "output": "Upcoming Reminders",
+      "params": [
+        { "key": "WFGetUpcomingItemCount", "name": "count", "label": "Darab", "type": "number" },
+        { "key": "WFGetUpcomingItemCalendar", "name": "list", "label": "Lista", "type": "string" }
+      ]
+    },
+    {
+      "id": "is.workflow.actions.timer.start", "name": "Start Timer", "dsl": "StartTimer",
+      "params": [ { "key": "WFDuration", "name": "duration", "label": "Időtartam", "type": "raw" } ]
+    },
+    {
+      "id": "is.workflow.actions.alarm.create", "name": "Create Alarm", "dsl": "CreateAlarm", "output": "Alarm",
+      "params": [
+        { "key": "WFTime", "name": "time", "label": "Idő", "type": "text" },
+        { "key": "WFLabel", "name": "label", "label": "Címke", "type": "text" }
+      ]
+    }
+  ]
+}

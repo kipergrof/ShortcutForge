@@ -1,0 +1,147 @@
+{
+  "category": "Appok és kommunikáció",
+  "actions": [
+    {
+      "id": "is.workflow.actions.openapp", "name": "Open App", "dsl": "OpenApp",
+      "params": [
+        { "key": "WFAppIdentifier", "name": "bundleId", "label": "App azonosító (bundle ID)", "type": "string" },
+        { "key": "WFSelectedApp", "name": "app", "label": "App", "type": "raw" }
+      ]
+    },
+    {
+      "id": "is.workflow.actions.hide.app", "name": "Hide App", "dsl": "HideApp",
+      "params": [ { "key": "WFApp", "name": "app", "label": "App", "type": "raw" } ]
+    },
+    {
+      "id": "is.workflow.actions.quit.app", "name": "Quit App", "dsl": "QuitApp",
+      "params": [ { "key": "WFApp", "name": "app", "label": "App", "type": "raw" } ]
+    },
+    {
+      "id": "is.workflow.actions.sendmessage", "name": "Send Message", "dsl": "SendMessage",
+      "params": [
+        { "key": "WFSendMessageContent", "name": "message", "label": "Üzenet", "type": "text" },
+        { "key": "WFSendMessageActionRecipients", "name": "recipients", "label": "Címzettek", "type": "raw" },
+        { "key": "ShowWhenRun", "name": "showWhenRun", "label": "Megjelenítés futáskor", "type": "bool" }
+      ]
+    },
+    {
+      "id": "is.workflow.actions.sendemail", "name": "Send Email", "dsl": "SendEmail",
+      "params": [
+        { "key": "WFSendEmailActionToRecipients", "name": "to", "label": "Címzett", "type": "raw" },
+        { "key": "WFSendEmailActionSubject", "name": "subject", "label": "Tárgy", "type": "text" },
+        { "key": "WFSendEmailActionInputAttachments", "name": "body", "label": "Szöveg", "type": "text" },
+        { "key": "WFSendEmailActionShowComposeSheet", "name": "showCompose", "label": "Szerkesztő megjelenítése", "type": "bool" }
+      ]
+    },
+    {
+      "id": "com.apple.mobilephone.call", "name": "Call", "dsl": "Call",
+      "params": [ { "key": "WFCallContact", "name": "contact", "label": "Kontakt", "type": "raw" } ]
+    },
+    {
+      "id": "com.apple.facetime.facetime", "name": "FaceTime", "dsl": "FaceTime",
+      "params": [
+        { "key": "WFFaceTimeContact", "name": "contact", "label": "Kontakt", "type": "raw" },
+        { "key": "WFFaceTimeType", "name": "type", "label": "Típus", "type": "enum", "options": [ "Video", "Audio" ] }
+      ]
+    },
+    {
+      "id": "is.workflow.actions.selectcontacts", "name": "Select Contacts", "dsl": "SelectContacts", "output": "Contacts",
+      "params": [ { "key": "WFSelectMultiple", "name": "multiple", "label": "Több", "type": "bool" } ]
+    },
+    {
+      "id": "is.workflow.actions.selectphone", "name": "Select Phone Number", "dsl": "SelectPhoneNumber", "output": "Phone Number"
+    },
+    {
+      "id": "is.workflow.actions.selectemail", "name": "Select Email Address", "dsl": "SelectEmailAddress", "output": "Email Address"
+    },
+    {
+      "id": "is.workflow.actions.phonenumber", "name": "Phone Number", "dsl": "PhoneNumber", "output": "Phone Number",
+      "params": [ { "key": "WFPhoneNumber", "name": "number", "label": "Telefonszám", "type": "text" } ]
+    },
+    {
+      "id": "is.workflow.actions.email", "name": "Email Address", "dsl": "EmailAddress", "output": "Email Address",
+      "params": [ { "key": "WFEmailAddress", "name": "address", "label": "Cím", "type": "text" } ]
+    },
+    {
+      "id": "is.workflow.actions.address", "name": "Street Address", "dsl": "StreetAddress", "output": "Street Address",
+      "params": [
+        { "key": "WFAddressLine1", "name": "line1", "label": "Cím 1", "type": "text" },
+        { "key": "WFAddressLine2", "name": "line2", "label": "Cím 2", "type": "text" },
+        { "key": "WFCity", "name": "city", "label": "Város", "type": "text" },
+        { "key": "WFState", "name": "state", "label": "Megye/állam", "type": "text" },
+        { "key": "WFPostalCode", "name": "postalCode", "label": "Irányítószám", "type": "text" },
+        { "key": "WFCountry", "name": "country", "label": "Ország", "type": "text" }
+      ]
+    },
+    {
+      "id": "is.workflow.actions.addnewcontact", "name": "Add New Contact", "dsl": "AddContact", "output": "New Contact",
+      "params": [
+        { "key": "WFContactFirstName", "name": "firstName", "label": "Keresztnév", "type": "text" },
+        { "key": "WFContactLastName", "name": "lastName", "label": "Vezetéknév", "type": "text" },
+        { "key": "WFContactCompany", "name": "company", "label": "Cég", "type": "text" },
+        { "key": "WFContactNotes", "name": "notes", "label": "Jegyzet", "type": "text" },
+        { "key": "ShowWhenRun", "name": "showWhenRun", "label": "Megjelenítés futáskor", "type": "bool" }
+      ]
+    },
+    {
+      "id": "is.workflow.actions.appendnote", "name": "Append to Note", "dsl": "AppendToNote",
+      "params": [
+        { "key": "WFNote", "name": "note", "label": "Jegyzet", "type": "raw" },
+        { "key": "WFInput", "name": "text", "label": "Szöveg", "type": "text" }
+      ]
+    },
+    {
+      "id": "com.apple.mobilenotes.SharingExtension", "name": "Create Note", "dsl": "CreateNote",
+      "params": [
+        { "key": "WFCreateNoteInput", "name": "body", "label": "Szöveg", "type": "text" },
+        { "key": "ShowWhenRun", "name": "showWhenRun", "label": "Megjelenítés futáskor", "type": "bool" }
+      ]
+    },
+    {
+      "id": "is.workflow.actions.shownote", "name": "Show Note", "dsl": "ShowNote",
+      "params": [ { "key": "WFInput", "name": "note", "label": "Jegyzet", "type": "variable" } ]
+    },
+    {
+      "id": "is.workflow.actions.homeaccessory", "name": "Control Home", "dsl": "ControlHome",
+      "params": [
+        { "key": "WFHomeName", "name": "home", "label": "Otthon", "type": "string" },
+        { "key": "WFHomeSceneName", "name": "scene", "label": "Jelenet", "type": "string" }
+      ]
+    },
+    {
+      "id": "is.workflow.actions.runsshscript", "name": "Run Script over SSH", "dsl": "RunSSH", "output": "Shell Script Result",
+      "params": [
+        { "key": "WFSSHHost", "name": "host", "label": "Hoszt", "type": "text" },
+        { "key": "WFSSHPort", "name": "port", "label": "Port", "type": "text" },
+        { "key": "WFSSHUser", "name": "user", "label": "Felhasználó", "type": "text" },
+        { "key": "WFSSHAuthenticationType", "name": "auth", "label": "Hitelesítés", "type": "enum", "options": [ "Password", "SSH Key" ] },
+        { "key": "WFSSHPassword", "name": "password", "label": "Jelszó", "type": "text" },
+        { "key": "WFSSHScript", "name": "script", "label": "Szkript", "type": "text" },
+        { "key": "WFInput", "name": "input", "label": "Bemenet", "type": "variable" }
+      ]
+    },
+    {
+      "id": "is.workflow.actions.runshellscript", "name": "Run Shell Script", "dsl": "RunShellScript", "output": "Shell Script Result", "macOnly": true,
+      "params": [
+        { "key": "Script", "name": "script", "label": "Szkript", "type": "text" },
+        { "key": "Shell", "name": "shell", "label": "Shell", "type": "enum", "options": [ "zsh", "bash", "sh", "csh", "ksh", "tcsh", "python3", "ruby", "perl" ] },
+        { "key": "Input", "name": "input", "label": "Bemenet", "type": "variable" },
+        { "key": "InputMode", "name": "inputMode", "label": "Bemenet mód", "type": "enum", "options": [ "to stdin", "as arguments" ] }
+      ]
+    },
+    {
+      "id": "is.workflow.actions.runapplescript", "name": "Run AppleScript", "dsl": "RunAppleScript", "output": "AppleScript Result", "macOnly": true,
+      "params": [
+        { "key": "Script", "name": "script", "label": "Szkript", "type": "text" },
+        { "key": "Input", "name": "input", "label": "Bemenet", "type": "variable" }
+      ]
+    },
+    {
+      "id": "is.workflow.actions.runjavascriptforautomation", "name": "Run JavaScript for Mac Automation", "dsl": "RunJXA", "output": "JavaScript Result", "macOnly": true,
+      "params": [
+        { "key": "Script", "name": "script", "label": "Szkript", "type": "text" },
+        { "key": "Input", "name": "input", "label": "Bemenet", "type": "variable" }
+      ]
+    }
+  ]
+}

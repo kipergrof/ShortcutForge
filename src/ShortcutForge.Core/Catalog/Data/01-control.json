@@ -1,0 +1,96 @@
+{
+  "category": "Vezérlés",
+  "actions": [
+    {
+      "id": "is.workflow.actions.conditional", "name": "If", "dsl": "If", "control": "if", "output": "If Result",
+      "description": "Feltételtől függően futtat akciókat (Ha / Egyébként / Ha vége).", "descriptionEn": "Runs actions depending on a condition (If / Otherwise / End If).",
+      "params": [
+        { "key": "WFInput", "name": "input", "label": "Bemenet", "type": "raw" },
+        { "key": "WFCondition", "name": "condition", "label": "Feltétel", "type": "integer" },
+        { "key": "WFConditionalActionString", "name": "text", "label": "Szöveg", "type": "text" },
+        { "key": "WFNumberValue", "name": "number", "label": "Szám", "type": "number" }
+      ]
+    },
+    {
+      "id": "is.workflow.actions.repeat.count", "name": "Repeat", "dsl": "Repeat", "control": "repeat", "output": "Repeat Results",
+      "description": "A benne lévő akciókat adott számszor ismétli.", "descriptionEn": "Repeats the contained actions a given number of times.",
+      "params": [ { "key": "WFRepeatCount", "name": "count", "label": "Ismétlésszám", "type": "number" } ]
+    },
+    {
+      "id": "is.workflow.actions.repeat.each", "name": "Repeat with Each", "dsl": "RepeatEach", "control": "repeatEach", "output": "Repeat Results",
+      "description": "Egy lista minden elemére lefuttatja a benne lévő akciókat.", "descriptionEn": "Runs the contained actions for every item of a list.",
+      "params": [ { "key": "WFInput", "name": "input", "label": "Lista", "type": "variable" } ]
+    },
+    {
+      "id": "is.workflow.actions.choosefrommenu", "name": "Choose from Menu", "dsl": "Menu", "control": "menu", "output": "Menu Result",
+      "description": "Menüt jelenít meg, és a választott ág akcióit futtatja.", "descriptionEn": "Shows a menu and runs the actions of the chosen item.",
+      "params": [
+        { "key": "WFMenuPrompt", "name": "prompt", "label": "Kérdés", "type": "text" },
+        { "key": "WFMenuItems", "name": "items", "label": "Menüpontok", "type": "raw" }
+      ]
+    },
+    {
+      "id": "is.workflow.actions.comment", "name": "Comment", "dsl": "Comment",
+      "description": "Megjegyzés, nem csinál semmit.", "descriptionEn": "A comment; does nothing.",
+      "params": [ { "key": "WFCommentActionText", "name": "text", "label": "Megjegyzés", "type": "string" } ]
+    },
+    { "id": "is.workflow.actions.nothing", "name": "Nothing", "dsl": "Nothing", "description": "Kiüríti az aktuális bemenetet.", "descriptionEn": "Clears the current input." },
+    { "id": "is.workflow.actions.exit", "name": "Stop This Shortcut", "dsl": "Stop", "description": "Leállítja a parancsot.", "descriptionEn": "Stops the shortcut.",
+      "params": [ { "key": "WFResult", "name": "result", "label": "Eredmény", "type": "variable" } ] },
+    {
+      "id": "is.workflow.actions.output", "name": "Stop and Output", "dsl": "Output",
+      "description": "Leállítja a parancsot és visszaadja a kimenetet.", "descriptionEn": "Stops the shortcut and returns the output.",
+      "params": [
+        { "key": "WFOutput", "name": "output", "label": "Kimenet", "type": "text" },
+        { "key": "WFNoOutputSurfaceBehavior", "name": "ifNowhere", "label": "Ha nincs hová", "type": "enum", "options": [ "Do Nothing", "Copy to Clipboard", "Respond" ] }
+      ]
+    },
+    {
+      "id": "is.workflow.actions.delay", "name": "Wait", "dsl": "Wait", "description": "Vár a megadott másodpercig.", "descriptionEn": "Waits for the given number of seconds.",
+      "params": [ { "key": "WFDelayTime", "name": "seconds", "label": "Másodperc", "type": "number" } ]
+    },
+    { "id": "is.workflow.actions.waittoreturn", "name": "Wait to Return", "dsl": "WaitToReturn", "description": "Megvárja, amíg visszatérsz a Parancsokba.", "descriptionEn": "Waits until you return to Shortcuts." },
+    {
+      "id": "is.workflow.actions.runworkflow", "name": "Run Shortcut", "dsl": "RunShortcut", "output": "Shortcut Result",
+      "description": "Egy másik parancsot futtat.", "descriptionEn": "Runs another shortcut.",
+      "params": [
+        { "key": "WFWorkflowName", "name": "name", "label": "Parancs neve", "type": "string" },
+        { "key": "WFWorkflow", "name": "workflow", "label": "Parancs hivatkozás", "type": "raw" },
+        { "key": "WFInput", "name": "input", "label": "Bemenet", "type": "variable" },
+        { "key": "WFShowWorkflow", "name": "show", "label": "Megjelenítés futás közben", "type": "bool" }
+      ]
+    },
+    { "id": "is.workflow.actions.getmyworkflows", "name": "Get My Shortcuts", "dsl": "GetMyShortcuts", "output": "My Shortcuts", "description": "Visszaadja a parancsaidat.", "descriptionEn": "Returns your shortcuts." },
+    {
+      "id": "is.workflow.actions.openworkflow", "name": "Open Shortcut", "dsl": "OpenShortcut", "description": "Megnyit egy parancsot szerkesztésre.", "descriptionEn": "Opens a shortcut for editing.",
+      "params": [ { "key": "workflow", "name": "workflow", "label": "Parancs", "type": "raw" } ]
+    },
+    {
+      "id": "is.workflow.actions.handoff", "name": "Continue in Shortcuts App", "dsl": "ContinueInApp", "description": "A Parancsok appban folytatja.", "descriptionEn": "Continues in the Shortcuts app."
+    },
+    {
+      "id": "is.workflow.actions.getitemtype", "name": "Get Type", "dsl": "GetType", "output": "Type",
+      "description": "Visszaadja a bemenet típusát.", "descriptionEn": "Returns the type of the input.",
+      "params": [ { "key": "WFInput", "name": "input", "label": "Bemenet", "type": "variable" } ]
+    },
+    {
+      "id": "is.workflow.actions.getitemname", "name": "Get Name", "dsl": "GetName", "output": "Name",
+      "description": "Visszaadja az elem nevét.", "descriptionEn": "Returns the name of the item.",
+      "params": [ { "key": "WFInput", "name": "input", "label": "Bemenet", "type": "variable" } ]
+    },
+    {
+      "id": "is.workflow.actions.setitemname", "name": "Set Name", "dsl": "SetName", "output": "Renamed Item",
+      "description": "Átnevez egy elemet.", "descriptionEn": "Renames an item.",
+      "params": [
+        { "key": "WFInput", "name": "input", "label": "Bemenet", "type": "variable" },
+        { "key": "WFName", "name": "name", "label": "Név", "type": "text" },
+        { "key": "WFDontIncludeFileExtension", "name": "noExtension", "label": "Kiterjesztés nélkül", "type": "bool" }
+      ]
+    },
+    {
+      "id": "is.workflow.actions.viewresult", "name": "View Content Graph", "dsl": "ViewContentGraph",
+      "description": "A bemenet tartalomgráfját mutatja.", "descriptionEn": "Shows the content graph of the input.",
+      "params": [ { "key": "WFInput", "name": "input", "label": "Bemenet", "type": "variable" } ]
+    }
+  ]
+}
