@@ -17,6 +17,9 @@
         <KeyBinding Key="E" Modifiers="Control" Command="{Binding ExportCommand}" />
         <KeyBinding Key="E" Modifiers="Control+Shift" Command="{Binding SendToIPhoneCommand}" />
         <KeyBinding Key="F1" Command="{x:Static vm:AppCommands.Help}" />
+        <KeyBinding Key="K" Modifiers="Control" Command="{x:Static vm:AppCommands.Palette}" />
+        <KeyBinding Key="P" Modifiers="Control+Shift" Command="{x:Static vm:AppCommands.Palette}" />
+
         <KeyBinding Key="H" Modifiers="Control" Command="{Binding ToggleFindPanelCommand}" />
         <KeyBinding Key="F" Modifiers="Control" Command="{x:Static vm:AppCommands.FocusSearch}" />
     </Window.InputBindings>
@@ -303,6 +306,8 @@
                 <MenuItem Header="{l:T 'Mozgatás _le', 'Move d_own'}" InputGestureText="Alt+↓" Command="{Binding MoveDownCommand}" />
             </MenuItem>
             <MenuItem Header="{l:T '_Nézet', '_View'}">
+                <MenuItem Header="{l:T '_Parancspaletta…', 'Command _palette…'}" InputGestureText="Ctrl+K" Command="{x:Static vm:AppCommands.Palette}" />
+                <Separator />
                 <MenuItem Header="{l:T 'Összes kártya össze_csukása', '_Collapse all cards'}" Command="{Binding CollapseAllCommand}" CommandParameter="true" />
                 <MenuItem Header="{l:T 'Összes kártya _kinyitása', '_Expand all cards'}" Command="{Binding CollapseAllCommand}" CommandParameter="false" />
                 <MenuItem Header="{l:T 'Keresés az akciók között', 'Search actions'}" InputGestureText="Ctrl+F" Click="FocusSearch_Click" />

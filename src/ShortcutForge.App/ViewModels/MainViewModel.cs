@@ -1280,6 +1280,58 @@ public sealed partial class MainViewModel : ObservableObject
         }
     }
 
+    // ------------------------------------------------------------------ command palette
+
+    /// <summary>Everything the command palette (Ctrl+K) offers: commands, templates and all actions.</summary>
+    public IReadOnlyList<PaletteItem> BuildPaletteItems()
+    {
+        var file = L.T("Fájl", "File");
+        var edit = L.T("Szerkesztés", "Edit");
+        var view = L.T("Nézet", "View");
+        var template = L.T("Sablon", "Template");
+        var add = L.T("Akció hozzáadása", "Add action");
+
+        void Run(System.Windows.Input.ICommand command, object? parameter = null)
+        {
+            if (command.CanExecute(parameter)) command.Execute(parameter);
+        }
+
+        var items = new List<PaletteItem>
+        {
+            new(L.T("Új parancs", "New shortcut"), file, "", () => Run(NewCommand), "new uj", "Ctrl+N"),
+            new(L.T("Megnyitás…", "Open…"), file, "", () => Run(OpenCommand), "open megnyitas", "Ctrl+O"),
+            new(L.T("Mentés", "Save"), file, "", () => Run(SaveFileCommand), "save mentes", "Ctrl+S"),
+            new(L.T("Mentés másként…", "Save as…"), file, "", () => Run(SaveFileAsCommand), "save as", "Ctrl+Shift+S"),
+            new(L.T("Exportálás .shortcut fájlba…", "Export to .shortcut file…"), file, "", () => Run(ExportCommand), "export sign alairas", "Ctrl+E"),
+            new(L.T("Exportálás iPhone-ra (Shortcut Source Helper)…", "Export for iPhone (Shortcut Source Helper)…"), file, "", () => Run(ExportForIPhoneCommand), "iphone plist"),
+            new(L.T("Importálás iCloud linkről…", "Import from iCloud link…"), file, "", () => Run(ImportICloudCommand), "icloud import link"),
+            new(L.T("Plist XML másolása a vágólapra", "Copy plist XML to clipboard"), file, "", () => Run(CopyPlistXmlCommand), "xml plist copy"),
+            new(L.T("Visszavonás", "Undo"), edit, "", () => Run(UndoCommand), "undo", "Ctrl+Z"),
+            new(L.T("Mégis", "Redo"), edit, "", () => Run(RedoCommand), "redo", "Ctrl+Y"),
+            new(L.T("Kijelölt kártya duplikálása", "Duplicate selected card"), edit, "", () => Run(DuplicateCardCommand), "duplicate copy", "Ctrl+D"),
+            new(L.T("Kijelölt kártya törlése", "Delete selected card"), edit, "", () => Run(DeleteCardCommand), "delete remove torles", "Del"),
+            new(L.T("Kijelölt kártya fel", "Move selected card up"), edit, "", () => Run(MoveUpCommand), "move up", "Alt+↑"),
+            new(L.T("Kijelölt kártya le", "Move selected card down"), edit, "", () => Run(MoveDownCommand), "move down", "Alt+↓"),
+            new(L.T("Összes kártya összecsukása", "Collapse all cards"), view, "", () => Run(CollapseAllCommand, "true"), "collapse"),
+            new(L.T("Összes kártya kinyitása", "Expand all cards"), view, "", () => Run(CollapseAllCommand, "false"), "expand"),
+            new(L.T("Téma: világos", "Theme: light"), view, "", () => Run(SetThemeCommand, "Light"), "theme light vilagos"),
+            new(L.T("Téma: sötét", "Theme: dark"), view, "", () => Run(SetThemeCommand, "Dark"), "theme dark sotet"),
+            new(L.T("Téma: a rendszer szerint", "Theme: follow system"), view, "", () => Run(SetThemeCommand, "System"), "theme system rendszer"),
+            new("Nyelv: magyar / Language: Hungarian", view, "", () => Run(SetLanguageCommand, "hu"), "language nyelv magyar hungarian"),
+            new("Language: English / Nyelv: angol", view, "", () => Run(SetLanguageCommand, "en"), "language nyelv english angol"),
+            new(L.T("Beállítások (aláírás)…", "Settings (signing)…"), L.T("Eszközök", "Tools"), "", () => Run(OpenSettingsCommand), "settings signing shortcuty mac ssh"),
+        };
+
+        items.AddRange(ShortcutTemplates.All.Select(t =>
+            new PaletteItem($"{template}: {t.Name}", file, "", () => Run(NewFromTemplateCommand, t), "template sablon new")));
+
+        items.AddRange(ActionCatalog.Default.Actions.Select(a =>
+            new PaletteItem($"{add}: {a.Name}", a.DisplayCategory, CategoryStyle.GlyphOf(a), () => AddAction(a),
+                $"{a.Dsl} {a.Category} {a.DisplayDescription}")));
+
+        return items;
+    }
+
     [RelayCommand]
     private void CopyPlistXml()
     {
