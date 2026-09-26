@@ -25,9 +25,10 @@ shortcuts sign --mode anyone --input parancs.shortcut --output alairt.shortcut
 
 Lehetőségek:
 
-1. **Ingyen, Mac nélkül (iPhone-on):** *Fájl › Exportálás iPhone-ra*. Ez egy `Név.plist` fájlt ment. Ezt a telefonon a RoutineHub ingyenes [Shortcut Source Helper](https://routinehub.co/shortcut/10060/) parancsával kell megnyitni, amely távoli aláírással (Remote Sign) aláírja és importálja. Az alkalmazás lépésről lépésre végigvezet rajta.
-2. **Mac SSH-n:** az *Eszközök › Beállítások* menüben megadható egy Mac (saját vagy bérelt felhős), és az alkalmazás exportáláskor automatikusan aláír vele. A Macen be kell kapcsolni a *Távoli bejelentkezést*, a „Bárki” módhoz pedig iCloud-fiók kell.
-3. **Aláíró szerver:** egy [shortcut-signing-server](https://github.com/scaxyz/shortcut-signing-server) kompatibilis URL, például saját Macen futtatva. A parancs tartalma erre a szerverre kerül.
+1. **Ingyen, online, Mac nélkül – Shortcuty (ajánlott):** az *Eszközök › Beállítások* menüben válaszd az „Ingyenes online aláírás – Shortcuty” módot. Az első exportnál az app egyszer rá is kérdez. Innentől az *Exportálás .shortcut* azonnal aláírt fájlt ment, ami AirDroppal vagy iCloud Drive-on át rögtön importálható. Ehhez a [Shortcuty nyilvános aláíró API-ját](https://github.com/Shortcuty/Signing-Server-API-Documentation) használja, „bárki” módban, API-kulcs nélkül. Figyelem: a parancs teljes tartalma a Shortcuty szerverére kerül.
+2. **Ingyen, Mac nélkül (iPhone-on):** *Fájl › Exportálás iPhone-ra*. Ez egy `Név.plist` fájlt ment. Ezt a telefonon a RoutineHub ingyenes [Shortcut Source Helper](https://routinehub.co/shortcut/10060/) parancsával kell megnyitni, amely távoli aláírással (Remote Sign) aláírja és importálja. Az alkalmazás lépésről lépésre végigvezet rajta.
+3. **Mac SSH-n:** az *Eszközök › Beállítások* menüben megadható egy Mac (saját vagy bérelt felhős), és az alkalmazás exportáláskor automatikusan aláír vele. A Macen be kell kapcsolni a *Távoli bejelentkezést*, a „Bárki” módhoz pedig iCloud-fiók kell.
+4. **Aláíró szerver:** egy [shortcut-signing-server](https://github.com/scaxyz/shortcut-signing-server) kompatibilis URL, például saját Macen futtatva. A parancs tartalma erre a szerverre kerül.
 
 A RoutineHub HubSign szolgáltatása csak engedélyezett klienseket fogad, ezért közvetlenül nem használható. Az alkalmazás nem álcázza magát más kliensnek.
 

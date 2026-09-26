@@ -27,13 +27,14 @@ public class MainViewModelTests : IDisposable
     private sealed class FakeDialogs : IDialogService
     {
         public string? NextSavePath;
+        public bool ConfirmAnswer = true;
         public string? NextOpenPath;
         public readonly List<string> Messages = [];
 
         public string? OpenFile(string filter) => NextOpenPath;
         public string? SaveFile(string filter, string fileName) => NextSavePath;
         public string? Prompt(string title, string message, string initial = "") => null;
-        public bool Confirm(string title, string message) { Messages.Add(message); return true; }
+        public bool Confirm(string title, string message) { Messages.Add(message); return ConfirmAnswer; }
         public bool? AskYesNoCancel(string title, string message) => false;
         public void Info(string title, string message) => Messages.Add(message);
         public void Error(string title, string message) => Messages.Add("ERROR: " + message);
@@ -278,7 +279,17 @@ public class MainViewModelTests : IDisposable
         Sta(() =>
         {
             dialogs!.NextSavePath = exportPath;
+            // Decline the one-time online signing offer: tests must not call the network.
+            dialogs.ConfirmAnswer = false;
             vm!.ExportCommand.ExecuteAsync(null).GetAwaiter().GetResult();
+            Assert.Equal(SignerKind.Unsigned, vm.Settings.Signer);
+            Assert.True(vm.Settings.ShortcutyOfferShown);
+            Assert.Contains(dialogs.Messages, m => m.Contains("Shortcuty"));
+
+            // Not asked again.
+            var asked = dialogs.Messages.Count(m => m.Contains("Shortcuty"));
+            vm.ExportCommand.ExecuteAsync(null).GetAwaiter().GetResult();
+            Assert.Equal(asked, dialogs.Messages.Count(m => m.Contains("Shortcuty online")));
         });
         Assert.True(File.Exists(exportPath));
         Assert.Contains(dialogs!.Messages, m => m.Contains("shortcuts sign"));

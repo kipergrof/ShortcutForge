@@ -11,6 +11,7 @@ public enum SignerKind
     Unsigned,
     MacSsh,
     RemoteServer,
+    Shortcuty,
 }
 
 /// <summary>User settings, stored in %APPDATA%\ShortcutForge\settings.json. The password is DPAPI-encrypted.</summary>
@@ -27,6 +28,9 @@ public sealed class AppSettings
 
     /// <summary>URL of a shortcut-signing-server compatible service (SignerKind.RemoteServer).</summary>
     public string RemoteServerUrl { get; set; } = "";
+
+    /// <summary>The one-time "sign for free with Shortcuty?" question was already asked.</summary>
+    public bool ShortcutyOfferShown { get; set; }
 
     public string MacHost { get; set; } = "";
     public int MacPort { get; set; } = 22;
@@ -104,6 +108,7 @@ public sealed class AppSettings
             Password = MacPassword,
             PrivateKeyPath = MacKeyPath,
         }),
+        SignerKind.Shortcuty => new ShortcutySigner(),
         SignerKind.RemoteServer => new RemoteSigner(
             ShortcutForge.Core.Localization.L.T($"Aláíró szerver ({RemoteServerUrl})", $"Signing server ({RemoteServerUrl})"), RemoteServerUrl),
         _ => new UnsignedExporter(),

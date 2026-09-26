@@ -10,6 +10,10 @@
         <TextBlock TextWrapping="Wrap" Foreground="{DynamicResource MutedText}" Margin="0,4,0,8"
                    Text="{l:T 'iOS 15 óta az iPhone, iPad és Mac csak Apple által aláírt .shortcut fájlt importál. Aláírni csak macOS-en lehet (shortcuts sign). Ha van elérhető Maced (saját vagy bérelt felhős Mac), az alkalmazás SSH-n keresztül aláírja a fájlt.', 'Since iOS 15, iPhone, iPad and Mac only import .shortcut files signed by Apple. Signing is only possible on macOS (shortcuts sign). If you have access to a Mac (your own or a rented cloud Mac), the app signs the file over SSH.'}" />
 
+        <RadioButton x:Name="ShortcutyRadio" GroupName="Signer" Margin="0,4" FontWeight="SemiBold"
+                     Content="{l:T 'Ingyenes online aláírás – Shortcuty (ajánlott, Mac nem kell)', 'Free online signing – Shortcuty (recommended, no Mac needed)'}" />
+        <TextBlock Margin="28,0,0,6" TextWrapping="Wrap" Foreground="{DynamicResource MutedText}" FontSize="11"
+                   Text="{l:T 'A sign.shortcuty.app nyilvános API-ja írja alá („bárki” módban). A parancs teljes tartalma a Shortcuty szerverére kerül, ezért jelszót, API-kulcsot vagy személyes adatot tartalmazó parancsot ne írass alá így.', 'Signed by the public sign.shortcuty.app API (anyone mode). The full shortcut is sent to Shortcuty, so do not sign shortcuts containing passwords, API keys or personal data this way.'}" />
         <RadioButton x:Name="UnsignedRadio" GroupName="Signer" Margin="0,4" Content="{l:T 'Aláírás nélküli export (később Macen aláírandó)', 'Unsigned export (sign later on a Mac)'}" />
         <RadioButton x:Name="ServerRadio" GroupName="Signer" Margin="0,4"
                      Content="{l:T 'Aláíró szerver (shortcut-signing-server kompatibilis URL)', 'Signing server (shortcut-signing-server compatible URL)'}" />

@@ -897,6 +897,21 @@ public sealed partial class MainViewModel : ObservableObject
                 return;
             }
 
+            // One-time offer of free online signing, so nothing is sent anywhere without consent.
+            if (Settings.Signer == SignerKind.Unsigned && !Settings.ShortcutyOfferShown)
+            {
+                Settings.ShortcutyOfferShown = true;
+                if (_dialogs.Confirm(L.T("Ingyenes aláírás", "Free signing"),
+                        L.T("Az iPhone csak aláírt parancsot importál. Aláírassam most ingyen a Shortcuty online szolgáltatással?\n\n" +
+                            "A parancs tartalma a Shortcuty szerverére kerül (jelszót, személyes adatot ne küldj így). " +
+                            "Később az Eszközök › Beállítások menüben módosítható.",
+                            "iPhone only imports signed shortcuts. Sign it now for free with the Shortcuty online service?\n\n" +
+                            "The shortcut's content is sent to Shortcuty's server (don't send passwords or personal data this way). " +
+                            "You can change this later in Tools › Settings.")))
+                    Settings.Signer = SignerKind.Shortcuty;
+                Settings.Save();
+            }
+
             var signer = Settings.CreateSigner();
             Status = L.T($"Exportálás: {signer.DisplayName}…", $"Exporting: {signer.DisplayName}…");
             var bytes = await signer.SignAsync(ShortcutDocument.UnsignedBytes(Current), Settings.SigningMode, Current.Name);
@@ -916,8 +931,8 @@ public sealed partial class MainViewModel : ObservableObject
                     L.T("Aláírás Macen (Terminál):\n", "To sign on a Mac (Terminal):\n") +
                     L.T($"  shortcuts sign --mode anyone --input \"{Path.GetFileName(path)}\" --output \"alairt.shortcut\"\n\n", $"  shortcuts sign --mode anyone --input \"{Path.GetFileName(path)}\" --output \"signed.shortcut\"\n\n") +
                     L.T("Vagy állíts be Mac-es aláírást SSH-n keresztül: Eszközök › Beállítások.\n\n", "Or set up signing on a Mac over SSH: Tools › Settings.\n\n") +
-                    L.T("Mac nélkül, ingyen: Fájl › Exportálás iPhone-ra (Shortcut Source Helper).",
-                        "Without a Mac, for free: File › Export for iPhone (Shortcut Source Helper)."));
+                    L.T("Mac nélkül, ingyen: Eszközök › Beállítások › „Ingyenes online aláírás – Shortcuty”, vagy Fájl › Exportálás iPhone-ra.",
+                        "Without a Mac, for free: Tools › Settings › \"Free online signing – Shortcuty\", or File › Export for iPhone."));
             }
         }
         catch (SigningException ex)
