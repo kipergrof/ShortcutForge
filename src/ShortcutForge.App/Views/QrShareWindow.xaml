@@ -11,6 +11,14 @@
                        Text="{l:T 'Figyelem: a fájl nincs aláírva, ezért az iPhone nem fogja importálni. Kapcsold be az ingyenes online aláírást: Eszközök › Beállítások › Shortcuty.', 'Note: the file is not signed, so the iPhone will not import it. Turn on free online signing: Tools › Settings › Shortcuty.'}" />
         </Border>
 
+        <Border x:Name="FirewallWarning" Background="{DynamicResource WarningBg}" CornerRadius="6" Padding="10,6" Margin="0,0,0,12" Visibility="Collapsed">
+            <DockPanel>
+                <Button x:Name="FirewallAllowButton" DockPanel.Dock="Right" Style="{StaticResource ToolButton}" VerticalAlignment="Center"
+                        Margin="10,0,0,0" Click="AllowFirewall_Click" Content="{l:T 'Engedélyezés', 'Allow'}" />
+                <TextBlock x:Name="FirewallWarningText" TextWrapping="Wrap" VerticalAlignment="Center" />
+            </DockPanel>
+        </Border>
+
         <DockPanel>
             <Border DockPanel.Dock="Left" Background="White" CornerRadius="10" Padding="10" Margin="0,0,16,0">
                 <Image x:Name="QrImage" Width="220" Height="220" RenderOptions.BitmapScalingMode="NearestNeighbor" />
