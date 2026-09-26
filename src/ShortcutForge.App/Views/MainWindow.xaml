@@ -15,6 +15,7 @@
         <KeyBinding Key="S" Modifiers="Control" Command="{Binding SaveFileCommand}" />
         <KeyBinding Key="S" Modifiers="Control+Shift" Command="{Binding SaveFileAsCommand}" />
         <KeyBinding Key="E" Modifiers="Control" Command="{Binding ExportCommand}" />
+        <KeyBinding Key="F5" Command="{Binding DryRunCommand}" />
         <KeyBinding Key="F1" Command="{x:Static vm:AppCommands.Help}" />
         <KeyBinding Key="F" Modifiers="Control" Command="{x:Static vm:AppCommands.FocusSearch}" />
     </Window.InputBindings>
@@ -317,6 +318,8 @@
                 </MenuItem>
             </MenuItem>
             <MenuItem Header="{l:T '_Eszközök', '_Tools'}">
+                <MenuItem Header="{l:T '_Próbafuttatás…', '_Dry run…'}" InputGestureText="F5" Command="{Binding DryRunCommand}" />
+                <Separator />
                 <MenuItem Header="{l:T '_Beállítások (aláírás)…', '_Settings (signing)…'}" Command="{Binding OpenSettingsCommand}" />
                 <MenuItem Header="{l:T 'Plist _XML másolása a vágólapra', 'Copy plist _XML to clipboard'}" Command="{Binding CopyPlistXmlCommand}" />
             </MenuItem>
@@ -348,7 +351,10 @@
                             Content="{l:T '🌐 English', '🌐 Magyar'}" ToolTip="{l:T 'Nyelv váltása', 'Switch language'}" />
                 </StackPanel>
                 <Button DockPanel.Dock="Right" HorizontalAlignment="Right" Style="{StaticResource PrimaryButton}"
-                        Command="{Binding ExportCommand}" Content="{l:T '⇪ Exportálás .shortcut', '⇪ Export .shortcut'}" ToolTip="Ctrl+E" />
+                        Command="{Binding ExportCommand}" Margin="6,0,0,0" Content="{l:T '⇪ Exportálás .shortcut', '⇪ Export .shortcut'}" ToolTip="Ctrl+E" />
+                <Button DockPanel.Dock="Right" HorizontalAlignment="Right" Style="{StaticResource ToolButton}"
+                        Command="{Binding DryRunCommand}" Content="{l:T '▶ Próbafuttatás', '▶ Dry run'}"
+                        ToolTip="{l:T 'A parancs lépésenkénti futtatása Windowson (F5)', 'Run the shortcut step by step on Windows (F5)'}" />
             </DockPanel>
         </Border>
 

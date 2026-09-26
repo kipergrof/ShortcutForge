@@ -12,6 +12,7 @@ Apple Parancsok (Shortcuts) készítése és szerkesztése **Windowson**.
 - **Megnyitás / import**: `.shortcut` (aláírt és aláíratlan), bináris és XML plist, iCloud megosztási link.
 - **Export**: `.shortcut` fájl, **ingyenes online aláírással** (Shortcuty), saját Macen SSH-n keresztül vagy aláíró szerverrel.
 - **Sablonok** (*Fájl › Új sablonból*): üdvözlés, JSON API lekérés, gyors menü, listafeldolgozás, akkumulátor-figyelő, megosztási lapos link-megnyitó.
+- **Próbafuttatás** (*Eszközök › Próbafuttatás*, F5): a parancs lépésenként lefut Windowson, és minden akciónál látszik az eredmény. A szöveg, a számok, a változók, a listák, a szótárak, a dátumok és a Ha / Ismétlés / Menü blokkok valóban lefutnak, a kérdések és a menük ablakként jelennek meg. Az iPhone-hoz kötött hatások csak megjelennek, az eszközt igénylő akciók kimaradnak. Fájl, hálózat és a valódi vágólap érintetlen marad.
 - **Kényelem**: kategóriaikonok, összecsukható kártyák (egyenként vagy *Nézet › Összes kártya összecsukása*), vezetővonalak a beágyazott blokkoknál, Ctrl+F keresés (Enter: az első találat hozzáadása), összecsukható `{ }` blokkok a szöveges nézetben.
 - **Sötét / világos téma** (a Windows beállítását követi), **magyar / angol** felület.
 

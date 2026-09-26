@@ -27,6 +27,9 @@ public interface IDialogService
     void Info(string title, string message);
     void Error(string title, string message);
     bool EditSettings(AppSettings settings);
+
+    /// <summary>Shows the dry-run window for the shortcut.</summary>
+    void ShowDryRun(Shortcut shortcut);
 }
 
 public sealed partial class MainViewModel : ObservableObject
@@ -739,6 +742,18 @@ public sealed partial class MainViewModel : ObservableObject
     {
         if (ApplyDslIfNeeded()) Status = L.T("Szöveg alkalmazva.", "Text applied.");
         else Status = L.T("A szövegben hiba van: ", "The text has an error: ") + DslError;
+    }
+
+    /// <summary>Tools › Dry run (F5): runs the shortcut step by step on Windows.</summary>
+    [RelayCommand]
+    private void DryRun()
+    {
+        if (!ApplyDslIfNeeded())
+        {
+            Status = L.T("A szövegben hiba van: ", "The text has an error: ") + DslError;
+            return;
+        }
+        _dialogs.ShowDryRun(Current);
     }
 
     [RelayCommand]

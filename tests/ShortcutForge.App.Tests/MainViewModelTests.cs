@@ -39,6 +39,8 @@ public class MainViewModelTests : IDisposable
         public void Info(string title, string message) => Messages.Add(message);
         public void Error(string title, string message) => Messages.Add("ERROR: " + message);
         public bool EditSettings(AppSettings settings) => false;
+        public Shortcut? DryRunShortcut;
+        public void ShowDryRun(Shortcut shortcut) => DryRunShortcut = shortcut;
     }
 
     /// <summary>WPF objects need an STA thread.</summary>
@@ -57,6 +59,15 @@ public class MainViewModelTests : IDisposable
     }
 
     private static ActionDefinition Def(string dsl) => ActionCatalog.Default.ByDslName(dsl)!;
+
+    [Fact]
+    public void Dry_run_gets_the_current_shortcut() => Sta(() =>
+    {
+        var dialogs = new FakeDialogs();
+        var vm = new MainViewModel(dialogs);
+        vm.DryRunCommand.Execute(null);
+        Assert.Same(vm.Current, dialogs.DryRunShortcut);
+    });
 
     [Fact]
     public void Starts_with_example_and_valid_structure() => Sta(() =>
