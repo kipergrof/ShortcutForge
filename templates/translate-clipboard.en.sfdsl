@@ -1,0 +1,7 @@
+#name "Translate to Hungarian"
+#icon color=blue glyph=59511
+
+clip = GetClipboard()
+translated = TranslateText(clip, to: "hu")
+ShowResult(translated)
+CopyToClipboard(translated)

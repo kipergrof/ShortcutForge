@@ -1,0 +1,7 @@
+#name "Döntsd el helyettem"
+#icon color=teal glyph=59511
+
+options = AskForInput(prompt: "Lehetőségek, soronként egy:", type: "Text", multiline: true)
+lines = SplitText(options, separator: "New Lines")
+pick = GetItemFromList(lines, which: "Random Item")
+Alert("A választás: {pick}", title: "🎲")

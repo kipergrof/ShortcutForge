@@ -1,0 +1,165 @@
+{
+  "version": 1,
+  "templates": [
+    {
+      "id": "pomodoro",
+      "category": "productivity",
+      "name": {
+        "hu": "Pomodoro időzítő",
+        "en": "Pomodoro timer"
+      },
+      "description": {
+        "hu": "25 perc munka, aztán értesítés a szünetről.",
+        "en": "25 minutes of work, then a break notification."
+      },
+      "files": {
+        "hu": "pomodoro.hu.sfdsl",
+        "en": "pomodoro.en.sfdsl"
+      }
+    },
+    {
+      "id": "clipboard-note",
+      "category": "productivity",
+      "name": {
+        "hu": "Vágólap jegyzetbe",
+        "en": "Clipboard to notes file"
+      },
+      "description": {
+        "hu": "A vágólap tartalmát dátummal egy szövegfájl végére írja.",
+        "en": "Appends the clipboard to a text file with the date."
+      },
+      "files": {
+        "hu": "clipboard-note.hu.sfdsl",
+        "en": "clipboard-note.en.sfdsl"
+      }
+    },
+    {
+      "id": "translate-clipboard",
+      "category": "text",
+      "name": {
+        "hu": "Vágólap fordítása",
+        "en": "Translate clipboard"
+      },
+      "description": {
+        "hu": "Lefordítja a vágólapot angolra, megmutatja és visszamásolja.",
+        "en": "Translates the clipboard to Hungarian, shows it and copies it back."
+      },
+      "files": {
+        "hu": "translate-clipboard.hu.sfdsl",
+        "en": "translate-clipboard.en.sfdsl"
+      }
+    },
+    {
+      "id": "resize-photos",
+      "category": "photos",
+      "name": {
+        "hu": "Fotók átméretezése",
+        "en": "Resize photos"
+      },
+      "description": {
+        "hu": "Kiválasztott fotókat 1280 pont szélesre kicsinyít és elmenti őket.",
+        "en": "Shrinks the selected photos to 1280 wide and saves them."
+      },
+      "files": {
+        "hu": "resize-photos.hu.sfdsl",
+        "en": "resize-photos.en.sfdsl"
+      }
+    },
+    {
+      "id": "random-picker",
+      "category": "fun",
+      "name": {
+        "hu": "Véletlen választó",
+        "en": "Random picker"
+      },
+      "description": {
+        "hu": "Beírt lehetőségek közül véletlenszerűen választ egyet.",
+        "en": "Picks one of the options you type in at random."
+      },
+      "files": {
+        "hu": "random-picker.hu.sfdsl",
+        "en": "random-picker.en.sfdsl"
+      }
+    },
+    {
+      "id": "dice",
+      "category": "fun",
+      "name": {
+        "hu": "Dobókocka",
+        "en": "Roll a die"
+      },
+      "description": {
+        "hu": "Dob egy hatoldalú kockával és felolvassa az eredményt.",
+        "en": "Rolls a six-sided die and reads out the result."
+      },
+      "files": {
+        "hu": "dice.hu.sfdsl",
+        "en": "dice.en.sfdsl"
+      }
+    },
+    {
+      "id": "qr-clipboard",
+      "category": "utilities",
+      "name": {
+        "hu": "QR-kód a vágólapról",
+        "en": "QR code from clipboard"
+      },
+      "description": {
+        "hu": "A vágólap szövegéből (pl. link) QR-kódot készít és megmutatja.",
+        "en": "Makes a QR code from the clipboard (e.g. a link) and shows it."
+      },
+      "files": {
+        "hu": "qr-clipboard.hu.sfdsl",
+        "en": "qr-clipboard.en.sfdsl"
+      }
+    },
+    {
+      "id": "word-count",
+      "category": "text",
+      "name": {
+        "hu": "Szószámláló",
+        "en": "Word count"
+      },
+      "description": {
+        "hu": "Megszámolja a vágólapon lévő szöveg szavait és karaktereit.",
+        "en": "Counts the words and characters of the text on the clipboard."
+      },
+      "files": {
+        "hu": "word-count.hu.sfdsl",
+        "en": "word-count.en.sfdsl"
+      }
+    },
+    {
+      "id": "night-mode",
+      "category": "utilities",
+      "name": {
+        "hu": "Éjszakai mód",
+        "en": "Night mode"
+      },
+      "description": {
+        "hu": "Sötét megjelenés, halk hang és alacsony fényerő egy koppintással.",
+        "en": "Dark appearance, low volume and dim screen in one tap."
+      },
+      "files": {
+        "hu": "night-mode.hu.sfdsl",
+        "en": "night-mode.en.sfdsl"
+      }
+    },
+    {
+      "id": "search-selection",
+      "category": "share-sheet",
+      "name": {
+        "hu": "Keresés a kijelölt szövegre",
+        "en": "Search selected text"
+      },
+      "description": {
+        "hu": "Megosztási lapról: a kijelölt szövegre rákeres a weben.",
+        "en": "From the share sheet: searches the web for the selected text."
+      },
+      "files": {
+        "hu": "search-selection.hu.sfdsl",
+        "en": "search-selection.en.sfdsl"
+      }
+    }
+  ]
+}

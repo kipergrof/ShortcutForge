@@ -1,0 +1,9 @@
+#name "Fotók kicsinyítése"
+#icon color=purple glyph=59511
+
+photos = SelectPhotos(multiple: true)
+foreach photos {
+    small = ResizeImage(RepeatItem, width: "1280", by: "Size")
+    SaveToPhotos(small)
+}
+Notification("A kicsinyített fotók elmentve.", title: "Fotók")
