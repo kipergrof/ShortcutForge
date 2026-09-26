@@ -1,24 +1,11 @@
 # Changelog
 
-All notable changes to ShortcutForge are listed here.
-Versions follow [Semantic Versioning](https://semver.org/): MAJOR.MINOR.PATCH.
+All notable changes to ShortcutForge. Versions follow [Semantic Versioning](https://semver.org/) (MAJOR.MINOR.PATCH).
 
-## Releasing a new version
+New entries are written automatically by the *Release* workflow (GitHub › Actions › Release › Run workflow)
+from the commit messages since the previous release — no manual editing needed.
 
-1. Update `<Version>` in `Directory.Build.props` (e.g. `1.1.0`).
-2. Add a section for it below.
-3. Commit, then tag and push:
-   ```
-   git tag v1.1.0
-   git push origin main v1.1.0
-   ```
-   The *Release* workflow checks that the tag matches `Directory.Build.props`, runs the tests,
-   builds `ShortcutForge-1.1.0-win-x64.exe` and publishes the GitHub release.
-
-## [Unreleased]
-
-- CI: build and test on every push; automated releases from version tags
-- Issue templates for bug reports and feature requests
+<!-- releases -->
 
 ## [1.0.0] – 2026-09-26
 

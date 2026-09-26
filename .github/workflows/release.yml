@@ -1,19 +1,33 @@
 name: Release
 
-# Push a tag like v1.1.0 (matching <Version> in Directory.Build.props) to build the
-# single-file exe and attach it to a GitHub release.
+# Fully automatic release. In GitHub: Actions › Release › Run workflow, pick the bump:
+#   patch = bug fixes (1.0.0 → 1.0.1), minor = new features (1.0.1 → 1.1.0), major = breaking (→ 2.0.0)
+# The workflow bumps <Version> in Directory.Build.props, writes the CHANGELOG entry from the
+# commit messages since the last release, commits, tags, runs the tests, builds the single-file
+# exe and publishes the GitHub release.
 on:
-  push:
-    tags: ['v*']
+  workflow_dispatch:
+    inputs:
+      bump:
+        description: Version bump
+        type: choice
+        options: [patch, minor, major]
+        default: patch
 
 permissions:
   contents: write
+
+concurrency:
+  group: release
+  cancel-in-progress: false
 
 jobs:
   release:
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # full history and tags for the changelog
 
       - uses: actions/setup-dotnet@v4
         with:
@@ -21,38 +35,71 @@ jobs:
             8.0.x
             10.0.x
 
-      - name: Check that the tag matches Directory.Build.props
+      - name: Bump version and write changelog
+        id: version
         shell: pwsh
         run: |
-          $tagVersion = "${{ github.ref_name }}".TrimStart('v')
-          $propsVersion = ([xml](Get-Content Directory.Build.props)).Project.PropertyGroup.Version
-          if ($tagVersion -ne $propsVersion) {
-            Write-Error "Tag ${{ github.ref_name }} does not match <Version>$propsVersion</Version> in Directory.Build.props."
-            exit 1
+          $utf8 = New-Object System.Text.UTF8Encoding($false)
+          $root = (Get-Location).Path
+          $props = Join-Path $root 'Directory.Build.props'
+          $changelogPath = Join-Path $root 'CHANGELOG.md'
+          $text = [IO.File]::ReadAllText($props, $utf8)
+          $current = [version]([regex]::Match($text, '<Version>([^<]+)</Version>').Groups[1].Value)
+          $next = switch ('${{ inputs.bump }}') {
+            'major' { [version]::new($current.Major + 1, 0, 0) }
+            'minor' { [version]::new($current.Major, $current.Minor + 1, 0) }
+            default { [version]::new($current.Major, $current.Minor, $current.Build + 1) }
           }
+          $version = "$($next.Major).$($next.Minor).$($next.Build)"
+          if (git tag -l "v$version") { throw "Tag v$version already exists." }
+          $text = $text -replace '<Version>[^<]+</Version>', "<Version>$version</Version>"
+          [IO.File]::WriteAllText($props, $text, $utf8)
+
+          # Changelog entry from the commit subjects since the previous release tag.
+          $lastTag = git describe --tags --abbrev=0 2>$null
+          $range = if ($lastTag) { "$lastTag..HEAD" } else { 'HEAD' }
+          $subjects = git log $range --no-merges --format='%s' |
+            Where-Object { $_ -and $_ -notmatch '^Release v\d' }
+          if (-not $subjects) { $subjects = @('Maintenance release') }
+          $bullets = ($subjects | ForEach-Object { "- $_" }) -join "`n"
+          $dash = [char]0x2013
+          $entry = "## [$version] $dash $(Get-Date -Format 'yyyy-MM-dd')`n`n$bullets"
+          $marker = '<!-- releases -->'
+          $changelog = [IO.File]::ReadAllText($changelogPath, $utf8).Replace($marker, "$marker`n`n$entry")
+          [IO.File]::WriteAllText($changelogPath, $changelog, $utf8)
+
+          [IO.File]::WriteAllText((Join-Path $root 'release-notes.md'), $bullets, $utf8)
+          "version=$version" >> $env:GITHUB_OUTPUT
+          Write-Host "Releasing $version (was $current)"
 
       - name: Test
         run: dotnet test -c Release
 
-      - name: Publish single-file exe
+      - name: Commit, tag and push
         shell: pwsh
         run: |
-          $version = "${{ github.ref_name }}".TrimStart('v')
+          # Committed under the repository owner's public noreply identity.
+          git config user.name "Krisztián Szilvágyi"
+          git config user.email "25442201+kipergrof@users.noreply.github.com"
+          git add Directory.Build.props CHANGELOG.md
+          git commit -m "Release v${{ steps.version.outputs.version }}"
+          git tag "v${{ steps.version.outputs.version }}"
+          git push origin HEAD:main "v${{ steps.version.outputs.version }}"
+
+      - name: Build the single-file exe
+        shell: pwsh
+        run: |
+          $v = '${{ steps.version.outputs.version }}'
           dotnet publish src/ShortcutForge.App -c Release -r win-x64 --self-contained `
             -p:PublishSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true `
-            -p:EnableCompressionInSingleFile=true -p:Version=$version -o publish
-          Copy-Item publish/ShortcutForge.App.exe "ShortcutForge-$version-win-x64.exe"
+            -p:EnableCompressionInSingleFile=true -o publish
+          Copy-Item publish/ShortcutForge.App.exe "ShortcutForge-$v-win-x64.exe"
 
-      - name: Create or update the release
+      - name: Publish the GitHub release
         shell: pwsh
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          $version = "${{ github.ref_name }}".TrimStart('v')
-          $asset = "ShortcutForge-$version-win-x64.exe"
-          gh release view "${{ github.ref_name }}" *> $null
-          if ($LASTEXITCODE -eq 0) {
-            gh release upload "${{ github.ref_name }}" $asset --clobber
-          } else {
-            gh release create "${{ github.ref_name }}" $asset --title "ShortcutForge $version" --generate-notes
-          }
+          $v = '${{ steps.version.outputs.version }}'
+          $notes = (Get-Content release-notes.md -Raw) + "`n`n**Download:** ShortcutForge-$v-win-x64.exe runs on Windows 10/11 x64 without installing .NET. SmartScreen may warn because the file is not code-signed (More info › Run anyway)."
+          gh release create "v$v" "ShortcutForge-$v-win-x64.exe" --title "ShortcutForge $v" --notes $notes
