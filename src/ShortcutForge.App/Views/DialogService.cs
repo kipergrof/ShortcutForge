@@ -42,6 +42,9 @@ public sealed class DialogService(Window owner) : IDialogService
     public void Error(string title, string message) =>
         MessageBox.Show(owner, message, title, MessageBoxButton.OK, MessageBoxImage.Error);
 
+    public void ShowShare(byte[] data, string fileName, bool isSigned) =>
+        new QrShareWindow(data, fileName, isSigned) { Owner = owner }.ShowDialog();
+
     public bool EditSettings(AppSettings settings) =>
         new SettingsWindow(settings) { Owner = owner }.ShowDialog() == true;
 }

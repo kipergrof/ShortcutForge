@@ -1,0 +1,43 @@
+<Window Icon="/Assets/app.ico" x:Class="ShortcutForge.App.Views.QrShareWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:l="clr-namespace:ShortcutForge.App.Services"
+        Title="{l:T 'Küldés iPhone-ra', 'Send to iPhone'}" Width="560" SizeToContent="Height" ResizeMode="NoResize"
+        WindowStartupLocation="CenterOwner" ShowInTaskbar="False"
+        Background="{DynamicResource WindowBg}" Foreground="{DynamicResource TextFg}" FontFamily="Segoe UI" FontSize="13">
+    <StackPanel Margin="18">
+        <Border x:Name="UnsignedWarning" Background="{DynamicResource WarningBg}" CornerRadius="6" Padding="10,6" Margin="0,0,0,12" Visibility="Collapsed">
+            <TextBlock TextWrapping="Wrap"
+                       Text="{l:T 'Figyelem: a fájl nincs aláírva, ezért az iPhone nem fogja importálni. Kapcsold be az ingyenes online aláírást: Eszközök › Beállítások › Shortcuty.', 'Note: the file is not signed, so the iPhone will not import it. Turn on free online signing: Tools › Settings › Shortcuty.'}" />
+        </Border>
+
+        <DockPanel>
+            <Border DockPanel.Dock="Left" Background="White" CornerRadius="10" Padding="10" Margin="0,0,16,0">
+                <Image x:Name="QrImage" Width="220" Height="220" RenderOptions.BitmapScalingMode="NearestNeighbor" />
+            </Border>
+            <StackPanel>
+                <TextBlock Text="{l:T 'Olvasd be az iPhone kamerájával', 'Scan with the iPhone camera'}" FontWeight="SemiBold" FontSize="15" TextWrapping="Wrap" />
+                <TextBlock TextWrapping="Wrap" Margin="0,8,0,0" Foreground="{DynamicResource MutedText}" LineHeight="20"
+                           Text="{l:T '1. Az iPhone legyen ugyanazon a Wi-Fi-n, mint ez a gép.&#10;2. Nyisd meg a Kamerát, és koppints a megjelenő linkre.&#10;3. Safariban: Letöltés.&#10;4. Nyisd meg a letöltött fájlt (Safari ↓ vagy Fájlok app) – a Parancsok importálja.', '1. The iPhone must be on the same Wi-Fi as this PC.&#10;2. Open the Camera and tap the link that appears.&#10;3. In Safari: Download.&#10;4. Open the downloaded file (Safari ↓ or Files app) – Shortcuts imports it.'}" />
+            </StackPanel>
+        </DockPanel>
+
+        <TextBlock Text="{l:T 'Cím:', 'Address:'}" Margin="0,14,0,4" Foreground="{DynamicResource MutedText}" />
+        <DockPanel>
+            <Button DockPanel.Dock="Right" Style="{StaticResource ToolButton}" Click="Copy_Click" Content="{l:T 'Másolás', 'Copy'}" />
+            <TextBox x:Name="UrlBox" IsReadOnly="True" FontFamily="Consolas" />
+        </DockPanel>
+        <DockPanel Margin="0,6,0,0" x:Name="AddressPanel">
+            <TextBlock Text="{l:T 'Hálózat:', 'Network:'}" VerticalAlignment="Center" Margin="0,0,8,0" Foreground="{DynamicResource MutedText}" />
+            <ComboBox x:Name="AddressBox" HorizontalAlignment="Stretch" SelectionChanged="AddressBox_SelectionChanged"
+                      ToolTip="{l:T 'Ha az iPhone nem éri el, válassz másik hálózati címet', 'If the iPhone cannot reach it, pick another network address'}" />
+        </DockPanel>
+
+        <TextBlock x:Name="StatusText" Margin="0,12,0,0" TextWrapping="Wrap" FontWeight="SemiBold" />
+        <TextBlock TextWrapping="Wrap" Margin="0,6,0,0" FontSize="11" Foreground="{DynamicResource MutedText}"
+                   Text="{l:T 'A fájl csak ezen a helyi hálózaton, egy véletlenszerű címen érhető el, amíg ez az ablak nyitva van. Ha a Windows tűzfal rákérdez, engedélyezd a magánhálózaton.', 'The file is only available on this local network, at a random address, while this window is open. If Windows Firewall asks, allow it on private networks.'}" />
+
+        <Button Style="{StaticResource PrimaryButton}" HorizontalAlignment="Right" Margin="0,14,0,0" MinWidth="110" IsCancel="True" IsDefault="True"
+                Click="Close_Click" Content="{l:T 'Kész', 'Done'}" />
+    </StackPanel>
+</Window>
