@@ -7,6 +7,17 @@ from the commit messages since the previous release — no manual editing needed
 
 <!-- releases -->
 
+## [1.1.0] – 2026-09-26
+
+- Dry run: run a shortcut step by step on Windows (#10)
+- Generate a shortcut from a plain-language description with Claude (#8)
+- Online template gallery with 10 new templates (#7)
+- Command palette (Ctrl+K) (#6)
+- Find and replace (#5)
+- winget package (#4)
+- Check for updates on GitHub (#3)
+- Send to iPhone with a QR code (#2)
+
 ## [1.0.0] – 2026-09-26
 
 First public release.
