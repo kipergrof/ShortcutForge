@@ -66,7 +66,7 @@ public sealed class ShortcutySigner(HttpClient? httpClient = null, string baseUr
         form.Add(file, "file", FileName(shortcutName));
 
         using var request = new HttpRequestMessage(HttpMethod.Post, baseUrl.TrimEnd('/') + "/api/v1/sign?response=json") { Content = form };
-        request.Headers.UserAgent.ParseAdd("ShortcutForge/1.0");
+        request.Headers.UserAgent.ParseAdd(ShortcutForge.Core.AppInfo.UserAgent);
         request.Headers.Accept.ParseAdd("application/json");
         using var response = await client.SendAsync(request, cancellationToken);
         return (response.StatusCode, await response.Content.ReadAsStringAsync(cancellationToken));

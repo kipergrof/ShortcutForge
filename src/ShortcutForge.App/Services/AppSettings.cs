@@ -19,9 +19,8 @@ public sealed class AppSettings
 {
     public AppTheme Theme { get; set; } = AppTheme.System;
 
-    /// <summary>UI language: "hu" or "en" (default: Hungarian on Hungarian Windows, otherwise English).</summary>
-    public string Language { get; set; } =
-        System.Globalization.CultureInfo.CurrentUICulture.TwoLetterISOLanguageName == "hu" ? "hu" : "en";
+    /// <summary>UI language: "en" (default) or "hu".</summary>
+    public string Language { get; set; } = "en";
 
     public SignerKind Signer { get; set; } = SignerKind.Unsigned;
     public SigningMode SigningMode { get; set; } = SigningMode.Anyone;

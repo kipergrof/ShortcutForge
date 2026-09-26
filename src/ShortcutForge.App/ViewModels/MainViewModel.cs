@@ -302,6 +302,8 @@ public sealed partial class MainViewModel : ObservableObject
 
     [ObservableProperty] private string? _structureWarning;
 
+    public string VersionText => $"v{ShortcutForge.Core.AppInfo.Version}";
+
     public string ActionCountText => L.T($"{Current.Actions.Count} akció", $"{Current.Actions.Count} actions");
 
     private void RefreshScope()

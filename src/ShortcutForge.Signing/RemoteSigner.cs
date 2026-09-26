@@ -36,7 +36,7 @@ public sealed class RemoteSigner(string displayName, string url, HttpClient? htt
             {
                 Content = JsonContent.Create(new { shortcutName = string.IsNullOrWhiteSpace(shortcutName) ? "Shortcut" : shortcutName, shortcut = xml }),
             };
-            request.Headers.UserAgent.ParseAdd("ShortcutForge/1.0");
+            request.Headers.UserAgent.ParseAdd(ShortcutForge.Core.AppInfo.UserAgent);
 
             using var response = await client.SendAsync(request, cancellationToken);
             var body = await response.Content.ReadAsByteArrayAsync(cancellationToken);

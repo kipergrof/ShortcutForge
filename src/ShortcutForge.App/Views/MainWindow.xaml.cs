@@ -79,10 +79,10 @@ public partial class MainWindow : Window
 
     private void About_Click(object sender, RoutedEventArgs e) =>
         MessageBox.Show(this,
-            L.T("ShortcutForge\nApple Parancsok (Shortcuts) készítése Windowson.\n\n" +
+            L.T($"ShortcutForge {ShortcutForge.Core.AppInfo.Version}\nApple Parancsok (Shortcuts) készítése Windowson.\n{ShortcutForge.Core.AppInfo.RepositoryUrl}\n\n" +
                 $"Akciókatalógus: {ActionCatalog.Default.Actions.Count} beépített akció; bármely más akció (külső appok) " +
                 "általános blokként szerkeszthető.\n\nA .shortcut fájlokat iOS 15 óta alá kell írni (Macen: shortcuts sign).",
-                "ShortcutForge\nCreate Apple Shortcuts on Windows.\n\n" +
+                $"ShortcutForge {ShortcutForge.Core.AppInfo.Version}\nCreate Apple Shortcuts on Windows.\n{ShortcutForge.Core.AppInfo.RepositoryUrl}\n\n" +
                 $"Action catalog: {ActionCatalog.Default.Actions.Count} built-in actions; any other action (third-party apps) " +
                 "can be edited as a generic block.\n\nSince iOS 15, .shortcut files must be signed (on a Mac: shortcuts sign)."),
             L.T("Névjegy", "About"), MessageBoxButton.OK, MessageBoxImage.Information);

@@ -588,6 +588,7 @@
         <!-- Status bar -->
         <Border Grid.Row="3" Background="{DynamicResource PanelBg}" BorderBrush="{DynamicResource CardBorder}" BorderThickness="0,1,0,0" Padding="10,4">
             <DockPanel>
+                <TextBlock DockPanel.Dock="Right" Text="{Binding VersionText}" Foreground="{DynamicResource MutedText}" Margin="12,0,0,0" />
                 <TextBlock DockPanel.Dock="Right" Text="{Binding ActionCountText}" Foreground="{DynamicResource MutedText}" />
                 <ProgressBar DockPanel.Dock="Right" Width="100" Height="10" Margin="0,0,12,0" IsIndeterminate="True"
                              Visibility="{Binding IsBusy, Converter={StaticResource BoolToVis}}" />

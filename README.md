@@ -1,101 +1,102 @@
-# ShortcutForge
+<p align="center">
+  <img src="src/ShortcutForge.App/Assets/app-256.png" width="96" alt="ShortcutForge icon" />
+</p>
 
-Apple Parancsok (Shortcuts) készítése és szerkesztése **Windowson**.
-*Create and edit Apple Shortcuts on Windows — English summary at the end.*
+<h1 align="center">ShortcutForge</h1>
 
-## Mit tud?
-
-- **Vizuális szerkesztő**: akciókártyák a Parancsok apphoz hasonlóan, húzással rendezhetők. Vannak benne blokkok (Ha / Egyébként, Ismétlés, Menü), változóválasztó, feltételszerkesztő és visszavonás.
-- **Változók részletei**: mint a Parancsok appban, a változó lekérhető típusként (`.as(Number)`), kérhető a tulajdonsága (`.get("File Size")`) vagy szótár-kulcsa (`["név"]`). A kimenetek átnevezhetők.
-- **Szöveges nézet (DSL)**: ugyanaz a parancs programkódként. Van benne szintaxiskiemelés, automatikus kiegészítés (Ctrl+Szóköz) és hibajelzés a hiba helyén. Fülváltáskor a két nézet szinkronizálódik.
-- **194 beépített akció** kategóriákba rendezve. Bármely más akció, például külső appok App Intentjei, általános blokként szerkeszthető, így importáláskor semmi sem vész el.
-- **Megnyitás / import**: `.shortcut` (aláírt és aláíratlan), bináris és XML plist, iCloud megosztási link.
-- **Export**: `.shortcut` fájl, opcionálisan **Macen, SSH-n keresztül automatikusan aláírva** (`shortcuts sign`).
-- **Sablonok** (*Fájl › Új sablonból*): üdvözlés, JSON API lekérés, gyors menü, listafeldolgozás, akkumulátor-figyelő, megosztási lapos link-megnyitó.
-- **Kényelem**: kategóriaikonok, összecsukható kártyák (egyenként vagy *Nézet › Összes kártya összecsukása*), vezetővonalak a beágyazott blokkoknál, Ctrl+F keresés (Enter: az első találat hozzáadása), összecsukható `{ }` blokkok a szöveges nézetben.
-- **Sötét / világos téma** (a Windows beállítását követi), **magyar / angol** felület.
-
-## Aláírás – fontos
-
-iOS 15 óta iPhone-ra, iPadre és Macre csak **Apple által aláírt** parancs importálható. Aláírni csak macOS-en lehet:
-
-```
-shortcuts sign --mode anyone --input parancs.shortcut --output alairt.shortcut
-```
-
-Lehetőségek:
-
-1. **Ingyen, online, Mac nélkül – Shortcuty (ajánlott):** az *Eszközök › Beállítások* menüben válaszd az „Ingyenes online aláírás – Shortcuty” módot. Az első exportnál az app egyszer rá is kérdez. Innentől az *Exportálás .shortcut* azonnal aláírt fájlt ment, ami AirDroppal vagy iCloud Drive-on át rögtön importálható. Ehhez a [Shortcuty nyilvános aláíró API-ját](https://github.com/Shortcuty/Signing-Server-API-Documentation) használja, „bárki” módban, API-kulcs nélkül. Figyelem: a parancs teljes tartalma a Shortcuty szerverére kerül.
-2. **Ingyen, Mac nélkül (iPhone-on):** *Fájl › Exportálás iPhone-ra*. Ez egy `Név.plist` fájlt ment. Ezt a telefonon a RoutineHub ingyenes [Shortcut Source Helper](https://routinehub.co/shortcut/10060/) parancsával kell megnyitni, amely távoli aláírással (Remote Sign) aláírja és importálja. Az alkalmazás lépésről lépésre végigvezet rajta.
-3. **Mac SSH-n:** az *Eszközök › Beállítások* menüben megadható egy Mac (saját vagy bérelt felhős), és az alkalmazás exportáláskor automatikusan aláír vele. A Macen be kell kapcsolni a *Távoli bejelentkezést*, a „Bárki” módhoz pedig iCloud-fiók kell.
-4. **Aláíró szerver:** egy [shortcut-signing-server](https://github.com/scaxyz/shortcut-signing-server) kompatibilis URL, például saját Macen futtatva. A parancs tartalma erre a szerverre kerül.
-
-A RoutineHub HubSign szolgáltatása csak engedélyezett klienseket fogad, ezért közvetlenül nem használható. Az alkalmazás nem álcázza magát más kliensnek.
-
-## A szöveges nyelv röviden
-
-```
-#name "Reggeli"
-#icon color=blue glyph=59511
-
-greeting = Text("Jó reggelt, {ShortcutInput}!")
-if greeting contains "reggel" {
-    Notification(greeting, title: "Hello")
-} else {
-    Alert("Nincs reggel")
-}
-fruits = List(["alma", "körte"])
-foreach fruits {
-    ShowResult(RepeatItem)
-}
-action "com.example.app.SomeIntent" (Param: "érték")
-
-data = GetContentsOfUrl("https://example.com/api")
-Alert(data.as(Dictionary)["name"])      // típus + szótár kulcs
-```
-
-A teljes leírás az alkalmazásban található: *Súgó › Szöveges nyelv (DSL) súgó*, vagy F1.
-
-## Fordítás és futtatás
-
-Szükséges: .NET 10 SDK (a könyvtárak .NET 8-at céloznak, az alkalmazás .NET 10-et a Fluent sötét téma miatt).
-
-```
-dotnet build
-dotnet test
-dotnet run --project src/ShortcutForge.App
-```
-
-## Felépítés
-
-| Projekt | Tartalom |
-|---|---|
-| `ShortcutForge.Core` | Modell, plist olvasás/írás, akciókatalógus (`Catalog/Data/*.json`), import (aláírt AEA fájlok, LZFSE, iCloud), lokalizáció |
-| `ShortcutForge.Dsl` | Lexer, parser, pretty-printer – veszteségmentes oda-vissza alakítás |
-| `ShortcutForge.Signing` | `ISigner`: aláíratlan export és Mac SSH aláírás |
-| `ShortcutForge.App` | WPF felület (MVVM, AvalonEdit) |
-| `tests/*` | xUnit tesztek (plist és DSL oda-vissza alakítás, LZFSE referencia-vektorok, ViewModel) |
-
-Új akció felvétele: egy bejegyzés a megfelelő `src/ShortcutForge.Core/Catalog/Data/*.json` fájlba (azonosító, név, DSL név, paraméterek).
-
-## Ismert korlátok
-
-- Az aláírt fájlok importja szintetikus tesztfájllal van ellenőrizve. Valódi, iPhone-ról exportált fájlon még érdemes kipróbálni.
-- Az iCloud-link import az iCloud nem hivatalos API-ját használja.
-- Az ikonnál csak a glyph száma adható meg, a szimbólum nem jelenik meg.
-- A DSL-ben adott változónevek (`x = …`) nem tárolódnak a parancsban. Visszaolvasáskor a kimenet nevéből képzett név (pl. `text`) jelenik meg.
+<p align="center">Create and edit Apple Shortcuts on <b>Windows</b>.<br/>
+<a href="README.hu.md">Magyar leírás</a></p>
 
 ---
 
-## English summary
+ShortcutForge is a Windows desktop app for building shortcuts for Apple's Shortcuts app (iPhone, iPad, Mac). You can build them visually with action cards, much like in the Shortcuts app, or write them as code. You can also open existing `.shortcut` files, edit them and export signed files that import straight onto your devices.
 
-ShortcutForge is a Windows desktop app (WPF, .NET) for building Apple Shortcuts:
+## Features
 
-- a visual card-based editor, including the tapped-variable options (get as type, property, dictionary key) and renaming outputs;
-- a text language (DSL) kept in sync with the visual editor;
-- 194 built-in actions, plus generic support for any other action;
-- import of signed and unsigned `.shortcut` files, plists and iCloud links;
-- export to `.shortcut`, with optional automatic signing on a Mac over SSH;
-- light/dark theme and a Hungarian/English UI (*View* menu).
+- **Visual editor**: action cards like in the Shortcuts app. They support drag and drop, blocks (If / Otherwise, Repeat, Repeat with Each, Choose from Menu), a condition editor, collapsible cards, and undo / redo.
+- **Variables like on the iPhone**: pick any action's output or a named variable. Get it as a type (`.as(Number)`), read a property (`.get("File Size")`) or a dictionary key (`["name"]`), and rename outputs.
+- **Text view (DSL)**: the same shortcut as code, with syntax highlighting, completion (Ctrl+Space), folding and inline error markers. It stays in sync with the visual editor.
+- **194 built-in actions** in categories. Any other action (including third-party App Intents) is kept and editable as a generic block, so nothing is lost when you import a shortcut.
+- **Open / import**: signed and unsigned `.shortcut` files, binary and XML plists, iCloud share links.
+- **Export**: `.shortcut` files, **signed for free online** (Shortcuty), on your own Mac over SSH, or by a signing server.
+- **Templates** (*File › New from template*): greeting, JSON API call, quick menu, list processing, battery watcher, open-in-Reader share sheet action.
+- **Light / dark theme** (follows Windows), **English / Hungarian** UI (*View* menu).
 
-Since iOS 15, shortcuts must be signed on macOS (`shortcuts sign`) before they can be imported on a device.
+## Signing — important
+
+Since iOS 15, iPhone, iPad and Mac only import shortcuts **signed by Apple**, and signing is only possible on macOS (`shortcuts sign`). ShortcutForge offers several ways around this:
+
+1. **Free, online, no Mac: Shortcuty (recommended).** In *Tools › Settings* choose "Free online signing – Shortcuty". The app also offers this once, the first time you export. After that, *Export .shortcut* saves a signed file that you can import right away via AirDrop, iCloud Drive or email. It uses the public [Shortcuty signing API](https://github.com/Shortcuty/Signing-Server-API-Documentation) ("anyone" mode, no API key). The full shortcut is sent to Shortcuty's server, so do not sign shortcuts containing passwords, API keys or personal data this way.
+2. **Free, on the iPhone:** *File › Export for iPhone* saves `Name.plist`. Open it on the phone with the free [Shortcut Source Helper](https://routinehub.co/shortcut/10060/) shortcut (RoutineHub), which signs it remotely and imports it. The app walks you through the steps.
+3. **Your Mac over SSH:** enter a Mac (your own or a rented cloud Mac) in *Tools › Settings*, and the app signs on export automatically. This needs Remote Login enabled on the Mac, and iCloud sign-in for "anyone" mode.
+4. **Signing server:** any [shortcut-signing-server](https://github.com/scaxyz/shortcut-signing-server) compatible URL, for example one running on your own Mac.
+
+## The text language at a glance
+
+```
+#name "Good morning"
+#icon color=blue glyph=59511
+
+greeting = Text("Good morning, {ShortcutInput}!")
+if greeting contains "morning" {
+    Notification(greeting, title: "Hello")
+} else {
+    Alert("Not morning")
+}
+fruits = List(["apple", "pear"])
+foreach fruits {
+    ShowResult(RepeatItem)
+}
+action "com.example.app.SomeIntent" (Param: "value")
+
+data = GetContentsOfUrl("https://example.com/api")
+Alert(data.as(Dictionary)["name"])      // type + dictionary key
+```
+
+The full reference is in the app: *Help › Text language (DSL) help*, or F1.
+
+## Download and run
+
+Build from source (requires the [.NET 10 SDK](https://dotnet.microsoft.com/download)):
+
+```
+git clone https://github.com/kipergrof/ShortcutForge.git
+cd ShortcutForge
+dotnet run --project src/ShortcutForge.App
+```
+
+To make a single self-contained `.exe` that runs without .NET installed:
+
+```
+dotnet publish src/ShortcutForge.App -c Release -r win-x64 --self-contained -p:PublishSingleFile=true -o publish
+```
+
+## Project structure
+
+| Project | Contents |
+|---|---|
+| `ShortcutForge.Core` | Model, lossless plist reading/writing, action catalog (`Catalog/Data/*.json`), import (signed AEA files, LZFSE, Apple Archive, iCloud), localization |
+| `ShortcutForge.Dsl` | Lexer, parser and pretty-printer with verified lossless round trips |
+| `ShortcutForge.Signing` | `ISigner`: unsigned export, Shortcuty, Mac over SSH, signing server |
+| `ShortcutForge.App` | WPF app (MVVM, CommunityToolkit.Mvvm, AvalonEdit, Fluent theme) |
+| `tests/*` | xUnit tests: plist and DSL round trips, LZFSE reference vectors, a real Apple-signed file, view models, signers |
+
+```
+dotnet test
+```
+
+**Adding an action:** add an entry to the matching `src/ShortcutForge.Core/Catalog/Data/*.json` file with its identifier, name, DSL name and parameters.
+
+The version number is set in `Directory.Build.props`.
+
+## Known limitations
+
+- iCloud link import uses iCloud's unofficial web API.
+- Icons are chosen by SF Symbol glyph number; the symbol itself is not previewed.
+- Variable names written in the DSL (`x = …`) are not stored in the shortcut. When the shortcut is read back, names are derived from the output name (e.g. `text`).
+
+## License
+
+[MIT](LICENSE). Third-party notices: [THIRD-PARTY-NOTICES.md](THIRD-PARTY-NOTICES.md).
+
+ShortcutForge is not affiliated with Apple. Apple, iPhone, iPad, Mac and Shortcuts are trademarks of Apple Inc.

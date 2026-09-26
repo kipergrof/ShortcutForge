@@ -1,3 +1,7 @@
+// Port of the LZFSE / LZVN decoder from https://github.com/lzfse/lzfse.
+// Copyright (c) 2015-2016, Apple Inc. All rights reserved.
+// Redistributed under the BSD 3-Clause license; see THIRD-PARTY-NOTICES.md for the full text.
+
 using System.Buffers.Binary;
 using System.Numerics;
 using ShortcutForge.Core.Localization;
