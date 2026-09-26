@@ -284,12 +284,12 @@ public class MainViewModelTests : IDisposable
             vm!.ExportCommand.ExecuteAsync(null).GetAwaiter().GetResult();
             Assert.Equal(SignerKind.Unsigned, vm.Settings.Signer);
             Assert.True(vm.Settings.ShortcutyOfferShown);
-            Assert.Contains(dialogs.Messages, m => m.Contains("Shortcuty"));
+            static bool IsOffer(string m) => m.Contains("Aláírassam most ingyen");
+            Assert.Single(dialogs.Messages, IsOffer);
 
             // Not asked again.
-            var asked = dialogs.Messages.Count(m => m.Contains("Shortcuty"));
             vm.ExportCommand.ExecuteAsync(null).GetAwaiter().GetResult();
-            Assert.Equal(asked, dialogs.Messages.Count(m => m.Contains("Shortcuty online")));
+            Assert.Single(dialogs.Messages, IsOffer);
         });
         Assert.True(File.Exists(exportPath));
         Assert.Contains(dialogs!.Messages, m => m.Contains("shortcuts sign"));
