@@ -2,12 +2,15 @@
   <Folder Name="/src/">
     <Project Path="src/ShortcutForge.App/ShortcutForge.App.csproj" />
     <Project Path="src/ShortcutForge.Core/ShortcutForge.Core.csproj" />
+    <Project Path="src/ShortcutForge.Desktop/ShortcutForge.Desktop.csproj" />
     <Project Path="src/ShortcutForge.Dsl/ShortcutForge.Dsl.csproj" />
+    <Project Path="src/ShortcutForge.Editor/ShortcutForge.Editor.csproj" />
     <Project Path="src/ShortcutForge.Signing/ShortcutForge.Signing.csproj" />
   </Folder>
   <Folder Name="/tests/">
     <Project Path="tests/ShortcutForge.App.Tests/ShortcutForge.App.Tests.csproj" />
     <Project Path="tests/ShortcutForge.Core.Tests/ShortcutForge.Core.Tests.csproj" />
     <Project Path="tests/ShortcutForge.Dsl.Tests/ShortcutForge.Dsl.Tests.csproj" />
+    <Project Path="tests/ShortcutForge.Editor.Tests/ShortcutForge.Editor.Tests.csproj" />
   </Folder>
 </Solution>

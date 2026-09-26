@@ -1,0 +1,23 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!--
+    UI-framework-independent editor logic (view models for the visual editor and the text view).
+    Used by the cross-platform Avalonia app; has no WPF or Avalonia dependency.
+  -->
+
+  <ItemGroup>
+    <ProjectReference Include="..\ShortcutForge.Core\ShortcutForge.Core.csproj" />
+    <ProjectReference Include="..\ShortcutForge.Dsl\ShortcutForge.Dsl.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.2" />
+  </ItemGroup>
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+</Project>

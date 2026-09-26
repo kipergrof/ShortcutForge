@@ -37,3 +37,34 @@ jobs:
         with:
           name: test-results
           path: TestResults
+
+  # macOS / Linux: the net8.0 libraries, the Avalonia desktop app and their tests.
+  # The WPF app (ShortcutForge.App) only builds on Windows, so the solution is not built here.
+  build-desktop:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 8.0.x
+
+      - name: Build desktop app
+        run: dotnet build src/ShortcutForge.Desktop -c Release
+
+      - name: Test
+        run: |
+          for project in tests/ShortcutForge.Core.Tests tests/ShortcutForge.Dsl.Tests tests/ShortcutForge.Editor.Tests; do
+            dotnet test "$project" -c Release --logger "trx;LogFilePrefix=results" --results-directory TestResults || exit 1
+          done
+
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results-${{ matrix.os }}
+          path: TestResults

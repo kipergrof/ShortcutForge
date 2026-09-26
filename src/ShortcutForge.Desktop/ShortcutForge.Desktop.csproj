@@ -1,0 +1,38 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!-- Cross-platform (macOS / Linux / Windows) desktop app built with Avalonia UI. Preview. -->
+
+  <ItemGroup>
+    <ProjectReference Include="..\ShortcutForge.Core\ShortcutForge.Core.csproj" />
+    <ProjectReference Include="..\ShortcutForge.Dsl\ShortcutForge.Dsl.csproj" />
+    <ProjectReference Include="..\ShortcutForge.Signing\ShortcutForge.Signing.csproj" />
+    <ProjectReference Include="..\ShortcutForge.Editor\ShortcutForge.Editor.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Avalonia" Version="11.3.22" />
+    <PackageReference Include="Avalonia.Desktop" Version="11.3.22" />
+    <PackageReference Include="Avalonia.Themes.Fluent" Version="11.3.22" />
+    <PackageReference Include="Avalonia.Fonts.Inter" Version="11.3.22" />
+    <PackageReference Include="Avalonia.AvaloniaEdit" Version="11.4.1" />
+    <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.2" />
+  </ItemGroup>
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net8.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <AssemblyName>ShortcutForge.Desktop</AssemblyName>
+    <AssemblyTitle>ShortcutForge</AssemblyTitle>
+    <BuiltInComInteropSupport>true</BuiltInComInteropSupport>
+    <AvaloniaUseCompiledBindingsByDefault>true</AvaloniaUseCompiledBindingsByDefault>
+    <ApplicationIcon>..\ShortcutForge.App\Assets\app.ico</ApplicationIcon>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!-- Same icon as the Windows app (shared, not copied). -->
+    <AvaloniaResource Include="..\ShortcutForge.App\Assets\app.ico" Link="Assets\app.ico" />
+  </ItemGroup>
+
+</Project>

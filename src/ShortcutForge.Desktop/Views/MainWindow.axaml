@@ -1,0 +1,383 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:vm="using:ShortcutForge.Desktop.ViewModels"
+        xmlns:ed="using:ShortcutForge.Editor"
+        xmlns:l="using:ShortcutForge.Desktop.Localization"
+        xmlns:local="using:ShortcutForge.Desktop"
+        xmlns:ae="using:AvaloniaEdit"
+        mc:Ignorable="d" d:DesignWidth="1300" d:DesignHeight="800"
+        x:Class="ShortcutForge.Desktop.Views.MainWindow"
+        x:DataType="vm:MainWindowViewModel"
+        Title="{Binding WindowTitle}"
+        Icon="avares://ShortcutForge.Desktop/Assets/app.ico"
+        Width="1360" Height="860" MinWidth="900" MinHeight="560"
+        WindowStartupLocation="CenterScreen">
+
+    <Window.Styles>
+        <Style Selector="TabControl#Tabs > TabItem">
+            <Setter Property="FontSize" Value="16" />
+            <Setter Property="MinHeight" Value="36" />
+        </Style>
+        <Style Selector="TextBlock.section">
+            <Setter Property="FontSize" Value="11" />
+            <Setter Property="FontWeight" Value="SemiBold" />
+            <Setter Property="Foreground" Value="{DynamicResource MutedText}" />
+            <Setter Property="Margin" Value="0,14,0,4" />
+        </Style>
+        <Style Selector="TextBlock.muted">
+            <Setter Property="Foreground" Value="{DynamicResource MutedText}" />
+        </Style>
+        <Style Selector="TextBox.mono, AutoCompleteBox.mono">
+            <Setter Property="FontFamily" Value="Cascadia Mono, Menlo, Consolas, DejaVu Sans Mono, monospace" />
+        </Style>
+        <Style Selector="Button.icon">
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="Padding" Value="6,2" />
+            <Setter Property="MinHeight" Value="0" />
+            <Setter Property="FontSize" Value="12" />
+        </Style>
+        <Style Selector="Button.libraryItem">
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="HorizontalAlignment" Value="Stretch" />
+            <Setter Property="HorizontalContentAlignment" Value="Left" />
+            <Setter Property="Padding" Value="6,3" />
+            <Setter Property="Margin" Value="0,1" />
+        </Style>
+        <Style Selector="ListBox#CardsList > ListBoxItem">
+            <Setter Property="Padding" Value="0,3" />
+            <Setter Property="Background" Value="Transparent" />
+        </Style>
+        <Style Selector="ListBox#CardsList > ListBoxItem:selected /template/ ContentPresenter#PART_ContentPresenter">
+            <Setter Property="Background" Value="Transparent" />
+        </Style>
+        <Style Selector="ListBox#CardsList > ListBoxItem:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+            <Setter Property="Background" Value="Transparent" />
+        </Style>
+        <Style Selector="ListBox#CardsList > ListBoxItem:selected Border.card">
+            <Setter Property="BorderBrush" Value="{DynamicResource SystemAccentColor}" />
+            <Setter Property="BorderThickness" Value="2" />
+        </Style>
+        <Style Selector="Border.card.marker">
+            <Setter Property="Background" Value="{DynamicResource MarkerCardBg}" />
+        </Style>
+    </Window.Styles>
+
+    <Window.DataTemplates>
+        <!-- One parameter row of a card -->
+        <DataTemplate DataType="ed:ParamViewModel">
+            <Grid ColumnDefinitions="150,*" Margin="0,3">
+                <TextBlock Text="{Binding Label}" ToolTip.Tip="{Binding ToolTip}" Classes="muted"
+                           VerticalAlignment="Top" Margin="0,7,8,0" TextTrimming="CharacterEllipsis" />
+                <StackPanel Grid.Column="1">
+                    <TextBox IsVisible="{Binding IsTextEditor}" Classes.mono="{Binding IsMonospace}"
+                             Text="{Binding Text, UpdateSourceTrigger=LostFocus}" Watermark="{Binding Placeholder}"
+                             AcceptsReturn="{Binding IsMultiline}" TextWrapping="Wrap" />
+                    <AutoCompleteBox IsVisible="{Binding IsVariableEditor}" Classes="mono"
+                                     ItemsSource="{Binding VariableSuggestions}" FilterMode="ContainsOrdinal" MinimumPrefixLength="0"
+                                     Text="{Binding Text, UpdateSourceTrigger=LostFocus}" Watermark="{Binding Placeholder}" />
+                    <AutoCompleteBox IsVisible="{Binding IsEnumEditor}"
+                                     ItemsSource="{Binding Options}" FilterMode="Contains" MinimumPrefixLength="0"
+                                     Text="{Binding Text, UpdateSourceTrigger=LostFocus}" Watermark="{Binding Placeholder}" />
+                    <ComboBox IsVisible="{Binding IsBoolEditor}" MinWidth="190"
+                              ItemsSource="{Binding BoolOptions}" SelectedIndex="{Binding BoolChoice}" />
+                    <TextBlock Text="{Binding Error}" Foreground="{DynamicResource ErrorText}" TextWrapping="Wrap" FontSize="11.5"
+                               IsVisible="{Binding Error, Converter={x:Static ObjectConverters.IsNotNull}}" Margin="0,2,0,0" />
+                </StackPanel>
+            </Grid>
+        </DataTemplate>
+
+        <!-- An action card -->
+        <DataTemplate DataType="ed:ActionCardViewModel">
+            <DockPanel>
+                <!-- Nesting: indent with a guide line -->
+                <Border DockPanel.Dock="Left" Width="{Binding IndentWidth}" IsVisible="{Binding IsIndented}">
+                    <Border HorizontalAlignment="Right" Width="2" Margin="0,0,12,0" Background="{DynamicResource GuideLine}" />
+                </Border>
+                <Border Classes="card" Classes.marker="{Binding IsMarker}" Background="{DynamicResource CardBg}"
+                        BorderBrush="{DynamicResource CardBorder}" BorderThickness="1" CornerRadius="10" ClipToBounds="True">
+                    <DockPanel>
+                        <Border DockPanel.Dock="Left" Width="5" Background="{Binding CategoryColor, Converter={x:Static local:Converters.HexToBrush}}" />
+                        <StackPanel Margin="10,6,8,8">
+                            <!-- Header -->
+                            <DockPanel>
+                                <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" Spacing="2">
+                                    <Button Classes="icon" Content="{l:T '+ Egyébként', '+ Otherwise'}" IsVisible="{Binding IsIfStart}"
+                                            Command="{ReflectionBinding $parent[ListBox].DataContext.AddElseCommand}" CommandParameter="{Binding}" />
+                                    <Button Classes="icon" Content="{l:T '+ Menüpont', '+ Menu item'}" IsVisible="{Binding IsMenuStart}"
+                                            Command="{ReflectionBinding $parent[ListBox].DataContext.AddMenuCaseCommand}" CommandParameter="{Binding}" />
+                                    <Button Classes="icon" Content="▲" ToolTip.Tip="{l:T 'Fel', 'Move up'}"
+                                            Command="{ReflectionBinding $parent[ListBox].DataContext.MoveUpCommand}" CommandParameter="{Binding}" />
+                                    <Button Classes="icon" Content="▼" ToolTip.Tip="{l:T 'Le', 'Move down'}"
+                                            Command="{ReflectionBinding $parent[ListBox].DataContext.MoveDownCommand}" CommandParameter="{Binding}" />
+                                    <Button Classes="icon" Content="⧉" ToolTip.Tip="{l:T 'Duplikálás', 'Duplicate'}"
+                                            Command="{ReflectionBinding $parent[ListBox].DataContext.DuplicateCardCommand}" CommandParameter="{Binding}" />
+                                    <Button Classes="icon" Content="✕" ToolTip.Tip="{l:T 'Törlés', 'Delete'}"
+                                            Command="{ReflectionBinding $parent[ListBox].DataContext.DeleteCardCommand}" CommandParameter="{Binding}" />
+                                </StackPanel>
+                                <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Spacing="6" ToolTip.Tip="{Binding Description}">
+                                    <Button Classes="icon" Padding="4,0" IsVisible="{Binding CanCollapse}" Command="{Binding ToggleCollapseCommand}"
+                                            Content="{Binding IsCollapsed, Converter={x:Static local:Converters.CollapseChevron}}"
+                                            ToolTip.Tip="{l:T 'Összecsukás / kinyitás', 'Collapse / expand'}" />
+                                    <Border Width="24" Height="24" CornerRadius="6" VerticalAlignment="Center"
+                                            Background="{Binding CategoryColor, Converter={x:Static local:Converters.HexToBrush}}">
+                                        <TextBlock Text="{Binding Badge}" Foreground="White" FontSize="12" FontWeight="SemiBold"
+                                                   HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                    </Border>
+                                    <TextBlock Text="{Binding Title}" FontWeight="SemiBold" FontSize="14" VerticalAlignment="Center" />
+                                    <TextBlock Text="{Binding Subtitle}" Classes="muted" FontSize="11" VerticalAlignment="Center" />
+                                    <Border Background="{DynamicResource WarningPanelBg}" CornerRadius="4" Padding="4,0" IsVisible="{Binding IsMacOnly}">
+                                        <TextBlock Text="{l:T 'csak Mac', 'Mac only'}" FontSize="10.5" />
+                                    </Border>
+                                    <Border Background="{DynamicResource AccentSoft}" CornerRadius="4" Padding="5,0" IsVisible="{Binding HasOutput}"
+                                            ToolTip.Tip="{l:T 'A kimenet ezen a néven hivatkozható', 'The output can be referenced by this name'}">
+                                        <TextBlock FontSize="11" Foreground="{DynamicResource AccentText}" Classes="mono"
+                                                   Text="{Binding OutputName, StringFormat='→ {0}'}" />
+                                    </Border>
+                                </StackPanel>
+                            </DockPanel>
+
+                            <!-- Collapsed: one-line summary -->
+                            <TextBlock Text="{Binding Summary}" Classes="muted" TextTrimming="CharacterEllipsis" Margin="54,4,0,0" FontSize="12"
+                                       IsVisible="{Binding IsCollapsed}" />
+
+                            <StackPanel IsVisible="{Binding IsExpanded}">
+                                <!-- If condition -->
+                                <StackPanel IsVisible="{Binding IsIfStart}" Margin="0,6,0,0">
+                                    <WrapPanel>
+                                        <AutoCompleteBox MinWidth="170" Margin="0,0,6,4" Classes="mono"
+                                                         ItemsSource="{Binding Main.VariableSuggestions}" FilterMode="ContainsOrdinal" MinimumPrefixLength="0"
+                                                         Text="{Binding ConditionInput, UpdateSourceTrigger=LostFocus}"
+                                                         Watermark="{l:T 'változó', 'variable'}" ToolTip.Tip="{l:T 'A vizsgált változó', 'The variable to test'}" />
+                                        <ComboBox MinWidth="170" Margin="0,0,6,4" ItemsSource="{x:Static ed:ActionCardViewModel.ConditionOptions}"
+                                                  SelectedItem="{Binding ConditionOperator}" />
+                                        <TextBox MinWidth="170" Margin="0,0,6,4" Text="{Binding ConditionValue, UpdateSourceTrigger=LostFocus}"
+                                                 IsVisible="{Binding ConditionNeedsValue}" ToolTip.Tip="{l:T 'Összehasonlított érték', 'Value to compare'}" />
+                                        <TextBlock Text="{l:T 'és', 'and'}" VerticalAlignment="Center" Margin="0,0,6,4" IsVisible="{Binding ConditionIsBetween}" />
+                                        <TextBox MinWidth="90" Margin="0,0,0,4" Text="{Binding ConditionValue2, UpdateSourceTrigger=LostFocus}"
+                                                 IsVisible="{Binding ConditionIsBetween}" />
+                                    </WrapPanel>
+                                    <TextBlock Text="{Binding ConditionError}" Foreground="{DynamicResource ErrorText}" TextWrapping="Wrap"
+                                               IsVisible="{Binding ConditionError, Converter={x:Static ObjectConverters.IsNotNull}}" />
+                                </StackPanel>
+
+                                <!-- Menu case title -->
+                                <TextBox Margin="0,6,0,0" IsVisible="{Binding IsMenuCase}" Text="{Binding CaseTitle, UpdateSourceTrigger=LostFocus}"
+                                         ToolTip.Tip="{l:T 'A menüpont felirata', 'Title of the menu item'}" />
+
+                                <!-- Parameters -->
+                                <ItemsControl ItemsSource="{Binding Params}" Margin="0,4,0,0" IsVisible="{Binding HasParams}" />
+                            </StackPanel>
+                        </StackPanel>
+                    </DockPanel>
+                </Border>
+            </DockPanel>
+        </DataTemplate>
+    </Window.DataTemplates>
+
+    <DockPanel>
+        <!-- Menu -->
+        <Menu DockPanel.Dock="Top" Name="MainMenu">
+            <MenuItem Header="{l:T '_Fájl', '_File'}">
+                <MenuItem Name="NewMenuItem" Header="{l:T 'Ú_j', '_New'}" Command="{Binding NewCommand}" />
+                <MenuItem Name="OpenMenuItem" Header="{l:T '_Megnyitás…', '_Open…'}" Command="{Binding OpenCommand}" />
+                <MenuItem Name="RecentMenu" Header="{l:T '_Legutóbbiak', '_Recent files'}" IsEnabled="{Binding HasRecentFiles}" />
+                <Separator />
+                <MenuItem Name="SaveMenuItem" Header="{l:T '_Mentés', '_Save'}" Command="{Binding SaveFileCommand}" />
+                <MenuItem Name="SaveAsMenuItem" Header="{l:T 'Mentés _másként…', 'Save _As…'}" Command="{Binding SaveFileAsCommand}" />
+                <Separator />
+                <MenuItem Name="ExportShortcutyMenuItem" Header="{l:T 'Exportálás aláírva (Shortcuty, online)…', 'Export signed (Shortcuty, online)…'}"
+                          Command="{Binding ExportShortcutyCommand}" />
+                <MenuItem Header="{l:T 'Exportálás aláírva ezen a Macen (shortcuts sign)…', 'Export signed on this Mac (shortcuts sign)…'}"
+                          Command="{Binding ExportSignedOnMacCommand}" IsVisible="{Binding CanSignOnThisMac}" />
+                <MenuItem Name="ExportMenuItem" Header="{l:T 'Exportálás aláírás nélkül…', 'Export unsigned…'}" Command="{Binding ExportUnsignedCommand}" />
+                <MenuItem Header="{l:T 'Exportálás XML plistként…', 'Export as XML plist…'}" Command="{Binding ExportXmlPlistCommand}" />
+                <Separator />
+                <MenuItem Name="ExitMenuItem" Header="{l:T '_Kilépés', 'E_xit'}" Click="Exit_Click" />
+            </MenuItem>
+            <MenuItem Header="{l:T '_Szerkesztés', '_Edit'}">
+                <MenuItem Name="UndoMenuItem" Header="{l:T '_Visszavonás', '_Undo'}" Command="{Binding UndoCommand}" />
+                <MenuItem Name="RedoMenuItem" Header="{l:T '_Mégis', '_Redo'}" Command="{Binding RedoCommand}" />
+                <Separator />
+                <MenuItem Name="DuplicateMenuItem" Header="{l:T '_Duplikálás', '_Duplicate'}" Command="{Binding DuplicateCardCommand}" />
+                <MenuItem Header="{l:T '_Törlés', 'De_lete'}" Command="{Binding DeleteCardCommand}" />
+                <MenuItem Header="{l:T 'Mozgatás _fel', 'Move _up'}" Command="{Binding MoveUpCommand}" />
+                <MenuItem Header="{l:T 'Mozgatás _le', 'Move d_own'}" Command="{Binding MoveDownCommand}" />
+            </MenuItem>
+            <MenuItem Header="{l:T '_Nézet', '_View'}">
+                <MenuItem Header="{l:T 'Összes kártya össze_csukása', '_Collapse all cards'}" Command="{Binding CollapseAllCommand}" CommandParameter="true" />
+                <MenuItem Header="{l:T 'Összes kártya _kinyitása', '_Expand all cards'}" Command="{Binding CollapseAllCommand}" CommandParameter="false" />
+                <Separator />
+                <MenuItem Header="{l:T '_Nyelv / Language', '_Language / Nyelv'}">
+                    <MenuItem Header="English" ToggleType="Radio" IsChecked="{Binding IsEnglish, Mode=OneWay}"
+                              Command="{Binding SetLanguageCommand}" CommandParameter="en" />
+                    <MenuItem Header="Magyar" ToggleType="Radio" IsChecked="{Binding IsHungarian, Mode=OneWay}"
+                              Command="{Binding SetLanguageCommand}" CommandParameter="hu" />
+                </MenuItem>
+            </MenuItem>
+            <MenuItem Header="{l:T '_Súgó', '_Help'}">
+                <MenuItem Header="{l:T '_Névjegy', '_About'}" Click="About_Click" />
+            </MenuItem>
+        </Menu>
+
+        <!-- Status bar -->
+        <Border DockPanel.Dock="Bottom" Background="{DynamicResource PanelBg}" BorderBrush="{DynamicResource CardBorder}"
+                BorderThickness="0,1,0,0" Padding="10,4">
+            <DockPanel>
+                <TextBlock DockPanel.Dock="Right" Text="{Binding VersionText}" Classes="muted" Margin="12,0,0,0" />
+                <TextBlock DockPanel.Dock="Right" Text="{Binding ActionCountText}" Classes="muted" />
+                <ProgressBar DockPanel.Dock="Right" Width="100" MinWidth="0" Margin="0,0,12,0" IsIndeterminate="True" IsVisible="{Binding IsBusy}" />
+                <TextBlock Text="{Binding Status}" TextTrimming="CharacterEllipsis" />
+            </DockPanel>
+        </Border>
+
+        <Grid ColumnDefinitions="280,4,*,4,290">
+            <!-- Action library -->
+            <DockPanel Background="{DynamicResource PanelBg}">
+                <StackPanel DockPanel.Dock="Top" Margin="10,10,10,6">
+                    <TextBlock FontWeight="SemiBold" FontSize="14">
+                        <Run Text="{l:T 'Akciók', 'Actions'}" />
+                        <Run Text="{Binding CatalogCount, StringFormat='({0})'}" Foreground="{DynamicResource MutedText}" />
+                    </TextBlock>
+                    <TextBox Name="SearchBox" Margin="0,6,0,0" Text="{Binding SearchText}" Watermark="{l:T 'Keresés…', 'Search…'}" />
+                    <TextBlock Text="{l:T 'Kattints egy akcióra a hozzáadáshoz. Enter: az első találat.', 'Click an action to add it. Enter: add the first match.'}"
+                               Classes="muted" FontSize="11" Margin="0,4,0,0" TextWrapping="Wrap" />
+                </StackPanel>
+                <ScrollViewer HorizontalScrollBarVisibility="Disabled">
+                    <StackPanel Margin="6,0,6,10">
+                        <TextBlock Text="{l:T 'Nincs találat.', 'No matches.'}" Classes="muted" Margin="6" IsVisible="{Binding LibraryIsEmpty}" />
+                        <ItemsControl ItemsSource="{Binding Library}">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate DataType="ed:LibraryGroup">
+                                    <StackPanel>
+                                        <TextBlock Text="{Binding Name}" Classes="section" Margin="6,10,0,2" />
+                                        <ItemsControl ItemsSource="{Binding Items}">
+                                            <ItemsControl.ItemTemplate>
+                                                <DataTemplate DataType="ed:LibraryItem">
+                                                    <Button Classes="libraryItem" ToolTip.Tip="{Binding Description}"
+                                                            Command="{ReflectionBinding $parent[Window].DataContext.AddActionCommand}"
+                                                            CommandParameter="{Binding Definition}">
+                                                        <DockPanel>
+                                                            <Border DockPanel.Dock="Left" Width="26" Height="26" CornerRadius="6" Margin="0,0,9,0"
+                                                                    VerticalAlignment="Center" Background="{Binding Color, Converter={x:Static local:Converters.HexToBrush}}">
+                                                                <TextBlock Text="{Binding Badge}" Foreground="White" FontSize="12" FontWeight="SemiBold"
+                                                                           HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                                            </Border>
+                                                            <StackPanel>
+                                                                <TextBlock Text="{Binding Name}" FontWeight="SemiBold" TextTrimming="CharacterEllipsis" />
+                                                                <TextBlock Text="{Binding Dsl}" Classes="muted" FontSize="11"
+                                                                           FontFamily="Cascadia Mono, Menlo, Consolas, DejaVu Sans Mono, monospace" />
+                                                            </StackPanel>
+                                                        </DockPanel>
+                                                    </Button>
+                                                </DataTemplate>
+                                            </ItemsControl.ItemTemplate>
+                                        </ItemsControl>
+                                    </StackPanel>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </StackPanel>
+                </ScrollViewer>
+            </DockPanel>
+
+            <GridSplitter Grid.Column="1" Background="{DynamicResource CardBorder}" ResizeDirection="Columns" />
+
+            <!-- Editor: visual cards and text view -->
+            <TabControl Name="Tabs" Grid.Column="2" Margin="8,4,8,8">
+                <TabItem Name="VisualTab" Header="{l:T 'Vizuális szerkesztő', 'Visual editor'}">
+                    <DockPanel>
+                        <Border DockPanel.Dock="Top" Background="{DynamicResource WarningPanelBg}" CornerRadius="6" Padding="10,6" Margin="0,0,0,6"
+                                IsVisible="{Binding StructureWarning, Converter={x:Static ObjectConverters.IsNotNull}}">
+                            <TextBlock Text="{Binding StructureWarning, StringFormat='⚠ {0}'}" TextWrapping="Wrap" />
+                        </Border>
+                        <ListBox Name="CardsList" ItemsSource="{Binding Cards}" SelectedItem="{Binding SelectedCard}" Background="Transparent"
+                                 ScrollViewer.HorizontalScrollBarVisibility="Disabled" />
+                    </DockPanel>
+                </TabItem>
+                <TabItem Name="DslTab" Header="{l:T 'Szöveg (DSL)', 'Text (DSL)'}">
+                    <DockPanel>
+                        <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Spacing="6" Margin="0,0,0,6">
+                            <Button Classes="accent" Command="{Binding ApplyDslCommand}" Content="{l:T '✓ Alkalmazás', '✓ Apply'}"
+                                    ToolTip.Tip="{l:T 'A szöveg alkalmazása a parancsra (fülváltáskor automatikus)', 'Apply the text to the shortcut (automatic when switching tabs)'}" />
+                            <Button Command="{Binding FormatDslCommand}" Content="{l:T '⟲ Formázás', '⟲ Format'}"
+                                    ToolTip.Tip="{l:T 'Alkalmazás és újraformázás', 'Apply and reformat'}" />
+                        </StackPanel>
+                        <Border Name="DslErrorPanel" DockPanel.Dock="Bottom" Background="{DynamicResource ErrorPanelBg}" CornerRadius="6" Padding="10,6"
+                                Margin="0,6,0,0" Cursor="Hand" ToolTip.Tip="{l:T 'Kattints a hibára ugráshoz', 'Click to jump to the error'}"
+                                IsVisible="{Binding DslError, Converter={x:Static ObjectConverters.IsNotNull}}">
+                            <TextBlock TextWrapping="Wrap" Text="{Binding DslError, StringFormat='⚠ {0}'}" />
+                        </Border>
+                        <Border BorderBrush="{DynamicResource CardBorder}" BorderThickness="1" CornerRadius="6">
+                            <ae:TextEditor Name="DslEditor" ShowLineNumbers="True" Padding="4" FontSize="13.5"
+                                           FontFamily="Cascadia Mono, Menlo, Consolas, DejaVu Sans Mono, monospace"
+                                           HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto" />
+                        </Border>
+                    </DockPanel>
+                </TabItem>
+            </TabControl>
+
+            <GridSplitter Grid.Column="3" Background="{DynamicResource CardBorder}" ResizeDirection="Columns" />
+
+            <!-- Shortcut settings -->
+            <ScrollViewer Grid.Column="4" Background="{DynamicResource PanelBg}">
+                <StackPanel Margin="12,10">
+                    <TextBlock Text="{l:T 'Parancs beállításai', 'Shortcut settings'}" FontWeight="SemiBold" FontSize="14" />
+
+                    <TextBlock Text="{l:T 'NÉV', 'NAME'}" Classes="section" />
+                    <TextBox Text="{Binding ShortcutName, UpdateSourceTrigger=LostFocus}" />
+
+                    <TextBlock Text="{l:T 'IKON SZÍNE', 'ICON COLOUR'}" Classes="section" />
+                    <DockPanel>
+                        <Border DockPanel.Dock="Left" Width="48" Height="48" CornerRadius="11" Margin="0,0,8,0"
+                                Background="{Binding SelectedColor.Hex, Converter={x:Static local:Converters.HexToBrush}}">
+                            <TextBlock Text="⌘" Foreground="White" FontSize="22" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                        </Border>
+                        <StackPanel Spacing="4">
+                            <ComboBox ItemsSource="{Binding ColorOptions}" SelectedItem="{Binding SelectedColor}" HorizontalAlignment="Stretch">
+                                <ComboBox.ItemTemplate>
+                                    <DataTemplate DataType="ed:ColorOption">
+                                        <StackPanel Orientation="Horizontal" Spacing="6">
+                                            <Border Width="14" Height="14" CornerRadius="3" Background="{Binding Hex, Converter={x:Static local:Converters.HexToBrush}}" />
+                                            <TextBlock Text="{Binding Name}" />
+                                        </StackPanel>
+                                    </DataTemplate>
+                                </ComboBox.ItemTemplate>
+                            </ComboBox>
+                            <DockPanel>
+                                <TextBlock Text="{l:T 'Glyph szám:', 'Glyph number:'}" VerticalAlignment="Center" Margin="0,0,6,0" Classes="muted" />
+                                <TextBox Text="{Binding GlyphNumber, UpdateSourceTrigger=LostFocus}"
+                                         ToolTip.Tip="{l:T 'Az ikon SF Symbol azonosítója (pl. 59511).', 'SF Symbol id of the icon (e.g. 59511).'}" />
+                            </DockPanel>
+                        </StackPanel>
+                    </DockPanel>
+
+                    <TextBlock Text="{l:T 'MEGJELENÉS', 'SHOW IN'}" Classes="section" />
+                    <ItemsControl ItemsSource="{Binding TypeOptions}">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate DataType="ed:CheckOption">
+                                <CheckBox Content="{Binding Label}" IsChecked="{Binding IsChecked}" ToolTip.Tip="{Binding Key}" />
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+
+                    <TextBlock Text="{l:T 'ELFOGADOTT BEMENETEK', 'ACCEPTED INPUT'}" Classes="section" />
+                    <ItemsControl ItemsSource="{Binding InputClassOptions}">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate DataType="ed:CheckOption">
+                                <CheckBox Content="{Binding Label}" IsChecked="{Binding IsChecked}" ToolTip.Tip="{Binding Key}" />
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+
+                    <TextBlock Text="{l:T 'ALÁÍRÁS', 'SIGNING'}" Classes="section" />
+                    <Border Background="{DynamicResource AccentSoft}" CornerRadius="8" Padding="10,8">
+                        <TextBlock TextWrapping="Wrap" FontSize="12"
+                                   Text="{l:T 'iOS 15 óta csak aláírt parancs importálható. Fájl menü: aláírás ingyen a Shortcuty online szolgáltatással, Macen pedig helyben a shortcuts sign paranccsal.', 'Since iOS 15 only signed shortcuts can be imported. File menu: sign for free with the Shortcuty online service, or locally on a Mac with shortcuts sign.'}" />
+                    </Border>
+                </StackPanel>
+            </ScrollViewer>
+        </Grid>
+    </DockPanel>
+</Window>
