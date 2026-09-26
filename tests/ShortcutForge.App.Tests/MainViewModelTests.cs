@@ -39,6 +39,9 @@ public class MainViewModelTests : IDisposable
         public void Info(string title, string message) => Messages.Add(message);
         public void Error(string title, string message) => Messages.Add("ERROR: " + message);
         public bool EditSettings(AppSettings settings) => false;
+        public string? NextAiCode;
+        public string? LastAiKey;
+        public string? GenerateWithAi(string? apiKey) { LastAiKey = apiKey; return NextAiCode; }
     }
 
     /// <summary>WPF objects need an STA thread.</summary>
@@ -57,6 +60,20 @@ public class MainViewModelTests : IDisposable
     }
 
     private static ActionDefinition Def(string dsl) => ActionCatalog.Default.ByDslName(dsl)!;
+
+    [Fact]
+    public void Generate_with_ai_opens_the_generated_code() => Sta(() =>
+    {
+        var dialogs = new FakeDialogs { NextAiCode = "#name \"Buzz\"\nVibrate()\n" };
+        var vm = new MainViewModel(dialogs);
+        vm.GenerateWithAiCommand.Execute(null);
+        Assert.Single(vm.Cards);
+        Assert.True(vm.IsDirty);
+
+        dialogs.NextAiCode = null; // closed without opening: nothing changes
+        vm.GenerateWithAiCommand.Execute(null);
+        Assert.Single(vm.Cards);
+    });
 
     [Fact]
     public void Starts_with_example_and_valid_structure() => Sta(() =>

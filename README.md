@@ -26,6 +26,7 @@ ShortcutForge is a Windows desktop app for building shortcuts for Apple's Shortc
 - **Open / import**: signed and unsigned `.shortcut` files, binary and XML plists, iCloud share links.
 - **Export**: `.shortcut` files, **signed for free online** (Shortcuty), on your own Mac over SSH, or by a signing server.
 - **Templates** (*File › New from template*): greeting, JSON API call, quick menu, list processing, battery watcher, open-in-Reader share sheet action.
+- **Shortcut from a description (AI)** (*File › Shortcut from description*, Ctrl+Shift+N): describe what you want in plain words, in any language, and Claude writes the shortcut. You can review it before opening. It needs your own Claude API key (*Tools › Settings*, or the `ANTHROPIC_API_KEY` environment variable). Your description is sent to Anthropic.
 - **Light / dark theme** (follows Windows), **English / Hungarian** UI (*View* menu).
 
 ## Signing — important

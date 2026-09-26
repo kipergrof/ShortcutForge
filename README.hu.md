@@ -12,6 +12,7 @@ Apple Parancsok (Shortcuts) készítése és szerkesztése **Windowson**.
 - **Megnyitás / import**: `.shortcut` (aláírt és aláíratlan), bináris és XML plist, iCloud megosztási link.
 - **Export**: `.shortcut` fájl, **ingyenes online aláírással** (Shortcuty), saját Macen SSH-n keresztül vagy aláíró szerverrel.
 - **Sablonok** (*Fájl › Új sablonból*): üdvözlés, JSON API lekérés, gyors menü, listafeldolgozás, akkumulátor-figyelő, megosztási lapos link-megnyitó.
+- **Parancs leírásból (AI)** (*Fájl › Parancs leírásból*, Ctrl+Shift+N): írd le a saját szavaiddal, bármilyen nyelven, mit csináljon a parancs, és a Claude megírja. Megnyitás előtt átnézheted. Saját Claude API-kulcs kell hozzá (*Eszközök › Beállítások*, vagy az `ANTHROPIC_API_KEY` környezeti változó). A leírásod az Anthropichoz kerül.
 - **Kényelem**: kategóriaikonok, összecsukható kártyák (egyenként vagy *Nézet › Összes kártya összecsukása*), vezetővonalak a beágyazott blokkoknál, Ctrl+F keresés (Enter: az első találat hozzáadása), összecsukható `{ }` blokkok a szöveges nézetben.
 - **Sötét / világos téma** (a Windows beállítását követi), **magyar / angol** felület.
 
