@@ -1,0 +1,29 @@
+name: Feature request
+description: Suggest an idea, e.g. a missing action or an editor improvement
+labels: [enhancement]
+body:
+  - type: dropdown
+    id: kind
+    attributes:
+      label: Kind of request
+      options:
+        - Missing action (add it to the catalog)
+        - Visual editor
+        - Text language (DSL)
+        - Import / export / signing
+        - Other
+    validations:
+      required: true
+  - type: textarea
+    id: idea
+    attributes:
+      label: What would you like?
+      description: Describe the problem it solves and how you would like it to work.
+    validations:
+      required: true
+  - type: textarea
+    id: action
+    attributes:
+      label: Action details (for missing actions)
+      description: The action's name in the Shortcuts app, and if you know it, its identifier (e.g. is.workflow.actions.…) and parameters. Opening a shortcut that uses it and copying the generic block from the text view helps a lot.
+      render: text

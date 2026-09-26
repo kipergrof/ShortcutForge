@@ -1,0 +1,60 @@
+name: Bug report
+description: Something doesn't work as expected
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for reporting! Please do not attach shortcuts that contain passwords, API keys or personal data.
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened?
+      description: What did you do, what did you expect, and what happened instead?
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      placeholder: |
+        1. Open …
+        2. Add the action …
+        3. Export …
+    validations:
+      required: true
+  - type: textarea
+    id: dsl
+    attributes:
+      label: Shortcut (text view)
+      description: If it is about a specific shortcut, paste it from the "Text view (DSL)" tab.
+      render: text
+  - type: input
+    id: version
+    attributes:
+      label: ShortcutForge version
+      description: Shown at the bottom right of the window and in Help › About.
+      placeholder: "1.0.0"
+    validations:
+      required: true
+  - type: input
+    id: windows
+    attributes:
+      label: Windows version
+      placeholder: "Windows 11 24H2"
+  - type: dropdown
+    id: signing
+    attributes:
+      label: Signing method (if the problem is about exporting)
+      options:
+        - Not related to signing
+        - Free online signing (Shortcuty)
+        - Export for iPhone (Shortcut Source Helper)
+        - Mac over SSH
+        - Signing server
+        - Unsigned export
+  - type: input
+    id: ios
+    attributes:
+      label: iOS / macOS version of the device you import on
+      placeholder: "iOS 26.0"

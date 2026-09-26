@@ -1,0 +1,48 @@
+name: Release
+
+# Push a tag like v1.1.0 (matching <Version> in Directory.Build.props) to build the
+# single-file exe and attach it to a GitHub release.
+on:
+  push:
+    tags: ['v*']
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: |
+            8.0.x
+            10.0.x
+
+      - name: Test
+        run: dotnet test -c Release
+
+      - name: Publish single-file exe
+        shell: pwsh
+        run: |
+          $version = "${{ github.ref_name }}".TrimStart('v')
+          dotnet publish src/ShortcutForge.App -c Release -r win-x64 --self-contained `
+            -p:PublishSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true `
+            -p:EnableCompressionInSingleFile=true -p:Version=$version -o publish
+          Copy-Item publish/ShortcutForge.App.exe "ShortcutForge-$version-win-x64.exe"
+
+      - name: Create or update the release
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          $version = "${{ github.ref_name }}".TrimStart('v')
+          $asset = "ShortcutForge-$version-win-x64.exe"
+          gh release view "${{ github.ref_name }}" *> $null
+          if ($LASTEXITCODE -eq 0) {
+            gh release upload "${{ github.ref_name }}" $asset --clobber
+          } else {
+            gh release create "${{ github.ref_name }}" $asset --title "ShortcutForge $version" --generate-notes
+          }

@@ -7,6 +7,12 @@
 <p align="center">Create and edit Apple Shortcuts on <b>Windows</b>.<br/>
 <a href="README.hu.md">Magyar leírás</a></p>
 
+<p align="center">
+  <a href="https://github.com/kipergrof/ShortcutForge/actions/workflows/build.yml"><img src="https://github.com/kipergrof/ShortcutForge/actions/workflows/build.yml/badge.svg" alt="Build and test" /></a>
+  <a href="https://github.com/kipergrof/ShortcutForge/releases/latest"><img src="https://img.shields.io/github/v/release/kipergrof/ShortcutForge" alt="Latest release" /></a>
+  <a href="LICENSE"><img src="https://img.shields.io/github/license/kipergrof/ShortcutForge" alt="License: MIT" /></a>
+</p>
+
 ---
 
 ShortcutForge is a Windows desktop app for building shortcuts for Apple's Shortcuts app (iPhone, iPad, Mac). You can build them visually with action cards, much like in the Shortcuts app, or write them as code. You can also open existing `.shortcut` files, edit them and export signed files that import straight onto your devices.
