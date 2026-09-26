@@ -25,7 +25,7 @@ ShortcutForge is a Windows desktop app for building shortcuts for Apple's Shortc
 - **194 built-in actions** in categories. Any other action (including third-party App Intents) is kept and editable as a generic block, so nothing is lost when you import a shortcut.
 - **Open / import**: signed and unsigned `.shortcut` files, binary and XML plists, iCloud share links.
 - **Export**: `.shortcut` files, **signed for free online** (Shortcuty), on your own Mac over SSH, or by a signing server.
-- **Templates** (*File › New from template*): greeting, JSON API call, quick menu, list processing, battery watcher, open-in-Reader share sheet action.
+- **Templates** (*File › New from template*) and an **online template gallery** (*File › Template gallery*) that grows on GitHub without app updates: pomodoro, clipboard to notes, translate, resize photos, random picker, QR code, word count, night mode and more.
 - **Light / dark theme** (follows Windows), **English / Hungarian** UI (*View* menu).
 
 ## Signing — important

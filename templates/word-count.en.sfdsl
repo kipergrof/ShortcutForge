@@ -1,0 +1,7 @@
+#name "Word count"
+#icon color=orange glyph=59511
+
+clip = GetClipboard()
+words = Count(clip, type: "Words")
+chars = Count(clip, type: "Characters")
+Alert("{words} words, {chars} characters", title: "Word count")

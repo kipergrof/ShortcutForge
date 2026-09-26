@@ -1,0 +1,7 @@
+#name "Decide for me"
+#icon color=teal glyph=59511
+
+options = AskForInput(prompt: "Options, one per line:", type: "Text", multiline: true)
+lines = SplitText(options, separator: "New Lines")
+pick = GetItemFromList(lines, which: "Random Item")
+Alert("The winner is: {pick}", title: "🎲")

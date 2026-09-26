@@ -1,0 +1,7 @@
+#name "Pomodoro"
+#icon color=red glyph=59511
+
+// 25 minutes of focus, then a break
+Notification("25 minute focus started.", title: "Pomodoro")
+Wait(1500)
+Notification("Time is up – take a 5 minute break!", title: "Pomodoro", sound: true)

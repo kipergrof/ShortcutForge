@@ -267,6 +267,7 @@
                         </Style>
                     </MenuItem.ItemContainerStyle>
                 </MenuItem>
+                <MenuItem Header="{l:T 'Sablon_galéria (online)…', 'Template _gallery (online)…'}" Command="{Binding OpenGalleryCommand}" />
                 <MenuItem Header="{l:T '_Megnyitás…', '_Open…'}" InputGestureText="Ctrl+O" Command="{Binding OpenCommand}" />
                 <MenuItem Header="{l:T '_Legutóbbiak', '_Recent files'}" ItemsSource="{Binding RecentFiles}">
                     <MenuItem.ItemContainerStyle>

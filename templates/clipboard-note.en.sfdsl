@@ -1,0 +1,8 @@
+#name "Clipboard to notes"
+#icon color=gold glyph=59511
+
+clip = GetClipboard()
+now = Date(mode: "Current Date")
+stamp = FormatDate(now, dateFormat: "Short", timeFormat: "Short")
+AppendToFile("{stamp}: {clip}", path: "Shortcuts/notes.txt", mode: "Append")
+Notification("Saved to your notes.", title: "Clipboard")

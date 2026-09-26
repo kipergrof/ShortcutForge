@@ -1,0 +1,7 @@
+#name "Éjszakai mód"
+#icon color=slate glyph=59511
+
+SetAppearance(operation: "set", style: "dark")
+SetBrightness(0.2)
+SetVolume(0.25)
+Notification("Jó éjt! 🌙", title: "Éjszakai mód")

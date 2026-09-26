@@ -1,0 +1,7 @@
+#name "Pomodoro"
+#icon color=red glyph=59511
+
+// 25 perc fókusz, utána szünet
+Notification("Indul a 25 perces fókusz.", title: "Pomodoro")
+Wait(1500)
+Notification("Lejárt az idő – tarts 5 perc szünetet!", title: "Pomodoro", sound: true)

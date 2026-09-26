@@ -1,0 +1,7 @@
+#name "Fordítás angolra"
+#icon color=blue glyph=59511
+
+clip = GetClipboard()
+translated = TranslateText(clip, to: "en")
+ShowResult(translated)
+CopyToClipboard(translated)
