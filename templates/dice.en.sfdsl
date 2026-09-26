@@ -1,0 +1,6 @@
+#name "Roll a die"
+#icon color=green glyph=59511
+
+roll = RandomNumber(min: 1, max: 6)
+SpeakText("You rolled {roll}")
+Alert("{roll}", title: "🎲")

@@ -41,6 +41,16 @@ public class MainViewModelTests : IDisposable
         public bool EditSettings(AppSettings settings) => false;
         public Shortcut? DryRunShortcut;
         public void ShowDryRun(Shortcut shortcut) => DryRunShortcut = shortcut;
+        public string? NextAiCode;
+        public string? LastAiKey;
+        public string? GenerateWithAi(string? apiKey) { LastAiKey = apiKey; return NextAiCode; }
+        public string? NextGallerySource;
+        public string? PickGalleryTemplate() => NextGallerySource;
+        public readonly List<string> OpenedUrls = [];
+        public void OpenUrl(string url) => OpenedUrls.Add(url);
+
+        public (byte[] Data, string Name, bool Signed)? Shared;
+        public void ShowShare(byte[] data, string fileName, bool isSigned) => Shared = (data, fileName, isSigned);
     }
 
     /// <summary>WPF objects need an STA thread.</summary>
@@ -67,6 +77,20 @@ public class MainViewModelTests : IDisposable
         var vm = new MainViewModel(dialogs);
         vm.DryRunCommand.Execute(null);
         Assert.Same(vm.Current, dialogs.DryRunShortcut);
+    });
+
+    [Fact]
+    public void Generate_with_ai_opens_the_generated_code() => Sta(() =>
+    {
+        var dialogs = new FakeDialogs { NextAiCode = "#name \"Buzz\"\nVibrate()\n" };
+        var vm = new MainViewModel(dialogs);
+        vm.GenerateWithAiCommand.Execute(null);
+        Assert.Single(vm.Cards);
+        Assert.True(vm.IsDirty);
+
+        dialogs.NextAiCode = null; // closed without opening: nothing changes
+        vm.GenerateWithAiCommand.Execute(null);
+        Assert.Single(vm.Cards);
     });
 
     [Fact]
@@ -142,6 +166,73 @@ public class MainViewModelTests : IDisposable
         Assert.Equal(9, vm.Current.Actions.Count);
         vm.RedoCommand.Execute(null);
         Assert.Equal(5, vm.Current.Actions.Count);
+    });
+
+    [Fact]
+    public void Opens_a_template_from_the_gallery() => Sta(() =>
+    {
+        var dialogs = new FakeDialogs { NextGallerySource = "#name \"Kocka\"\nroll = RandomNumber(min: 1, max: 6)\nAlert(\"{roll}\")" };
+        var vm = new MainViewModel(dialogs);
+        vm.OpenGalleryCommand.Execute(null);
+        Assert.Equal("Kocka", vm.ShortcutName);
+        Assert.Equal(2, vm.Cards.Count);
+
+        dialogs.NextGallerySource = null; // cancelled: nothing changes
+        vm.OpenGalleryCommand.Execute(null);
+        Assert.Equal("Kocka", vm.ShortcutName);
+    });
+
+    [Fact]
+    public void Find_replace_and_rename_variable() => Sta(() =>
+    {
+        var vm = new MainViewModel(new FakeDialogs());
+        vm.OnDslEdited("""
+            var name = "alma"
+            t = Text("alma és {name}")
+            Alert("Nincs alma")
+            """);
+        Assert.True(vm.ApplyDslIfNeeded());
+
+        vm.ToggleFindPanelCommand.Execute(null);
+        Assert.True(vm.IsFindPanelOpen);
+        Assert.Equal("name", vm.RenameFrom);
+
+        vm.FindText = "alma";
+        vm.SelectedCard = null;
+        vm.FindNextCommand.Execute(null);
+        Assert.Equal(0, vm.SelectedCard!.Index);
+        vm.FindNextCommand.Execute(null);
+        Assert.Equal(1, vm.SelectedCard!.Index);
+
+        vm.ReplaceText = "körte";
+        vm.ReplaceAllCommand.Execute(null);
+        Assert.Contains("3", vm.FindStatus);
+        Assert.Equal("körte és {name}", vm.Cards[1].Params.Single(p => p.Key == "WFTextActionText").Text);
+
+        vm.RenameTo = "gyümölcs";
+        vm.RenameVariableCommand.Execute(null);
+        Assert.Equal(["gyümölcs"], vm.NamedVariableNames);
+        Assert.Contains("gyümölcs", vm.CurrentDsl);
+
+        // Both operations are undoable.
+        vm.UndoCommand.Execute(null);
+        Assert.Equal(["name"], vm.NamedVariableNames);
+        vm.UndoCommand.Execute(null);
+        Assert.Contains("alma és", vm.CurrentDsl);
+    });
+
+    [Fact]
+    public void Send_to_iphone_signs_and_opens_the_share_window() => Sta(() =>
+    {
+        var dialogs = new FakeDialogs { ConfirmAnswer = false }; // decline online signing: no network in tests
+        var vm = new MainViewModel(dialogs);
+
+        vm.SendToIPhoneCommand.ExecuteAsync(null).GetAwaiter().GetResult();
+
+        var shared = Assert.NotNull(dialogs.Shared);
+        Assert.Equal("Első parancsom.shortcut", shared.Name);
+        Assert.False(shared.Signed); // unsigned exporter → the window shows the warning
+        Assert.Equal(vm.Current.Actions.Count, Core.Import.ShortcutFileReader.Read(shared.Data).Actions.Count);
     });
 
     [Fact]

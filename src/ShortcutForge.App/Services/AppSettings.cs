@@ -39,6 +39,46 @@ public sealed class AppSettings
 
     public List<string> RecentFiles { get; set; } = [];
 
+    /// <summary>Claude API key for AI generation, DPAPI-encrypted.</summary>
+    public string? ProtectedClaudeApiKey { get; set; }
+
+    /// <summary>Decrypted Claude API key; never written to the JSON file.</summary>
+    [System.Text.Json.Serialization.JsonIgnore]
+    public string? ClaudeApiKey
+    {
+        get => Unprotect(ProtectedClaudeApiKey);
+        set => ProtectedClaudeApiKey = Protect(value);
+    }
+
+    /// <summary>The key to use: the saved one, or the ANTHROPIC_API_KEY environment variable.</summary>
+    [System.Text.Json.Serialization.JsonIgnore]
+    public string? EffectiveClaudeApiKey =>
+        ClaudeApiKey is { Length: > 0 } key ? key : Environment.GetEnvironmentVariable("ANTHROPIC_API_KEY");
+
+    private static string? Unprotect(string? value)
+    {
+        if (string.IsNullOrEmpty(value)) return null;
+        try
+        {
+            return Encoding.UTF8.GetString(ProtectedData.Unprotect(Convert.FromBase64String(value), null, DataProtectionScope.CurrentUser));
+        }
+        catch (Exception ex) when (ex is CryptographicException or FormatException)
+        {
+            return null;
+        }
+    }
+
+    private static string? Protect(string? value) =>
+        string.IsNullOrEmpty(value)
+            ? null
+            : Convert.ToBase64String(ProtectedData.Protect(Encoding.UTF8.GetBytes(value), null, DataProtectionScope.CurrentUser));
+    /// <summary>Look for a newer release on GitHub at startup (at most once a day).</summary>
+    public bool CheckForUpdates { get; set; } = true;
+    public DateTime? LastUpdateCheck { get; set; }
+
+    /// <summary>A release the user chose to skip; not offered again.</summary>
+    public string? SkippedVersion { get; set; }
+
     /// <summary>Settings folder; SHORTCUTFORGE_SETTINGS_DIR overrides it (used by tests).</summary>
     private static string Folder =>
         Environment.GetEnvironmentVariable("SHORTCUTFORGE_SETTINGS_DIR") is { Length: > 0 } dir

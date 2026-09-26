@@ -1,0 +1,9 @@
+#name "Resize photos"
+#icon color=purple glyph=59511
+
+photos = SelectPhotos(multiple: true)
+foreach photos {
+    small = ResizeImage(RepeatItem, width: "1280", by: "Size")
+    SaveToPhotos(small)
+}
+Notification("Resized photos saved.", title: "Photos")
