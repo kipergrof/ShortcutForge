@@ -39,6 +39,8 @@ public class MainViewModelTests : IDisposable
         public void Info(string title, string message) => Messages.Add(message);
         public void Error(string title, string message) => Messages.Add("ERROR: " + message);
         public bool EditSettings(AppSettings settings) => false;
+        public readonly List<string> OpenedUrls = [];
+        public void OpenUrl(string url) => OpenedUrls.Add(url);
     }
 
     /// <summary>WPF objects need an STA thread.</summary>

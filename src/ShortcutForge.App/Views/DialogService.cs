@@ -42,6 +42,9 @@ public sealed class DialogService(Window owner) : IDialogService
     public void Error(string title, string message) =>
         MessageBox.Show(owner, message, title, MessageBoxButton.OK, MessageBoxImage.Error);
 
+    public void OpenUrl(string url) =>
+        System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo(url) { UseShellExecute = true });
+
     public bool EditSettings(AppSettings settings) =>
         new SettingsWindow(settings) { Owner = owner }.ShowDialog() == true;
 }

@@ -64,6 +64,12 @@ public partial class MainWindow : Window
             if (select is { } i && i >= 0 && i < _vm.Cards.Count) CardsList.ScrollIntoView(_vm.Cards[i]);
         });
 
+        Loaded += async (_, _) =>
+        {
+            try { await _vm.CheckForUpdatesInBackgroundAsync(); }
+            catch (Exception ex) when (ex is System.IO.IOException or UnauthorizedAccessException) { /* settings not writable: ignore */ }
+        };
+
         var args = Environment.GetCommandLineArgs();
         if (args.Length > 1 && System.IO.File.Exists(args[1])) _vm.OpenPath(args[1]);
     }

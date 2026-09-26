@@ -39,6 +39,13 @@ public sealed class AppSettings
 
     public List<string> RecentFiles { get; set; } = [];
 
+    /// <summary>Look for a newer release on GitHub at startup (at most once a day).</summary>
+    public bool CheckForUpdates { get; set; } = true;
+    public DateTime? LastUpdateCheck { get; set; }
+
+    /// <summary>A release the user chose to skip; not offered again.</summary>
+    public string? SkippedVersion { get; set; }
+
     /// <summary>Settings folder; SHORTCUTFORGE_SETTINGS_DIR overrides it (used by tests).</summary>
     private static string Folder =>
         Environment.GetEnvironmentVariable("SHORTCUTFORGE_SETTINGS_DIR") is { Length: > 0 } dir
