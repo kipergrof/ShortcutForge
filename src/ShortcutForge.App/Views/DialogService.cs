@@ -45,6 +45,9 @@ public sealed class DialogService(Window owner) : IDialogService
     public void OpenUrl(string url) =>
         System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo(url) { UseShellExecute = true });
 
+    public void ShowShare(byte[] data, string fileName, bool isSigned) =>
+        new QrShareWindow(data, fileName, isSigned) { Owner = owner }.ShowDialog();
+
     public bool EditSettings(AppSettings settings) =>
         new SettingsWindow(settings) { Owner = owner }.ShowDialog() == true;
 }

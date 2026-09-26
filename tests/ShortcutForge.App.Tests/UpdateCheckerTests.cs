@@ -104,6 +104,7 @@ public class UpdateCheckerTests : IDisposable
         public void Error(string title, string message) { }
         public bool EditSettings(AppSettings settings) => false;
         public void OpenUrl(string url) => Opened.Add(url);
+        public void ShowShare(byte[] data, string fileName, bool isSigned) { }
     }
 
     private static void Sta(Func<Task> body)

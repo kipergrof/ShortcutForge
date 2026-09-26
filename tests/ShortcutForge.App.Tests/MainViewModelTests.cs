@@ -41,6 +41,9 @@ public class MainViewModelTests : IDisposable
         public bool EditSettings(AppSettings settings) => false;
         public readonly List<string> OpenedUrls = [];
         public void OpenUrl(string url) => OpenedUrls.Add(url);
+
+        public (byte[] Data, string Name, bool Signed)? Shared;
+        public void ShowShare(byte[] data, string fileName, bool isSigned) => Shared = (data, fileName, isSigned);
     }
 
     /// <summary>WPF objects need an STA thread.</summary>
@@ -133,6 +136,20 @@ public class MainViewModelTests : IDisposable
         Assert.Equal(9, vm.Current.Actions.Count);
         vm.RedoCommand.Execute(null);
         Assert.Equal(5, vm.Current.Actions.Count);
+    });
+
+    [Fact]
+    public void Send_to_iphone_signs_and_opens_the_share_window() => Sta(() =>
+    {
+        var dialogs = new FakeDialogs { ConfirmAnswer = false }; // decline online signing: no network in tests
+        var vm = new MainViewModel(dialogs);
+
+        vm.SendToIPhoneCommand.ExecuteAsync(null).GetAwaiter().GetResult();
+
+        var shared = Assert.NotNull(dialogs.Shared);
+        Assert.Equal("Első parancsom.shortcut", shared.Name);
+        Assert.False(shared.Signed); // unsigned exporter → the window shows the warning
+        Assert.Equal(vm.Current.Actions.Count, Core.Import.ShortcutFileReader.Read(shared.Data).Actions.Count);
     });
 
     [Fact]

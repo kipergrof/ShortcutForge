@@ -15,6 +15,7 @@
         <KeyBinding Key="S" Modifiers="Control" Command="{Binding SaveFileCommand}" />
         <KeyBinding Key="S" Modifiers="Control+Shift" Command="{Binding SaveFileAsCommand}" />
         <KeyBinding Key="E" Modifiers="Control" Command="{Binding ExportCommand}" />
+        <KeyBinding Key="E" Modifiers="Control+Shift" Command="{Binding SendToIPhoneCommand}" />
         <KeyBinding Key="F1" Command="{x:Static vm:AppCommands.Help}" />
         <KeyBinding Key="F" Modifiers="Control" Command="{x:Static vm:AppCommands.FocusSearch}" />
     </Window.InputBindings>
@@ -283,7 +284,8 @@
                 <MenuItem Header="{l:T 'Mentés _másként…', 'Save _As…'}" InputGestureText="Ctrl+Shift+S" Command="{Binding SaveFileAsCommand}" />
                 <Separator />
                 <MenuItem Header="{l:T '_Exportálás .shortcut fájlba…', '_Export to .shortcut file…'}" InputGestureText="Ctrl+E" Command="{Binding ExportCommand}" />
-                <MenuItem Header="{l:T 'Exportálás i_Phone-ra (ingyenes, Mac nélkül)…', 'Export for i_Phone (free, no Mac)…'}" Command="{Binding ExportForIPhoneCommand}" />
+                <MenuItem Header="{l:T '_Küldés iPhone-ra QR-kóddal…', '_Send to iPhone with a QR code…'}" InputGestureText="Ctrl+Shift+E" Command="{Binding SendToIPhoneCommand}" />
+                <MenuItem Header="{l:T 'Exportálás i_Phone-ra (Shortcut Source Helper)…', 'Export for i_Phone (Shortcut Source Helper)…'}" Command="{Binding ExportForIPhoneCommand}" />
                 <MenuItem Header="{l:T 'Importálás _iCloud linkről…', 'Import from _iCloud link…'}" Command="{Binding ImportICloudCommand}" />
                 <Separator />
                 <MenuItem Header="{l:T '_Kilépés', 'E_xit'}" Click="Exit_Click" />
@@ -339,8 +341,8 @@
                     <Button Style="{StaticResource ToolButton}" Command="{Binding UndoCommand}" ToolTip="{l:T 'Visszavonás (Ctrl+Z)', 'Undo (Ctrl+Z)'}">↶</Button>
                     <Button Style="{StaticResource ToolButton}" Command="{Binding RedoCommand}" ToolTip="{l:T 'Mégis (Ctrl+Y)', 'Redo (Ctrl+Y)'}">↷</Button>
                     <Rectangle Width="1" Fill="{DynamicResource CardBorder}" Margin="6,2" />
-                    <Button Style="{StaticResource ToolButton}" Command="{Binding ExportForIPhoneCommand}" Content="{l:T '📱 iPhone-ra', '📱 For iPhone'}"
-                            ToolTip="{l:T 'Plist mentése a Shortcut Source Helperhez: ingyenes aláírás és import az iPhone-on, Mac nélkül', 'Save a plist for Shortcut Source Helper: free signing and import on the iPhone, no Mac needed'}" />
+                    <Button Style="{StaticResource ToolButton}" Command="{Binding SendToIPhoneCommand}" Content="{l:T '📱 Küldés iPhone-ra', '📱 Send to iPhone'}"
+                            ToolTip="{l:T 'Aláírja, és QR-kódot mutat: olvasd be az iPhone kamerájával (ugyanazon a Wi-Fi-n)', 'Signs it and shows a QR code: scan it with the iPhone camera (same Wi-Fi)'}" />
                     <Button Style="{StaticResource ToolButton}" Command="{Binding ImportICloudCommand}" Content="{l:T '☁ iCloud import', '☁ iCloud import'}"
                             ToolTip="{l:T 'Megosztott parancs letöltése iCloud linkről', 'Download a shared shortcut from an iCloud link'}" />
                     <Button Style="{StaticResource ToolButton}" Command="{Binding OpenSettingsCommand}" Content="{l:T '⚙ Beállítások', '⚙ Settings'}" />

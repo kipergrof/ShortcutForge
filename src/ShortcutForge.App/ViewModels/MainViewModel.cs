@@ -31,6 +31,9 @@ public interface IDialogService
 
     /// <summary>Opens a web page in the default browser.</summary>
     void OpenUrl(string url);
+
+    /// <summary>Shows the QR code window that serves <paramref name="data"/> on the local network.</summary>
+    void ShowShare(byte[] data, string fileName, bool isSigned);
 }
 
 public sealed partial class MainViewModel : ObservableObject
@@ -878,6 +881,64 @@ public sealed partial class MainViewModel : ObservableObject
         return cleaned.Length == 0 ? "parancs" : cleaned;
     }
 
+    /// <summary>One-time offer of free online signing, so nothing is sent anywhere without consent.</summary>
+    private void OfferFreeSigningOnce()
+    {
+        if (Settings.Signer != SignerKind.Unsigned || Settings.ShortcutyOfferShown) return;
+        Settings.ShortcutyOfferShown = true;
+        if (_dialogs.Confirm(L.T("Ingyenes aláírás", "Free signing"),
+                L.T("Az iPhone csak aláírt parancsot importál. Aláírassam most ingyen a Shortcuty online szolgáltatással?\n\n" +
+                    "A parancs tartalma a Shortcuty szerverére kerül (jelszót, személyes adatot ne küldj így). " +
+                    "Később az Eszközök › Beállítások menüben módosítható.",
+                    "iPhone only imports signed shortcuts. Sign it now for free with the Shortcuty online service?\n\n" +
+                    "The shortcut's content is sent to Shortcuty's server (don't send passwords or personal data this way). " +
+                    "You can change this later in Tools › Settings.")))
+            Settings.Signer = SignerKind.Shortcuty;
+        Settings.Save();
+    }
+
+    /// <summary>
+    /// Signs the shortcut with the configured signer and offers it on the local network with a
+    /// QR code, so the iPhone can download it with its camera (no AirDrop on Windows).
+    /// </summary>
+    [RelayCommand]
+    private async Task SendToIPhoneAsync()
+    {
+        if (!ApplyDslIfNeeded())
+        {
+            _dialogs.Error(L.T("Küldés iPhone-ra", "Send to iPhone"), L.T("A szöveges nézetben hiba van:\n", "The text view has an error:\n") + DslError);
+            return;
+        }
+        if (ControlFlow.Validate(Current.Actions) is { } problem &&
+            !_dialogs.Confirm(L.T("Szerkezeti hiba", "Structure error"), problem + L.T("\n\nÍgy is elküldöd?", "\n\nSend anyway?")))
+            return;
+
+        try
+        {
+            IsBusy = true;
+            OfferFreeSigningOnce();
+            var signer = Settings.CreateSigner();
+            Status = L.T($"Aláírás: {signer.DisplayName}…", $"Signing: {signer.DisplayName}…");
+            var bytes = await signer.SignAsync(ShortcutDocument.UnsignedBytes(Current), Settings.SigningMode, Current.Name);
+            Status = L.T("QR-kód megjelenítve – olvasd be az iPhone kamerájával.", "QR code shown – scan it with the iPhone camera.");
+            _dialogs.ShowShare(bytes, SafeFileName(Current.Name) + ".shortcut", signer.ProducesSignedFile);
+        }
+        catch (SigningException ex)
+        {
+            _dialogs.Error(L.T("Aláírás sikertelen", "Signing failed"), ex.Message);
+            Status = L.T("Aláírás sikertelen.", "Signing failed.");
+        }
+        catch (System.Net.Sockets.SocketException ex)
+        {
+            _dialogs.Error(L.T("Küldés iPhone-ra", "Send to iPhone"),
+                L.T($"Nem sikerült elindítani a helyi megosztást: {ex.Message}", $"Could not start local sharing: {ex.Message}"));
+        }
+        finally
+        {
+            IsBusy = false;
+        }
+    }
+
     [RelayCommand]
     private async Task ExportAsync()
     {
@@ -903,21 +964,7 @@ public sealed partial class MainViewModel : ObservableObject
                 return;
             }
 
-            // One-time offer of free online signing, so nothing is sent anywhere without consent.
-            if (Settings.Signer == SignerKind.Unsigned && !Settings.ShortcutyOfferShown)
-            {
-                Settings.ShortcutyOfferShown = true;
-                if (_dialogs.Confirm(L.T("Ingyenes aláírás", "Free signing"),
-                        L.T("Az iPhone csak aláírt parancsot importál. Aláírassam most ingyen a Shortcuty online szolgáltatással?\n\n" +
-                            "A parancs tartalma a Shortcuty szerverére kerül (jelszót, személyes adatot ne küldj így). " +
-                            "Később az Eszközök › Beállítások menüben módosítható.",
-                            "iPhone only imports signed shortcuts. Sign it now for free with the Shortcuty online service?\n\n" +
-                            "The shortcut's content is sent to Shortcuty's server (don't send passwords or personal data this way). " +
-                            "You can change this later in Tools › Settings.")))
-                    Settings.Signer = SignerKind.Shortcuty;
-                Settings.Save();
-            }
-
+            OfferFreeSigningOnce();
             var signer = Settings.CreateSigner();
             Status = L.T($"Exportálás: {signer.DisplayName}…", $"Exporting: {signer.DisplayName}…");
             var bytes = await signer.SignAsync(ShortcutDocument.UnsignedBytes(Current), Settings.SigningMode, Current.Name);
