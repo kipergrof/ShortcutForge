@@ -1,7 +1,7 @@
 <Project>
   <!-- Shared metadata for every project. Bump <Version> for a new release. -->
   <PropertyGroup>
-    <Version>1.1.1</Version>
+    <Version>1.1.2</Version>
     <Product>ShortcutForge</Product>
     <Authors>Krisztián Szilvágyi</Authors>
     <Copyright>Copyright © 2026 Krisztián Szilvágyi</Copyright>

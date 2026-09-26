@@ -7,6 +7,11 @@ from the commit messages since the previous release — no manual editing needed
 
 <!-- releases -->
 
+## [1.1.2] – 2026-09-26
+
+- Microsoft Store package (MSIX) (#15)
+- Credit Shortcuty: logo, site and Discord links (#16)
+
 ## [1.1.1] – 2026-09-26
 
 - Microsoft Store listing and privacy policy (#13)
