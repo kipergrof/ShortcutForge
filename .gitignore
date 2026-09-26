@@ -483,3 +483,6 @@ $RECYCLE.BIN/
 
 # Written by the release workflow
 release-notes.md
+
+# Local agent worktrees (Claude Code)
+.claude/worktrees/
