@@ -101,6 +101,10 @@ dotnet run --project src/ShortcutForge.App
 - A DSL-ben adott változónevek (`x = …`) nem tárolódnak a parancsban. Visszaolvasáskor a kimenet nevéből képzett név (pl. `text`) jelenik meg.
 
 
+## Adatvédelem
+
+Nincs telemetria, fiók és reklám. A beállítások a gépeden maradnak, és az alkalmazás csak az általad használt funkciókhoz megy online. Részletek az [adatvédelmi tájékoztatóban](PRIVACY.md#adatvédelmi-tájékoztató).
+
 ## Szerző és licenc
 
 A ShortcutForge-ot **Szilvágyi Krisztián** ([@kipergrof](https://github.com/kipergrof)) készítette.
