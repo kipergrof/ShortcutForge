@@ -100,12 +100,15 @@ jobs:
           Copy-Item publish/ShortcutForge.App.exe "ShortcutForge-$v-win-x64.exe"
 
       - name: Build the Microsoft Store package
+        # Optional: a problem with the Store package must not block the GitHub release.
+        continue-on-error: true
         shell: pwsh
         run: ./packaging/msix/build-msix.ps1 -Output "ShortcutForge-${{ steps.version.outputs.version }}-store.msix"
 
       # Unsigned (the Store signs it on upload), so it is not attached to the release:
       # download it from the workflow run and upload it in Partner Center.
       - name: Keep the Store package as a workflow artifact
+        continue-on-error: true
         uses: actions/upload-artifact@v4
         with:
           name: store-msix
