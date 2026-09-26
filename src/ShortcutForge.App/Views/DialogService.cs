@@ -42,6 +42,11 @@ public sealed class DialogService(Window owner) : IDialogService
     public void Error(string title, string message) =>
         MessageBox.Show(owner, message, title, MessageBoxButton.OK, MessageBoxImage.Error);
 
+    public string? PickGalleryTemplate()
+    {
+        var window = new GalleryWindow { Owner = owner };
+        return window.ShowDialog() == true ? window.SelectedSource : null;
+    }
     public void OpenUrl(string url) =>
         System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo(url) { UseShellExecute = true });
 

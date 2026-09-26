@@ -103,6 +103,7 @@ public class UpdateCheckerTests : IDisposable
         public void Info(string title, string message) { }
         public void Error(string title, string message) { }
         public bool EditSettings(AppSettings settings) => false;
+        public string? PickGalleryTemplate() => null;
         public void OpenUrl(string url) => Opened.Add(url);
         public void ShowShare(byte[] data, string fileName, bool isSigned) { }
     }

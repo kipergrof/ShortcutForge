@@ -29,6 +29,8 @@ public interface IDialogService
     void Error(string title, string message);
     bool EditSettings(AppSettings settings);
 
+    /// <summary>Shows the online template gallery; returns the chosen template's source or null.</summary>
+    string? PickGalleryTemplate();
     /// <summary>Opens a web page in the default browser.</summary>
     void OpenUrl(string url);
 
@@ -788,6 +790,23 @@ public sealed partial class MainViewModel : ObservableObject
         if (template is null || !ConfirmDiscardIncludingDsl()) return;
         LoadShortcut(DslParser.Parse(template.Source), null);
         Status = L.F("Új parancs sablonból: {0}", "New shortcut from template: {0}", template.Name);
+    }
+
+    [RelayCommand]
+    private void OpenGallery()
+    {
+        if (!ConfirmDiscardIncludingDsl()) return;
+        var source = _dialogs.PickGalleryTemplate();
+        if (source is null) return;
+        try
+        {
+            LoadShortcut(DslParser.Parse(source), null);
+            Status = L.T("Sablon megnyitva a galériából.", "Template opened from the gallery.");
+        }
+        catch (DslException ex)
+        {
+            _dialogs.Error(L.T("Sablongaléria", "Template gallery"), ex.ToString());
+        }
     }
 
     [RelayCommand]

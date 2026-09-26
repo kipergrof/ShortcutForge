@@ -1,0 +1,7 @@
+#name "Szószámláló"
+#icon color=orange glyph=59511
+
+clip = GetClipboard()
+words = Count(clip, type: "Words")
+chars = Count(clip, type: "Characters")
+Alert("{words} szó, {chars} karakter", title: "Szószámláló")

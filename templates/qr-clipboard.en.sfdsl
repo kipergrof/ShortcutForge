@@ -1,0 +1,6 @@
+#name "QR from clipboard"
+#icon color=darkblue glyph=59511
+
+clip = GetClipboard()
+qr = GenerateQRCode(clip, correction: "Medium")
+QuickLook(qr)

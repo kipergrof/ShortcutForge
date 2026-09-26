@@ -39,6 +39,8 @@ public class MainViewModelTests : IDisposable
         public void Info(string title, string message) => Messages.Add(message);
         public void Error(string title, string message) => Messages.Add("ERROR: " + message);
         public bool EditSettings(AppSettings settings) => false;
+        public string? NextGallerySource;
+        public string? PickGalleryTemplate() => NextGallerySource;
         public readonly List<string> OpenedUrls = [];
         public void OpenUrl(string url) => OpenedUrls.Add(url);
 
@@ -136,6 +138,20 @@ public class MainViewModelTests : IDisposable
         Assert.Equal(9, vm.Current.Actions.Count);
         vm.RedoCommand.Execute(null);
         Assert.Equal(5, vm.Current.Actions.Count);
+    });
+
+    [Fact]
+    public void Opens_a_template_from_the_gallery() => Sta(() =>
+    {
+        var dialogs = new FakeDialogs { NextGallerySource = "#name \"Kocka\"\nroll = RandomNumber(min: 1, max: 6)\nAlert(\"{roll}\")" };
+        var vm = new MainViewModel(dialogs);
+        vm.OpenGalleryCommand.Execute(null);
+        Assert.Equal("Kocka", vm.ShortcutName);
+        Assert.Equal(2, vm.Cards.Count);
+
+        dialogs.NextGallerySource = null; // cancelled: nothing changes
+        vm.OpenGalleryCommand.Execute(null);
+        Assert.Equal("Kocka", vm.ShortcutName);
     });
 
     [Fact]
