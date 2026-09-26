@@ -29,11 +29,38 @@ public sealed class LocalShareServer : IDisposable
         _listener = new TcpListener(IPAddress.Any, port);
     }
 
-    /// <summary>Starts serving <paramref name="content"/> as <paramref name="fileName"/> (port 0 = any free port).</summary>
-    public static LocalShareServer Start(byte[] content, string fileName, int port = 0)
+    /// <summary>
+    /// Fixed port tried first, so one firewall rule (see <see cref="FirewallHelper"/>) keeps working
+    /// across launches. Falls back to any free port when it is taken.
+    /// </summary>
+    public const int PreferredPort = 47813;
+
+    /// <summary>
+    /// Starts serving <paramref name="content"/> as <paramref name="fileName"/>.
+    /// Port -1 = <see cref="PreferredPort"/> or any free port; 0 = any free port.
+    /// </summary>
+    public static LocalShareServer Start(byte[] content, string fileName, int port = -1)
     {
-        var server = new LocalShareServer(content, fileName, port);
-        server._listener.Start();
+        LocalShareServer server;
+        if (port == -1)
+        {
+            server = new LocalShareServer(content, fileName, PreferredPort);
+            try
+            {
+                server._listener.Start();
+            }
+            catch (SocketException)
+            {
+                server.Dispose();
+                server = new LocalShareServer(content, fileName, 0);
+                server._listener.Start();
+            }
+        }
+        else
+        {
+            server = new LocalShareServer(content, fileName, port);
+            server._listener.Start();
+        }
         _ = server.AcceptLoopAsync();
         return server;
     }
@@ -44,6 +71,14 @@ public sealed class LocalShareServer : IDisposable
     public string Path => $"/{_token}/{Uri.EscapeDataString(_fileName)}";
 
     public string UrlFor(IPAddress address) => $"http://{address}:{Port}{Path}";
+
+    /// <summary>Landing page with a download button and instructions (what the QR code opens).</summary>
+    public string PagePath => $"/{_token}/";
+
+    public string PageUrlFor(IPAddress address) => $"http://{address}:{Port}{PagePath}";
+
+    /// <summary>Raised (on a worker thread) when a device opened the landing page: the connection works.</summary>
+    public event EventHandler<EndPoint?>? PageOpened;
 
     public int Downloads => _downloads;
 
@@ -92,6 +127,12 @@ public sealed class LocalShareServer : IDisposable
                     await WriteAsync(stream, "405 Method Not Allowed", "text/plain", "Method not allowed"u8.ToArray(), headOnly: false, timeout.Token);
                     return;
                 }
+                if (target == PagePath || target == PagePath.TrimEnd('/'))
+                {
+                    await WriteAsync(stream, "200 OK", "text/html; charset=utf-8", Encoding.UTF8.GetBytes(LandingPage()), method == "HEAD", timeout.Token);
+                    if (method == "GET") PageOpened?.Invoke(this, client.Client.RemoteEndPoint);
+                    return;
+                }
                 if (!IsFilePath(target))
                 {
                     await WriteAsync(stream, "404 Not Found", "text/plain", "Not found"u8.ToArray(), method == "HEAD", timeout.Token);
@@ -112,6 +153,41 @@ public sealed class LocalShareServer : IDisposable
                 // client went away or timed out
             }
         }
+    }
+
+    private string LandingPage()
+    {
+        var name = WebUtility.HtmlEncode(System.IO.Path.GetFileNameWithoutExtension(_fileName));
+        // Rooted, not relative: the page is also served without its trailing slash, and a relative
+        // href would then resolve to /<file> instead of /<token>/<file>.
+        var href = WebUtility.HtmlEncode(Path);
+        var download = WebUtility.HtmlEncode(_fileName);
+        string T(string hu, string en) => WebUtility.HtmlEncode(Core.Localization.L.T(hu, en));
+        return $$"""
+            <!doctype html>
+            <html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+            <title>{{name}}</title>
+            <style>
+            body{font-family:-apple-system,system-ui,sans-serif;margin:0;padding:28px 20px;background:#f2f2f7;color:#111;text-align:center}
+            .card{background:#fff;border-radius:16px;padding:24px 18px;max-width:420px;margin:0 auto;box-shadow:0 1px 3px rgba(0,0,0,.08)}
+            h1{font-size:22px;margin:4px 0 18px}
+            a.btn{display:block;background:#007aff;color:#fff;text-decoration:none;font-size:18px;font-weight:600;padding:15px;border-radius:12px}
+            ol{text-align:left;font-size:15px;line-height:1.5;padding-left:22px;margin:20px 0 0;color:#333}
+            small{display:block;margin-top:18px;color:#888}
+            @media (prefers-color-scheme:dark){body{background:#000;color:#eee}.card{background:#1c1c1e}ol{color:#ccc} }
+            </style></head>
+            <body><div class="card">
+            <div style="font-size:40px">⚡️</div>
+            <h1>{{name}}</h1>
+            <a class="btn" href="{{href}}" download="{{download}}">{{T("Letöltés", "Download")}}</a>
+            <ol>
+            <li>{{T("Koppints a Letöltés gombra, majd a felugró kérdésnél a Letöltésre.", "Tap Download, then Download again when asked.")}}</li>
+            <li>{{T("Nyisd meg a letöltést (Safari: ↓ ikon a címsorban, vagy Fájlok app › Letöltések).", "Open the download (Safari: the ↓ icon in the address bar, or Files app › Downloads).")}}</li>
+            <li>{{T("A Parancsok app megnyílik: koppints a Parancs hozzáadása gombra.", "The Shortcuts app opens: tap Add Shortcut.")}}</li>
+            </ol>
+            <small>ShortcutForge</small>
+            </div></body></html>
+            """;
     }
 
     private bool IsFilePath(string target)

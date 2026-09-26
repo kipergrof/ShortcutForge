@@ -42,6 +42,50 @@ public class LocalShareServerTests
         Assert.Equal(1, server.Downloads);
     }
 
+    // The QR code points at the landing page. Scanning a link that answers with an octet-stream
+    // attachment leaves Safari on a blank page with no download prompt, so the phone needs a real
+    // page with a Download button on it.
+    [Fact]
+    public async Task Landing_page_offers_the_file_and_reports_the_visit()
+    {
+        using var server = LocalShareServer.Start(Content, "Reggeli parancs.shortcut");
+        using var http = new HttpClient();
+        var pageUrl = server.PageUrlFor(IPAddress.Loopback);
+
+        var opened = new TaskCompletionSource();
+        server.PageOpened += (_, _) => opened.TrySetResult();
+
+        using var page = await http.GetAsync(pageUrl);
+        Assert.Equal(HttpStatusCode.OK, page.StatusCode);
+        Assert.Equal("text/html", page.Content.Headers.ContentType!.MediaType);
+        await opened.Task.WaitAsync(TimeSpan.FromSeconds(5));
+        Assert.Equal(0, server.Downloads); // opening the page is not a download
+
+        // The download button must resolve to the file, from the page URL with and without its
+        // trailing slash (a relative href would break on the second one).
+        var html = await page.Content.ReadAsStringAsync();
+        var href = WebUtility.HtmlDecode(html.Split("href=\"")[1].Split('"')[0]);
+        foreach (var basePage in new[] { pageUrl, pageUrl.TrimEnd('/') })
+        {
+            using var file = await http.GetAsync(new Uri(new Uri(basePage), href));
+            Assert.Equal(HttpStatusCode.OK, file.StatusCode);
+            Assert.Equal(Content, await file.Content.ReadAsByteArrayAsync());
+        }
+
+        // The page is served without the trailing slash too, so a trimmed link still works.
+        using var noSlash = await http.GetAsync(pageUrl.TrimEnd('/'));
+        Assert.Equal(HttpStatusCode.OK, noSlash.StatusCode);
+    }
+
+    [Fact]
+    public async Task Landing_page_is_behind_the_random_token()
+    {
+        using var server = LocalShareServer.Start(Content, "x.shortcut");
+        using var http = new HttpClient();
+        using var wrongToken = await http.GetAsync($"http://127.0.0.1:{server.Port}/0000/");
+        Assert.Equal(HttpStatusCode.NotFound, wrongToken.StatusCode);
+    }
+
     [Fact]
     public void Paths_are_unguessable_and_different_per_share()
     {

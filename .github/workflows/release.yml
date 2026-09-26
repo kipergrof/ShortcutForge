@@ -123,8 +123,16 @@ jobs:
       - name: Update the winget package
         if: env.WINGET_TOKEN != ''
         shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
         run: |
           $v = '${{ steps.version.outputs.version }}'
+          # wingetcreate update only works once the package is in the winget catalog.
+          gh api repos/microsoft/winget-pkgs/contents/manifests/k/kipergrof/ShortcutForge --silent 2>$null
+          if ($LASTEXITCODE -ne 0) {
+            Write-Host "kipergrof.ShortcutForge is not in winget-pkgs yet; skipping the winget update."
+            exit 0
+          }
           Invoke-WebRequest https://aka.ms/wingetcreate/latest -OutFile wingetcreate.exe
           ./wingetcreate.exe update kipergrof.ShortcutForge --version $v `
             --urls "https://github.com/kipergrof/ShortcutForge/releases/download/v$v/ShortcutForge-$v-win-x64.exe" `
