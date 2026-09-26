@@ -7,6 +7,12 @@ from the commit messages since the previous release — no manual editing needed
 
 <!-- releases -->
 
+## [1.1.1] – 2026-09-26
+
+- Microsoft Store listing and privacy policy (#13)
+- Fix Send to iPhone: landing page and firewall help (#12)
+- Release: skip the winget update until the package is in the winget catalog (#11)
+
 ## [1.1.0] – 2026-09-26
 
 - Dry run: run a shortcut step by step on Windows (#10)
