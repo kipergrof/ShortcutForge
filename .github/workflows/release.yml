@@ -99,6 +99,18 @@ jobs:
             -p:EnableCompressionInSingleFile=true -o publish
           Copy-Item publish/ShortcutForge.App.exe "ShortcutForge-$v-win-x64.exe"
 
+      - name: Build the Microsoft Store package
+        shell: pwsh
+        run: ./packaging/msix/build-msix.ps1 -Output "ShortcutForge-${{ steps.version.outputs.version }}-store.msix"
+
+      # Unsigned (the Store signs it on upload), so it is not attached to the release:
+      # download it from the workflow run and upload it in Partner Center.
+      - name: Keep the Store package as a workflow artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: store-msix
+          path: ShortcutForge-${{ steps.version.outputs.version }}-store.msix
+
       - name: Publish the GitHub release
         shell: pwsh
         env:

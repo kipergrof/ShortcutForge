@@ -13,8 +13,8 @@
 param(
     [string] $Output = 'ShortcutForge.msix',
     [string] $IdentityName = 'kipergrof.ShortcutForge',
-    [string] $Publisher = 'CN=kipergrof',
-    [string] $PublisherDisplayName = 'Krisztián Szilvágyi',
+    [string] $Publisher = 'CN=4C083E5C-0222-4881-85C3-CD7C0DF59FA0',
+    [string] $PublisherDisplayName = 'kipergrof',
     [string] $MakeAppx,
     [string] $SignTool,
     [string] $CertificatePfx,
