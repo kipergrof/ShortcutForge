@@ -57,7 +57,9 @@ The full reference is in the app: *Help › Text language (DSL) help*, or F1.
 
 ## Download and run
 
-Build from source (requires the [.NET 10 SDK](https://dotnet.microsoft.com/download)):
+**Easiest:** download `ShortcutForge-<version>-win-x64.exe` from the [latest release](https://github.com/kipergrof/ShortcutForge/releases/latest) and run it. It is a single file for Windows 10/11 x64 and needs no .NET install. SmartScreen may warn because the file is not code-signed; choose *More info › Run anyway*.
+
+Or build from source (requires the [.NET 10 SDK](https://dotnet.microsoft.com/download)):
 
 ```
 git clone https://github.com/kipergrof/ShortcutForge.git
