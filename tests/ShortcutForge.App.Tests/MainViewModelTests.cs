@@ -139,6 +139,45 @@ public class MainViewModelTests : IDisposable
     });
 
     [Fact]
+    public void Find_replace_and_rename_variable() => Sta(() =>
+    {
+        var vm = new MainViewModel(new FakeDialogs());
+        vm.OnDslEdited("""
+            var name = "alma"
+            t = Text("alma és {name}")
+            Alert("Nincs alma")
+            """);
+        Assert.True(vm.ApplyDslIfNeeded());
+
+        vm.ToggleFindPanelCommand.Execute(null);
+        Assert.True(vm.IsFindPanelOpen);
+        Assert.Equal("name", vm.RenameFrom);
+
+        vm.FindText = "alma";
+        vm.SelectedCard = null;
+        vm.FindNextCommand.Execute(null);
+        Assert.Equal(0, vm.SelectedCard!.Index);
+        vm.FindNextCommand.Execute(null);
+        Assert.Equal(1, vm.SelectedCard!.Index);
+
+        vm.ReplaceText = "körte";
+        vm.ReplaceAllCommand.Execute(null);
+        Assert.Contains("3", vm.FindStatus);
+        Assert.Equal("körte és {name}", vm.Cards[1].Params.Single(p => p.Key == "WFTextActionText").Text);
+
+        vm.RenameTo = "gyümölcs";
+        vm.RenameVariableCommand.Execute(null);
+        Assert.Equal(["gyümölcs"], vm.NamedVariableNames);
+        Assert.Contains("gyümölcs", vm.CurrentDsl);
+
+        // Both operations are undoable.
+        vm.UndoCommand.Execute(null);
+        Assert.Equal(["name"], vm.NamedVariableNames);
+        vm.UndoCommand.Execute(null);
+        Assert.Contains("alma és", vm.CurrentDsl);
+    });
+
+    [Fact]
     public void Send_to_iphone_signs_and_opens_the_share_window() => Sta(() =>
     {
         var dialogs = new FakeDialogs { ConfirmAnswer = false }; // decline online signing: no network in tests

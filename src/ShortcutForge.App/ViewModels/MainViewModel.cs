@@ -1003,6 +1003,107 @@ public sealed partial class MainViewModel : ObservableObject
         }
     }
 
+    // ------------------------------------------------------------------ find & replace
+
+    [ObservableProperty] private bool _isFindPanelOpen;
+    [ObservableProperty] private string _findText = "";
+    [ObservableProperty] private string _replaceText = "";
+    [ObservableProperty] private bool _findMatchCase;
+    [ObservableProperty] private string? _findStatus;
+    [ObservableProperty] private string? _renameFrom;
+    [ObservableProperty] private string _renameTo = "";
+
+    public IReadOnlyList<string> NamedVariableNames => ShortcutRefactor.NamedVariables(Current);
+
+    /// <summary>Asks the view to bring a card into view (index).</summary>
+    public event EventHandler<int>? CardFocusRequested;
+
+    partial void OnFindTextChanged(string value) => FindStatus = null;
+
+    [RelayCommand]
+    private void ToggleFindPanel()
+    {
+        IsFindPanelOpen = !IsFindPanelOpen;
+        if (IsFindPanelOpen)
+        {
+            OnPropertyChanged(nameof(NamedVariableNames));
+            RenameFrom ??= NamedVariableNames.FirstOrDefault();
+        }
+    }
+
+    [RelayCommand]
+    private void CloseFindPanel() => IsFindPanelOpen = false;
+
+    private IReadOnlyList<int> Matches() => ShortcutRefactor.FindActions(Current, FindText, FindMatchCase,
+        a => ActionCatalog.Default.ById(a.Identifier)?.Name);
+
+    [RelayCommand]
+    private void FindNext()
+    {
+        if (!ApplyDslIfNeeded() || string.IsNullOrEmpty(FindText)) return;
+        var matches = Matches();
+        if (matches.Count == 0)
+        {
+            FindStatus = L.T("Nincs találat.", "No matches.");
+            return;
+        }
+        var from = SelectedCard?.Index ?? -1;
+        var next = matches.FirstOrDefault(i => i > from, matches[0]);
+        var card = Cards[next];
+        card.IsCollapsed = false;
+        SelectedCard = card;
+        CardFocusRequested?.Invoke(this, next);
+        FindStatus = L.T($"{matches.ToList().IndexOf(next) + 1}. / {matches.Count} találat", $"Match {matches.ToList().IndexOf(next) + 1} of {matches.Count}");
+    }
+
+    [RelayCommand]
+    private void ReplaceAll()
+    {
+        if (!ApplyDslIfNeeded() || string.IsNullOrEmpty(FindText)) return;
+        _checkpointTaken = false;
+        var snapshot = TakeSnapshot();
+        var count = ShortcutRefactor.ReplaceText(Current, FindText, ReplaceText, FindMatchCase);
+        if (count == 0)
+        {
+            FindStatus = L.T("Nincs mit cserélni.", "Nothing to replace.");
+            return;
+        }
+        _undo.Push(snapshot);
+        _redo.Clear();
+        UndoCommand.NotifyCanExecuteChanged();
+        RedoCommand.NotifyCanExecuteChanged();
+        MarkDirty();
+        RebuildCards(SelectedCard?.Index);
+        FindStatus = L.T($"{count} csere.", $"{count} replaced.");
+        Status = FindStatus;
+    }
+
+    [RelayCommand]
+    private void RenameVariable()
+    {
+        if (!ApplyDslIfNeeded() || string.IsNullOrEmpty(RenameFrom) || string.IsNullOrWhiteSpace(RenameTo)) return;
+        var newName = RenameTo.Trim();
+        if (NamedVariableNames.Contains(newName) && newName != RenameFrom &&
+            !_dialogs.Confirm(L.T("Változó átnevezése", "Rename variable"),
+                L.T($"Már van „{newName}” nevű változó; a kettő összeolvad. Folytatod?",
+                    $"A variable named \"{newName}\" already exists; the two will be merged. Continue?")))
+            return;
+        _checkpointTaken = false;
+        var snapshot = TakeSnapshot();
+        var count = ShortcutRefactor.RenameVariable(Current, RenameFrom, newName);
+        if (count == 0) return;
+        _undo.Push(snapshot);
+        _redo.Clear();
+        UndoCommand.NotifyCanExecuteChanged();
+        RedoCommand.NotifyCanExecuteChanged();
+        MarkDirty();
+        RebuildCards(SelectedCard?.Index);
+        FindStatus = L.T($"„{RenameFrom}” → „{newName}”: {count} helyen.", $"\"{RenameFrom}\" → \"{newName}\": {count} places.");
+        OnPropertyChanged(nameof(NamedVariableNames));
+        RenameFrom = newName;
+        RenameTo = "";
+    }
+
     // ------------------------------------------------------------------ updates
 
     /// <summary>The update check; replaceable in tests.</summary>

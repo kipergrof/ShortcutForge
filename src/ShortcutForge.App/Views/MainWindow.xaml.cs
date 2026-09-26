@@ -55,6 +55,21 @@ public partial class MainWindow : Window
         CommandBindings.Add(new CommandBinding(AppCommands.Help, (_, _) => new HelpWindow { Owner = this }.Show()));
         CommandBindings.Add(new CommandBinding(AppCommands.FocusSearch, (_, _) => FocusSearch()));
 
+        // Find & replace: built-in search panel in the text view, find bar in the visual editor.
+        ICSharpCode.AvalonEdit.Search.SearchPanel.Install(DslEditor);
+        _vm.CardFocusRequested += (_, index) => Dispatcher.BeginInvoke(DispatcherPriority.Loaded, () =>
+        {
+            if (index >= 0 && index < _vm.Cards.Count) CardsList.ScrollIntoView(_vm.Cards[index]);
+        });
+        _vm.PropertyChanged += (_, e) =>
+        {
+            if (e.PropertyName == nameof(MainViewModel.IsFindPanelOpen) && _vm.IsFindPanelOpen)
+            {
+                if (Tabs.SelectedItem != VisualTab) Tabs.SelectedItem = VisualTab;
+                Dispatcher.BeginInvoke(DispatcherPriority.Input, () => { FindBox.Focus(); FindBox.SelectAll(); });
+            }
+        };
+
         // Keep the scroll position when the cards are recreated; bring new / moved cards into view.
         double savedOffset = 0;
         _vm.CardsRebuilding += (_, _) => savedOffset = CardsScrollViewer()?.VerticalOffset ?? 0;
@@ -178,6 +193,12 @@ public partial class MainWindow : Window
         DslEditor.TextArea.Caret.Column = _vm.DslErrorColumn;
         DslEditor.ScrollToLine(line);
         DslEditor.Focus();
+    }
+
+    private void FindBox_PreviewKeyDown(object sender, KeyEventArgs e)
+    {
+        if (e.Key == Key.Enter) { _vm.FindNextCommand.Execute(null); e.Handled = true; }
+        else if (e.Key == Key.Escape) { _vm.CloseFindPanelCommand.Execute(null); e.Handled = true; }
     }
 
     // ------------------------------------------------------------------ library keyboard
