@@ -585,10 +585,12 @@ public sealed class DslParser
                             color = ShortcutIcon.ColorByName(value.Text) ?? throw Error(L.T($"Ismeretlen szín: {value.Text}", $"Unknown color: {value.Text}"), value);
                             break;
                         case "color" when value.Kind == TokenKind.Number:
-                            color = long.Parse(value.Text);
+                            if (!long.TryParse(value.Text, out color))
+                                throw Error(L.T($"Hibás szín érték: {value.Text}", $"Invalid color value: {value.Text}"), value);
                             break;
                         case "glyph" when value.Kind == TokenKind.Number:
-                            glyph = long.Parse(value.Text);
+                            if (!long.TryParse(value.Text, out glyph))
+                                throw Error(L.T($"Hibás glyph szám: {value.Text}", $"Invalid glyph number: {value.Text}"), value);
                             break;
                         default:
                             throw Error(L.T($"Hibás ikon beállítás: {key.Text}", $"Invalid icon setting: {key.Text}"), key);
