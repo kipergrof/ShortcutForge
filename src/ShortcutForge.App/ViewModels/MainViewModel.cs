@@ -1359,6 +1359,9 @@ public sealed partial class MainViewModel : ObservableObject
             new(L.T("Mentés másként…", "Save as…"), file, "", () => Run(SaveFileAsCommand), "save as", "Ctrl+Shift+S"),
             new(L.T("Exportálás .shortcut fájlba…", "Export to .shortcut file…"), file, "", () => Run(ExportCommand), "export sign alairas", "Ctrl+E"),
             new(L.T("Exportálás iPhone-ra (Shortcut Source Helper)…", "Export for iPhone (Shortcut Source Helper)…"), file, "", () => Run(ExportForIPhoneCommand), "iphone plist"),
+            new(L.T("Parancs leírásból (AI)…", "Shortcut from description (AI)…"), file, "", () => Run(GenerateWithAiCommand), "ai claude generate leiras generalas", "Ctrl+Shift+N"),
+            new(L.T("Sablongaléria (online)…", "Template gallery (online)…"), file, "", () => Run(OpenGalleryCommand), "gallery galeria template sablon online"),
+            new(L.T("Küldés iPhone-ra QR-kóddal…", "Send to iPhone with a QR code…"), file, "", () => Run(SendToIPhoneCommand), "qr iphone send kuldes share", "Ctrl+Shift+E"),
             new(L.T("Importálás iCloud linkről…", "Import from iCloud link…"), file, "", () => Run(ImportICloudCommand), "icloud import link"),
             new(L.T("Plist XML másolása a vágólapra", "Copy plist XML to clipboard"), file, "", () => Run(CopyPlistXmlCommand), "xml plist copy"),
             new(L.T("Visszavonás", "Undo"), edit, "", () => Run(UndoCommand), "undo", "Ctrl+Z"),
@@ -1375,7 +1378,9 @@ public sealed partial class MainViewModel : ObservableObject
             new(L.T("Téma: a rendszer szerint", "Theme: follow system"), view, "", () => Run(SetThemeCommand, "System"), "theme system rendszer"),
             new("Nyelv: magyar / Language: Hungarian", view, "", () => Run(SetLanguageCommand, "hu"), "language nyelv magyar hungarian"),
             new("Language: English / Nyelv: angol", view, "", () => Run(SetLanguageCommand, "en"), "language nyelv english angol"),
+            new(L.T("Próbafuttatás…", "Dry run…"), L.T("Eszközök", "Tools"), "", () => Run(DryRunCommand), "dry run proba futtatas test simulate", "F5"),
             new(L.T("Beállítások (aláírás)…", "Settings (signing)…"), L.T("Eszközök", "Tools"), "", () => Run(OpenSettingsCommand), "settings signing shortcuty mac ssh"),
+            new(L.T("Frissítések keresése", "Check for updates"), L.T("Súgó", "Help"), "", () => Run(CheckForUpdatesCommand), "update frissites version verzio"),
         };
 
         items.AddRange(ShortcutTemplates.All.Select(t =>
