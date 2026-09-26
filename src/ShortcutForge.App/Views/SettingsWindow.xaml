@@ -18,6 +18,11 @@
         </RadioButton>
         <TextBlock Margin="28,0,0,6" TextWrapping="Wrap" Foreground="{DynamicResource MutedText}" FontSize="11"
                    Text="{l:T 'A sign.shortcuty.app nyilvános API-ja írja alá („bárki” módban). A parancs teljes tartalma a Shortcuty szerverére kerül, ezért jelszót, API-kulcsot vagy személyes adatot tartalmazó parancsot ne írass alá így.', 'Signed by the public sign.shortcuty.app API (anyone mode). The full shortcut is sent to Shortcuty, so do not sign shortcuts containing passwords, API keys or personal data this way.'}" />
+        <TextBlock Margin="28,0,0,6" FontSize="11">
+            <Hyperlink NavigateUri="https://sign.shortcuty.app" RequestNavigate="Link_RequestNavigate">sign.shortcuty.app</Hyperlink>
+            <Run Text="  ·  " Foreground="{DynamicResource MutedText}" />
+            <Hyperlink NavigateUri="https://discord.gg/5wkwSkknVA" RequestNavigate="Link_RequestNavigate"><Run Text="{l:T 'Shortcuty Discord (API-hírek)', 'Shortcuty Discord (API news)'}" /></Hyperlink>
+        </TextBlock>
         <RadioButton x:Name="UnsignedRadio" GroupName="Signer" Margin="0,4" Content="{l:T 'Aláírás nélküli export (később Macen aláírandó)', 'Unsigned export (sign later on a Mac)'}" />
         <RadioButton x:Name="ServerRadio" GroupName="Signer" Margin="0,4"
                      Content="{l:T 'Aláíró szerver (shortcut-signing-server kompatibilis URL)', 'Signing server (shortcut-signing-server compatible URL)'}" />
