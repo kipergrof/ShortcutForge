@@ -103,7 +103,9 @@ The version number is set in `Directory.Build.props`.
 - Icons are chosen by SF Symbol glyph number; the symbol itself is not previewed.
 - Variable names written in the DSL (`x = …`) are not stored in the shortcut. When the shortcut is read back, names are derived from the output name (e.g. `text`).
 
-## License
+## Author and license
+
+ShortcutForge is created by **Krisztián Szilvágyi** ([@kipergrof](https://github.com/kipergrof)).
 
 [MIT](LICENSE). Third-party notices: [THIRD-PARTY-NOTICES.md](THIRD-PARTY-NOTICES.md).
 
