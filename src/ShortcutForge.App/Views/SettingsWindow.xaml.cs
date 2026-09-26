@@ -27,6 +27,7 @@ public partial class SettingsWindow : Window
         ModeBox.SelectedIndex = settings.SigningMode == SigningMode.Anyone ? 0 : 1;
         ClaudeKeyBox.Password = settings.ClaudeApiKey ?? "";
         UpdatesCheck.IsChecked = settings.CheckForUpdates;
+        if (PackageInfo.IsPackaged) UpdatesCheck.Visibility = Visibility.Collapsed; // the Store updates the app
     }
 
     private MacSshSettings CurrentSsh() => new()

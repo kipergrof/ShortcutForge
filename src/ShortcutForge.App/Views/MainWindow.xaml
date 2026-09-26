@@ -339,7 +339,8 @@
             </MenuItem>
             <MenuItem Header="{l:T '_Súgó', '_Help'}">
                 <MenuItem Header="{l:T '_Szöveges nyelv (DSL) súgó', '_Text language (DSL) help'}" InputGestureText="F1" Command="{x:Static vm:AppCommands.Help}" />
-                <MenuItem Header="{l:T '_Frissítések keresése…', 'Check for _updates…'}" Command="{Binding CheckForUpdatesCommand}" />
+                <MenuItem Header="{l:T '_Frissítések keresése…', 'Check for _updates…'}" Command="{Binding CheckForUpdatesCommand}"
+                          Visibility="{Binding UpdatesFromGitHub, Converter={StaticResource BoolToVis}}" />
                 <MenuItem Header="{l:T '_Névjegy', '_About'}" Click="About_Click" />
             </MenuItem>
         </Menu>
