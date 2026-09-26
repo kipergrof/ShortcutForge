@@ -117,7 +117,7 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           $v = '${{ steps.version.outputs.version }}'
-          $notes = (Get-Content release-notes.md -Raw) + "`n`n**Download:** ShortcutForge-$v-win-x64.exe runs on Windows 10/11 x64 without installing .NET. SmartScreen may warn because the file is not code-signed (More info › Run anyway)."
+          $notes = "ShortcutForge $v by **Krisztián Szilvágyi** ([@kipergrof](https://github.com/kipergrof)).`n`n" + (Get-Content release-notes.md -Raw) +"`n`n**Download:** ShortcutForge-$v-win-x64.exe runs on Windows 10/11 x64 without installing .NET. SmartScreen may warn because the file is not code-signed (More info › Run anyway)."
           gh release create "v$v" "ShortcutForge-$v-win-x64.exe" --title "ShortcutForge $v" --notes $notes
 
       - name: Update the winget package
