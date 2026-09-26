@@ -13,6 +13,7 @@ Apple Parancsok (Shortcuts) készítése és szerkesztése **Windowson**.
 - **Export**: `.shortcut` fájl, **ingyenes online aláírással** (Shortcuty), saját Macen SSH-n keresztül vagy aláíró szerverrel.
 - **Sablonok** (*Fájl › Új sablonból*): üdvözlés, JSON API lekérés, gyors menü, listafeldolgozás, akkumulátor-figyelő, megosztási lapos link-megnyitó.
 - **Kényelem**: kategóriaikonok, összecsukható kártyák (egyenként vagy *Nézet › Összes kártya összecsukása*), vezetővonalak a beágyazott blokkoknál, Ctrl+F keresés (Enter: az első találat hozzáadása), összecsukható `{ }` blokkok a szöveges nézetben.
+- **Parancspaletta** (Ctrl+K): pár betűvel bármely parancs, sablon vagy akció elérhető; elgépelést tűrő, ékezetfüggetlen keresés.
 - **Sötét / világos téma** (a Windows beállítását követi), **magyar / angol** felület.
 
 ## Aláírás – fontos

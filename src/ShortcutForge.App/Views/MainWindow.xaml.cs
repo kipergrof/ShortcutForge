@@ -54,6 +54,7 @@ public partial class MainWindow : Window
 
         CommandBindings.Add(new CommandBinding(AppCommands.Help, (_, _) => new HelpWindow { Owner = this }.Show()));
         CommandBindings.Add(new CommandBinding(AppCommands.FocusSearch, (_, _) => FocusSearch()));
+        CommandBindings.Add(new CommandBinding(AppCommands.Palette, (_, _) => ShowPalette()));
 
         // Keep the scroll position when the cards are recreated; bring new / moved cards into view.
         double savedOffset = 0;
@@ -172,6 +173,23 @@ public partial class MainWindow : Window
         DslEditor.TextArea.Caret.Column = _vm.DslErrorColumn;
         DslEditor.ScrollToLine(line);
         DslEditor.Focus();
+    }
+
+    // ------------------------------------------------------------------ command palette
+
+    private void ShowPalette()
+    {
+        var view = L.T("Nézet", "View");
+        var items = new List<PaletteItem>
+        {
+            new(L.T("Vizuális szerkesztő", "Visual editor"), view, "\uE8A9", () => Tabs.SelectedItem = VisualTab, "visual tab kartyak"),
+            new(L.T("Szöveges nézet (DSL)", "Text view (DSL)"), view, "\uE943", () => Tabs.SelectedItem = DslTab, "text dsl code kod"),
+            new(L.T("Keresés az akciók között", "Search actions"), view, "\uE721", FocusSearch, "search library", "Ctrl+F"),
+            new(L.T("Szöveges nyelv (DSL) súgó", "Text language (DSL) help"), L.T("Súgó", "Help"), "\uE897",
+                () => new HelpWindow { Owner = this }.Show(), "help sugo dsl", "F1"),
+        };
+        items.AddRange(_vm.BuildPaletteItems());
+        new PaletteWindow(this, items).Show();
     }
 
     // ------------------------------------------------------------------ library keyboard
