@@ -73,8 +73,26 @@ public sealed class DslParser
             }
             if (c == '{')
             {
-                // Interpolated expression: copied verbatim (it may contain quoted strings).
                 var end = FindInterpolationEnd(template, i);
+                if (LooksLikeRegexQuantifier(template, i + 1, end - 1))
+                {
+                    // "{2,4}"-style regex repetition count: never a valid variable expression
+                    // (a comma can't appear inside one), so it can only be literal pattern text
+                    // someone typed into a Match Text pattern field. Keep it as-is rather than
+                    // failing to parse it as an interpolation.
+                    for (var j = i; j < end; j++)
+                        sb.Append(template[j] switch
+                        {
+                            '\\' => "\\\\",
+                            '"' => "\\\"",
+                            '{' => "\\{",
+                            '}' => "\\}",
+                            _ => template[j].ToString(),
+                        });
+                    i = end - 1;
+                    continue;
+                }
+                // Interpolated expression: copied verbatim (it may contain quoted strings).
                 sb.Append(template, i, end - i);
                 i = end - 1;
                 continue;
@@ -91,6 +109,26 @@ public sealed class DslParser
         }
         var value = ParseValue(sb.Append('"').ToString(), ParamKind.Text, scope);
         return (TokenString)value;
+    }
+
+    /// <summary>
+    /// True for the content of a "{...}" span shaped like a regex repetition quantifier
+    /// (<c>{n}</c>, <c>{n,}</c>, <c>{n,m}</c>) — syntax a DSL value expression can never produce,
+    /// since a bare comma isn't valid there, so it can't be a genuine variable interpolation.
+    /// </summary>
+    private static bool LooksLikeRegexQuantifier(string text, int start, int end)
+    {
+        if (end <= start) return false;
+        var sawDigit = false;
+        var sawComma = false;
+        for (var i = start; i < end; i++)
+        {
+            var c = text[i];
+            if (char.IsDigit(c)) { sawDigit = true; continue; }
+            if (c == ',' && !sawComma) { sawComma = true; continue; }
+            return false;
+        }
+        return sawDigit && sawComma;
     }
 
     /// <summary>Index just past the '}' matching the '{' at <paramref name="start"/> (or the end of text).</summary>
@@ -585,10 +623,12 @@ public sealed class DslParser
                             color = ShortcutIcon.ColorByName(value.Text) ?? throw Error(L.T($"Ismeretlen szín: {value.Text}", $"Unknown color: {value.Text}"), value);
                             break;
                         case "color" when value.Kind == TokenKind.Number:
-                            color = long.Parse(value.Text);
+                            if (!long.TryParse(value.Text, out color))
+                                throw Error(L.T($"Hibás szín érték: {value.Text}", $"Invalid color value: {value.Text}"), value);
                             break;
                         case "glyph" when value.Kind == TokenKind.Number:
-                            glyph = long.Parse(value.Text);
+                            if (!long.TryParse(value.Text, out glyph))
+                                throw Error(L.T($"Hibás glyph szám: {value.Text}", $"Invalid glyph number: {value.Text}"), value);
                             break;
                         default:
                             throw Error(L.T($"Hibás ikon beállítás: {key.Text}", $"Invalid icon setting: {key.Text}"), key);
