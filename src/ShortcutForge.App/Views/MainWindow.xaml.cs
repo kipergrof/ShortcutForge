@@ -56,6 +56,21 @@ public partial class MainWindow : Window
         CommandBindings.Add(new CommandBinding(AppCommands.FocusSearch, (_, _) => FocusSearch()));
         CommandBindings.Add(new CommandBinding(AppCommands.Palette, (_, _) => ShowPalette()));
 
+        // Find & replace: built-in search panel in the text view, find bar in the visual editor.
+        ICSharpCode.AvalonEdit.Search.SearchPanel.Install(DslEditor);
+        _vm.CardFocusRequested += (_, index) => Dispatcher.BeginInvoke(DispatcherPriority.Loaded, () =>
+        {
+            if (index >= 0 && index < _vm.Cards.Count) CardsList.ScrollIntoView(_vm.Cards[index]);
+        });
+        _vm.PropertyChanged += (_, e) =>
+        {
+            if (e.PropertyName == nameof(MainViewModel.IsFindPanelOpen) && _vm.IsFindPanelOpen)
+            {
+                if (Tabs.SelectedItem != VisualTab) Tabs.SelectedItem = VisualTab;
+                Dispatcher.BeginInvoke(DispatcherPriority.Input, () => { FindBox.Focus(); FindBox.SelectAll(); });
+            }
+        };
+
         // Keep the scroll position when the cards are recreated; bring new / moved cards into view.
         double savedOffset = 0;
         _vm.CardsRebuilding += (_, _) => savedOffset = CardsScrollViewer()?.VerticalOffset ?? 0;
@@ -64,6 +79,12 @@ public partial class MainWindow : Window
             CardsScrollViewer()?.ScrollToVerticalOffset(savedOffset);
             if (select is { } i && i >= 0 && i < _vm.Cards.Count) CardsList.ScrollIntoView(_vm.Cards[i]);
         });
+
+        Loaded += async (_, _) =>
+        {
+            try { await _vm.CheckForUpdatesInBackgroundAsync(); }
+            catch (Exception ex) when (ex is System.IO.IOException or UnauthorizedAccessException) { /* settings not writable: ignore */ }
+        };
 
         var args = Environment.GetCommandLineArgs();
         if (args.Length > 1 && System.IO.File.Exists(args[1])) _vm.OpenPath(args[1]);
@@ -80,10 +101,10 @@ public partial class MainWindow : Window
 
     private void About_Click(object sender, RoutedEventArgs e) =>
         MessageBox.Show(this,
-            L.T($"ShortcutForge {ShortcutForge.Core.AppInfo.Version}\nApple Parancsok (Shortcuts) készítése Windowson.\n{ShortcutForge.Core.AppInfo.RepositoryUrl}\n\n" +
+            L.T($"ShortcutForge {ShortcutForge.Core.AppInfo.Version}\nApple Parancsok (Shortcuts) készítése Windowson.\n\nKészítette: Szilvágyi Krisztián\n{ShortcutForge.Core.AppInfo.Copyright}\n{ShortcutForge.Core.AppInfo.RepositoryUrl}\n\n" +
                 $"Akciókatalógus: {ActionCatalog.Default.Actions.Count} beépített akció; bármely más akció (külső appok) " +
                 "általános blokként szerkeszthető.\n\nA .shortcut fájlokat iOS 15 óta alá kell írni (Macen: shortcuts sign).",
-                $"ShortcutForge {ShortcutForge.Core.AppInfo.Version}\nCreate Apple Shortcuts on Windows.\n{ShortcutForge.Core.AppInfo.RepositoryUrl}\n\n" +
+                $"ShortcutForge {ShortcutForge.Core.AppInfo.Version}\nCreate Apple Shortcuts on Windows.\n\nCreated by Krisztián Szilvágyi\n{ShortcutForge.Core.AppInfo.Copyright}\n{ShortcutForge.Core.AppInfo.RepositoryUrl}\n\n" +
                 $"Action catalog: {ActionCatalog.Default.Actions.Count} built-in actions; any other action (third-party apps) " +
                 "can be edited as a generic block.\n\nSince iOS 15, .shortcut files must be signed (on a Mac: shortcuts sign)."),
             L.T("Névjegy", "About"), MessageBoxButton.OK, MessageBoxImage.Information);
@@ -190,6 +211,12 @@ public partial class MainWindow : Window
         };
         items.AddRange(_vm.BuildPaletteItems());
         new PaletteWindow(this, items).Show();
+    }
+
+    private void FindBox_PreviewKeyDown(object sender, KeyEventArgs e)
+    {
+        if (e.Key == Key.Enter) { _vm.FindNextCommand.Execute(null); e.Handled = true; }
+        else if (e.Key == Key.Escape) { _vm.CloseFindPanelCommand.Execute(null); e.Handled = true; }
     }
 
     // ------------------------------------------------------------------ library keyboard

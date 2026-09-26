@@ -76,5 +76,7 @@ public class CommandPaletteTests
         public void Info(string title, string message) { }
         public void Error(string title, string message) { }
         public bool EditSettings(Services.AppSettings settings) => false;
+        public void OpenUrl(string url) { }
+        public void ShowShare(byte[] data, string fileName, bool isSigned) { }
     }
 }
