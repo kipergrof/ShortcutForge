@@ -99,13 +99,28 @@ jobs:
             -p:EnableCompressionInSingleFile=true -o publish
           Copy-Item publish/ShortcutForge.App.exe "ShortcutForge-$v-win-x64.exe"
 
+      - name: Build the Microsoft Store package
+        # Optional: a problem with the Store package must not block the GitHub release.
+        continue-on-error: true
+        shell: pwsh
+        run: ./packaging/msix/build-msix.ps1 -Output "ShortcutForge-${{ steps.version.outputs.version }}-store.msix"
+
+      # Unsigned (the Store signs it on upload), so it is not attached to the release:
+      # download it from the workflow run and upload it in Partner Center.
+      - name: Keep the Store package as a workflow artifact
+        continue-on-error: true
+        uses: actions/upload-artifact@v4
+        with:
+          name: store-msix
+          path: ShortcutForge-${{ steps.version.outputs.version }}-store.msix
+
       - name: Publish the GitHub release
         shell: pwsh
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
           $v = '${{ steps.version.outputs.version }}'
-          $notes = (Get-Content release-notes.md -Raw) + "`n`n**Download:** ShortcutForge-$v-win-x64.exe runs on Windows 10/11 x64 without installing .NET. SmartScreen may warn because the file is not code-signed (More info › Run anyway)."
+          $notes = "ShortcutForge $v by **Krisztián Szilvágyi** ([@kipergrof](https://github.com/kipergrof)).`n`n" + (Get-Content release-notes.md -Raw) +"`n`n**Download:** ShortcutForge-$v-win-x64.exe runs on Windows 10/11 x64 without installing .NET. SmartScreen may warn because the file is not code-signed (More info › Run anyway)."
           gh release create "v$v" "ShortcutForge-$v-win-x64.exe" --title "ShortcutForge $v" --notes $notes
 
       - name: Update the winget package

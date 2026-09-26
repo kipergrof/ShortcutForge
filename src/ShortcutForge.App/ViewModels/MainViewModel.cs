@@ -1161,6 +1161,9 @@ public sealed partial class MainViewModel : ObservableObject
 
     // ------------------------------------------------------------------ updates
 
+    /// <summary>False in the Microsoft Store version, which is updated by the Store.</summary>
+    public bool UpdatesFromGitHub { get; init; } = !PackageInfo.IsPackaged;
+
     /// <summary>The update check; replaceable in tests.</summary>
     public Func<CancellationToken, Task<UpdateCheckResult>> UpdateCheck { get; set; } =
         ct => UpdateChecker.CheckAsync(ShortcutForge.Core.AppInfo.Version, null, ct);
@@ -1177,7 +1180,7 @@ public sealed partial class MainViewModel : ObservableObject
     /// <summary>Background check at startup: at most once a day, silent on errors.</summary>
     public async Task CheckForUpdatesInBackgroundAsync()
     {
-        if (!Settings.CheckForUpdates) return;
+        if (!UpdatesFromGitHub || !Settings.CheckForUpdates) return;
         if (Settings.LastUpdateCheck is { } last && DateTime.UtcNow - last < TimeSpan.FromHours(20)) return;
         var result = await UpdateCheck(CancellationToken.None);
         if (result.Error is not null) return;
@@ -1382,6 +1385,8 @@ public sealed partial class MainViewModel : ObservableObject
             new(L.T("Beállítások (aláírás)…", "Settings (signing)…"), L.T("Eszközök", "Tools"), "", () => Run(OpenSettingsCommand), "settings signing shortcuty mac ssh"),
             new(L.T("Frissítések keresése", "Check for updates"), L.T("Súgó", "Help"), "", () => Run(CheckForUpdatesCommand), "update frissites version verzio"),
         };
+
+        if (!UpdatesFromGitHub) items.RemoveAll(i => i.Keywords?.StartsWith("update frissites", StringComparison.Ordinal) == true);
 
         items.AddRange(ShortcutTemplates.All.Select(t =>
             new PaletteItem($"{template}: {t.Name}", file, "", () => Run(NewFromTemplateCommand, t), "template sablon new")));
