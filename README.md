@@ -30,6 +30,7 @@ ShortcutForge is a Windows desktop app for building shortcuts for Apple's Shortc
 - **Command palette** (Ctrl+K): type a few letters to run any command, template or add any action; fuzzy and accent-insensitive.
 - **Update notifications**: checks GitHub for a newer release once a day (can be turned off; also *Help › Check for updates*).
 - **Shortcut from a description (AI)** (*File › Shortcut from description*, Ctrl+Shift+N): describe what you want in plain words, in any language, and Claude writes the shortcut. You can review it before opening. It needs your own Claude API key (*Tools › Settings*, or the `ANTHROPIC_API_KEY` environment variable). Your description is sent to Anthropic.
+- **Dry run** (*Tools › Dry run*, F5): run the shortcut step by step on Windows and see what each action produces. Text, numbers, variables, lists, dictionaries, dates and If / Repeat / Menu run for real, and questions and menus appear as dialogs. iPhone-only effects are only shown, and actions that need the device are skipped. Files, the network and the real clipboard are never touched.
 - **Light / dark theme** (follows Windows), **English / Hungarian** UI (*View* menu).
 
 ## Signing — important

@@ -39,6 +39,8 @@ public class MainViewModelTests : IDisposable
         public void Info(string title, string message) => Messages.Add(message);
         public void Error(string title, string message) => Messages.Add("ERROR: " + message);
         public bool EditSettings(AppSettings settings) => false;
+        public Shortcut? DryRunShortcut;
+        public void ShowDryRun(Shortcut shortcut) => DryRunShortcut = shortcut;
         public string? NextAiCode;
         public string? LastAiKey;
         public string? GenerateWithAi(string? apiKey) { LastAiKey = apiKey; return NextAiCode; }
@@ -67,6 +69,15 @@ public class MainViewModelTests : IDisposable
     }
 
     private static ActionDefinition Def(string dsl) => ActionCatalog.Default.ByDslName(dsl)!;
+
+    [Fact]
+    public void Dry_run_gets_the_current_shortcut() => Sta(() =>
+    {
+        var dialogs = new FakeDialogs();
+        var vm = new MainViewModel(dialogs);
+        vm.DryRunCommand.Execute(null);
+        Assert.Same(vm.Current, dialogs.DryRunShortcut);
+    });
 
     [Fact]
     public void Generate_with_ai_opens_the_generated_code() => Sta(() =>

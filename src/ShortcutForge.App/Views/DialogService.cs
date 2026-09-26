@@ -42,6 +42,8 @@ public sealed class DialogService(Window owner) : IDialogService
     public void Error(string title, string message) =>
         MessageBox.Show(owner, message, title, MessageBoxButton.OK, MessageBoxImage.Error);
 
+    public void ShowDryRun(ShortcutForge.Core.Model.Shortcut shortcut) =>
+        new DryRunWindow(shortcut) { Owner = owner }.ShowDialog();
     public string? GenerateWithAi(string? apiKey)
     {
         var window = new AiGenerateWindow(apiKey) { Owner = owner };

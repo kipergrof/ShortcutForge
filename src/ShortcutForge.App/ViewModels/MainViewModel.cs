@@ -29,6 +29,8 @@ public interface IDialogService
     void Error(string title, string message);
     bool EditSettings(AppSettings settings);
 
+    /// <summary>Shows the dry-run window for the shortcut.</summary>
+    void ShowDryRun(Shortcut shortcut);
     /// <summary>Shows the AI window; returns the generated code the user opened, or null.</summary>
     string? GenerateWithAi(string? apiKey);
     /// <summary>Shows the online template gallery; returns the chosen template's source or null.</summary>
@@ -752,6 +754,18 @@ public sealed partial class MainViewModel : ObservableObject
         else Status = L.T("A szövegben hiba van: ", "The text has an error: ") + DslError;
     }
 
+    /// <summary>Tools › Dry run (F5): runs the shortcut step by step on Windows.</summary>
+    [RelayCommand]
+    private void DryRun()
+    {
+        if (!ApplyDslIfNeeded())
+        {
+            Status = L.T("A szövegben hiba van: ", "The text has an error: ") + DslError;
+            return;
+        }
+        _dialogs.ShowDryRun(Current);
+    }
+
     [RelayCommand]
     private void FormatDsl()
     {
@@ -1345,10 +1359,14 @@ public sealed partial class MainViewModel : ObservableObject
             new(L.T("Mentés másként…", "Save as…"), file, "", () => Run(SaveFileAsCommand), "save as", "Ctrl+Shift+S"),
             new(L.T("Exportálás .shortcut fájlba…", "Export to .shortcut file…"), file, "", () => Run(ExportCommand), "export sign alairas", "Ctrl+E"),
             new(L.T("Exportálás iPhone-ra (Shortcut Source Helper)…", "Export for iPhone (Shortcut Source Helper)…"), file, "", () => Run(ExportForIPhoneCommand), "iphone plist"),
+            new(L.T("Parancs leírásból (AI)…", "Shortcut from description (AI)…"), file, "", () => Run(GenerateWithAiCommand), "ai claude generate leiras generalas", "Ctrl+Shift+N"),
+            new(L.T("Sablongaléria (online)…", "Template gallery (online)…"), file, "", () => Run(OpenGalleryCommand), "gallery galeria template sablon online"),
+            new(L.T("Küldés iPhone-ra QR-kóddal…", "Send to iPhone with a QR code…"), file, "", () => Run(SendToIPhoneCommand), "qr iphone send kuldes share", "Ctrl+Shift+E"),
             new(L.T("Importálás iCloud linkről…", "Import from iCloud link…"), file, "", () => Run(ImportICloudCommand), "icloud import link"),
             new(L.T("Plist XML másolása a vágólapra", "Copy plist XML to clipboard"), file, "", () => Run(CopyPlistXmlCommand), "xml plist copy"),
             new(L.T("Visszavonás", "Undo"), edit, "", () => Run(UndoCommand), "undo", "Ctrl+Z"),
             new(L.T("Mégis", "Redo"), edit, "", () => Run(RedoCommand), "redo", "Ctrl+Y"),
+            new(L.T("Keresés és csere", "Find and replace"), edit, "", () => Run(ToggleFindPanelCommand), "find replace kereses csere rename atnevezes", "Ctrl+H"),
             new(L.T("Kijelölt kártya duplikálása", "Duplicate selected card"), edit, "", () => Run(DuplicateCardCommand), "duplicate copy", "Ctrl+D"),
             new(L.T("Kijelölt kártya törlése", "Delete selected card"), edit, "", () => Run(DeleteCardCommand), "delete remove torles", "Del"),
             new(L.T("Kijelölt kártya fel", "Move selected card up"), edit, "", () => Run(MoveUpCommand), "move up", "Alt+↑"),
@@ -1360,7 +1378,9 @@ public sealed partial class MainViewModel : ObservableObject
             new(L.T("Téma: a rendszer szerint", "Theme: follow system"), view, "", () => Run(SetThemeCommand, "System"), "theme system rendszer"),
             new("Nyelv: magyar / Language: Hungarian", view, "", () => Run(SetLanguageCommand, "hu"), "language nyelv magyar hungarian"),
             new("Language: English / Nyelv: angol", view, "", () => Run(SetLanguageCommand, "en"), "language nyelv english angol"),
+            new(L.T("Próbafuttatás…", "Dry run…"), L.T("Eszközök", "Tools"), "", () => Run(DryRunCommand), "dry run proba futtatas test simulate", "F5"),
             new(L.T("Beállítások (aláírás)…", "Settings (signing)…"), L.T("Eszközök", "Tools"), "", () => Run(OpenSettingsCommand), "settings signing shortcuty mac ssh"),
+            new(L.T("Frissítések keresése", "Check for updates"), L.T("Súgó", "Help"), "", () => Run(CheckForUpdatesCommand), "update frissites version verzio"),
         };
 
         items.AddRange(ShortcutTemplates.All.Select(t =>

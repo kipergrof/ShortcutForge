@@ -78,6 +78,7 @@ public class CommandPaletteTests
         public bool EditSettings(Services.AppSettings settings) => false;
         public string? PickGalleryTemplate() => null;
         public string? GenerateWithAi(string? apiKey) => null;
+        public void ShowDryRun(ShortcutForge.Core.Model.Shortcut shortcut) { }
         public void OpenUrl(string url) { }
         public void ShowShare(byte[] data, string fileName, bool isSigned) { }
     }
