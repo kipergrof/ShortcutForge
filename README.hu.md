@@ -62,6 +62,12 @@ A teljes leírás az alkalmazásban található: *Súgó › Szöveges nyelv (DS
 
 A legegyszerűbb: töltsd le a `ShortcutForge-<verzió>-win-x64.exe` fájlt a [legfrissebb kiadásból](https://github.com/kipergrof/ShortcutForge/releases/latest), és indítsd el. Egyetlen fájl, Windows 10/11 (x64) rendszeren .NET telepítése nélkül fut. A SmartScreen figyelmeztethet, mert a fájl nincs kódaláírva: *További információ › Futtatás mindenképp*.
 
+**winget-tel** (miután a csomagot elfogadták a winget tárolóba):
+
+```
+winget install kipergrof.ShortcutForge
+```
+
 ## Fordítás és futtatás
 
 Szükséges: .NET 10 SDK (a könyvtárak .NET 8-at céloznak, az alkalmazás .NET 10-et a Fluent sötét téma miatt).
