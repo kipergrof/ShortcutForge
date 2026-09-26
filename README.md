@@ -25,7 +25,7 @@ ShortcutForge is a Windows desktop app for building shortcuts for Apple's Shortc
 - **194 built-in actions** in categories. Any other action (including third-party App Intents) is kept and editable as a generic block, so nothing is lost when you import a shortcut.
 - **Open / import**: signed and unsigned `.shortcut` files, binary and XML plists, iCloud share links.
 - **Export**: `.shortcut` files, **signed for free online** (Shortcuty), on your own Mac over SSH, or by a signing server.
-- **Send to iPhone with a QR code** (Ctrl+Shift+E): signs the shortcut and shows a QR code; scan it with the iPhone camera on the same Wi-Fi and it downloads straight into Shortcuts. No AirDrop, cable or cloud needed.
+- **Send to iPhone with a QR code** (Ctrl+Shift+E): signs the shortcut and shows a QR code; scan it with the iPhone camera on the same Wi-Fi and a small download page opens on the phone — tap Download and Shortcuts imports the file. No AirDrop, cable or cloud needed.
 - **Templates** (*File › New from template*) and an **online template gallery** (*File › Template gallery*) that grows on GitHub without app updates: pomodoro, clipboard to notes, translate, resize photos, random picker, QR code, word count, night mode and more.
 - **Command palette** (Ctrl+K): type a few letters to run any command, template or add any action; fuzzy and accent-insensitive.
 - **Update notifications**: checks GitHub for a newer release once a day (can be turned off; also *Help › Check for updates*).

@@ -18,8 +18,18 @@ public partial class QrShareWindow : Window
         UnsignedWarning.Visibility = isSigned ? Visibility.Collapsed : Visibility.Visible;
 
         _server = LocalShareServer.Start(data, fileName);
+        _server.PageOpened += (_, endpoint) => Dispatcher.BeginInvoke(() =>
+        {
+            if (_server.Downloads > 0) return; // already past this step
+            StatusText.Text = L.T($"✓ A telefon csatlakozott ({endpoint}) – koppints a Letöltés gombra.",
+                $"✓ The phone connected ({endpoint}) – tap the Download button.");
+        });
         _server.Downloaded += (_, endpoint) => Dispatcher.BeginInvoke(() =>
             StatusText.Text = L.T($"✓ Letöltve ({_server.Downloads}×) – {endpoint}", $"✓ Downloaded ({_server.Downloads}×) – {endpoint}"));
+
+        // Registered before the early return below, so the listener never outlives the window
+        // and keeps PreferredPort taken.
+        Closed += (_, _) => _server.Dispose();
 
         var addresses = LocalShareServer.GetLanAddresses();
         if (addresses.Count == 0)
@@ -33,7 +43,6 @@ public partial class QrShareWindow : Window
         AddressPanel.Visibility = addresses.Count > 1 ? Visibility.Visible : Visibility.Collapsed;
         AddressBox.SelectedIndex = 0;
         StatusText.Text = L.T("Várakozás az iPhone-ra…", "Waiting for the iPhone…");
-        Closed += (_, _) => _server.Dispose();
     }
 
     private void ShowUrl(string url)
@@ -53,7 +62,9 @@ public partial class QrShareWindow : Window
 
     private void AddressBox_SelectionChanged(object sender, System.Windows.Controls.SelectionChangedEventArgs e)
     {
-        if (AddressBox.SelectedItem is LocalShareServer.LocalAddress address) ShowUrl(_server.UrlFor(address.Address));
+        // The QR code points at the landing page, not straight at the file: Safari shows a blank
+        // page and offers no download when a scanned link answers with an octet-stream attachment.
+        if (AddressBox.SelectedItem is LocalShareServer.LocalAddress address) ShowUrl(_server.PageUrlFor(address.Address));
     }
 
     private void Copy_Click(object sender, RoutedEventArgs e)

@@ -18,7 +18,7 @@
             <StackPanel>
                 <TextBlock Text="{l:T 'Olvasd be az iPhone kamerájával', 'Scan with the iPhone camera'}" FontWeight="SemiBold" FontSize="15" TextWrapping="Wrap" />
                 <TextBlock TextWrapping="Wrap" Margin="0,8,0,0" Foreground="{DynamicResource MutedText}" LineHeight="20"
-                           Text="{l:T '1. Az iPhone legyen ugyanazon a Wi-Fi-n, mint ez a gép.&#10;2. Nyisd meg a Kamerát, és koppints a megjelenő linkre.&#10;3. Safariban: Letöltés.&#10;4. Nyisd meg a letöltött fájlt (Safari ↓ vagy Fájlok app) – a Parancsok importálja.', '1. The iPhone must be on the same Wi-Fi as this PC.&#10;2. Open the Camera and tap the link that appears.&#10;3. In Safari: Download.&#10;4. Open the downloaded file (Safari ↓ or Files app) – Shortcuts imports it.'}" />
+                           Text="{l:T '1. Az iPhone legyen ugyanazon a Wi-Fi-n, mint ez a gép.&#10;2. Nyisd meg a Kamerát, és koppints a megjelenő linkre.&#10;3. A megnyíló oldalon koppints a Letöltés gombra, majd a kérdésnél újra a Letöltésre.&#10;4. Nyisd meg a letöltött fájlt (Safari ↓ vagy Fájlok app) – a Parancsok importálja.', '1. The iPhone must be on the same Wi-Fi as this PC.&#10;2. Open the Camera and tap the link that appears.&#10;3. On the page that opens, tap Download, then Download again when asked.&#10;4. Open the downloaded file (Safari ↓ or Files app) – Shortcuts imports it.'}" />
             </StackPanel>
         </DockPanel>
 
@@ -35,7 +35,7 @@
 
         <TextBlock x:Name="StatusText" Margin="0,12,0,0" TextWrapping="Wrap" FontWeight="SemiBold" />
         <TextBlock TextWrapping="Wrap" Margin="0,6,0,0" FontSize="11" Foreground="{DynamicResource MutedText}"
-                   Text="{l:T 'A fájl csak ezen a helyi hálózaton, egy véletlenszerű címen érhető el, amíg ez az ablak nyitva van. Ha a Windows tűzfal rákérdez, engedélyezd a magánhálózaton.', 'The file is only available on this local network, at a random address, while this window is open. If Windows Firewall asks, allow it on private networks.'}" />
+                   Text="{l:T 'A fájl csak ezen a helyi hálózaton, egy véletlenszerű címen érhető el, amíg ez az ablak nyitva van. Ha a Windows tűzfal rákérdez, engedélyezd a magánhálózaton. Ha ezt a címet a gépen, böngészőben nyitod meg, a böngésző figyelmeztethet, hogy a fájlt ritkán töltik le – ezt a .shortcut kiterjesztés váltja ki, és az iPhone-on nem jelenik meg.', 'The file is only available on this local network, at a random address, while this window is open. If Windows Firewall asks, allow it on private networks. If you open this address in a browser on the PC, the browser may warn that the file is not commonly downloaded – that is triggered by the .shortcut extension and does not happen on the iPhone.'}" />
 
         <Button Style="{StaticResource PrimaryButton}" HorizontalAlignment="Right" Margin="0,14,0,0" MinWidth="110" IsCancel="True" IsDefault="True"
                 Click="Close_Click" Content="{l:T 'Kész', 'Done'}" />
