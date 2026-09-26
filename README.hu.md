@@ -11,8 +11,12 @@ Apple Parancsok (Shortcuts) készítése és szerkesztése **Windowson**.
 - **194 beépített akció** kategóriákba rendezve. Bármely más akció, például külső appok App Intentjei, általános blokként szerkeszthető, így importáláskor semmi sem vész el.
 - **Megnyitás / import**: `.shortcut` (aláírt és aláíratlan), bináris és XML plist, iCloud megosztási link.
 - **Export**: `.shortcut` fájl, **ingyenes online aláírással** (Shortcuty), saját Macen SSH-n keresztül vagy aláíró szerverrel.
+- **Küldés iPhone-ra QR-kóddal** (Ctrl+Shift+E): aláírja a parancsot és QR-kódot mutat. Ugyanazon a Wi-Fi-n az iPhone kamerájával beolvasva egyenesen a Parancsok appba töltődik, AirDrop, kábel vagy felhő nélkül.
 - **Sablonok** (*Fájl › Új sablonból*) és **online sablongaléria** (*Fájl › Sablongaléria*), ami a GitHubon bővül, app-frissítés nélkül: pomodoro, vágólap jegyzetbe, fordítás, fotó-átméretezés, véletlen választó, QR-kód, szószámláló, éjszakai mód és még több.
 - **Kényelem**: kategóriaikonok, összecsukható kártyák (egyenként vagy *Nézet › Összes kártya összecsukása*), vezetővonalak a beágyazott blokkoknál, Ctrl+F keresés (Enter: az első találat hozzáadása), összecsukható `{ }` blokkok a szöveges nézetben.
+- **Parancspaletta** (Ctrl+K): pár betűvel bármely parancs, sablon vagy akció elérhető; elgépelést tűrő, ékezetfüggetlen keresés.
+
+- **Frissítés-értesítés**: naponta egyszer megnézi a GitHubon, van-e újabb kiadás (kikapcsolható; kézzel: *Súgó › Frissítések keresése*).
 - **Sötét / világos téma** (a Windows beállítását követi), **magyar / angol** felület.
 
 ## Aláírás – fontos
@@ -60,6 +64,12 @@ A teljes leírás az alkalmazásban található: *Súgó › Szöveges nyelv (DS
 
 A legegyszerűbb: töltsd le a `ShortcutForge-<verzió>-win-x64.exe` fájlt a [legfrissebb kiadásból](https://github.com/kipergrof/ShortcutForge/releases/latest), és indítsd el. Egyetlen fájl, Windows 10/11 (x64) rendszeren .NET telepítése nélkül fut. A SmartScreen figyelmeztethet, mert a fájl nincs kódaláírva: *További információ › Futtatás mindenképp*.
 
+**winget-tel** (miután a csomagot elfogadták a winget tárolóba):
+
+```
+winget install kipergrof.ShortcutForge
+```
+
 ## Fordítás és futtatás
 
 Szükséges: .NET 10 SDK (a könyvtárak .NET 8-at céloznak, az alkalmazás .NET 10-et a Fluent sötét téma miatt).
@@ -89,6 +99,8 @@ dotnet run --project src/ShortcutForge.App
 - A DSL-ben adott változónevek (`x = …`) nem tárolódnak a parancsban. Visszaolvasáskor a kimenet nevéből képzett név (pl. `text`) jelenik meg.
 
 
-## Licenc
+## Szerző és licenc
+
+A ShortcutForge-ot **Szilvágyi Krisztián** ([@kipergrof](https://github.com/kipergrof)) készítette.
 
 [MIT](LICENSE). Harmadik féltől származó komponensek: [THIRD-PARTY-NOTICES.md](THIRD-PARTY-NOTICES.md).

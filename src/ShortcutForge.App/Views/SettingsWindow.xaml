@@ -69,6 +69,9 @@
             </Grid>
         </Border>
 
+        <CheckBox x:Name="UpdatesCheck" Margin="0,14,0,0"
+                  Content="{l:T 'Frissítések keresése indításkor (naponta egyszer, a GitHubon)', 'Check for updates at startup (once a day, on GitHub)'}" />
+
         <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,14,0,0">
             <Button Style="{StaticResource PrimaryButton}" IsDefault="True" Click="Ok_Click" MinWidth="90" Content="{l:T 'Mentés', 'Save'}" />
             <Button Style="{StaticResource ToolButton}" IsCancel="True" MinWidth="80" Content="{l:T 'Mégse', 'Cancel'}" />
