@@ -38,10 +38,13 @@ OF SUCH DAMAGE.
 ## NuGet packages
 
 These packages are referenced (not included in this repository) and are
-distributed under the MIT license by their authors:
+distributed by their authors under the licenses shown:
 
 | Package | License |
 |---|---|
+| [Avalonia](https://github.com/AvaloniaUI/Avalonia) (Avalonia, Avalonia.Desktop, Avalonia.Themes.Fluent) | MIT |
+| [Avalonia.Fonts.Inter](https://github.com/AvaloniaUI/Avalonia) | MIT; the bundled [Inter](https://github.com/rsms/inter) font is under the SIL Open Font License 1.1 |
+| [Avalonia.AvaloniaEdit](https://github.com/AvaloniaUI/AvaloniaEdit) | MIT |
 | [AvalonEdit](https://github.com/icsharpcode/AvalonEdit) | MIT |
 | [CommunityToolkit.Mvvm](https://github.com/CommunityToolkit/dotnet) | MIT |
 | [plist-cil](https://github.com/claunia/plist-cil) | MIT |

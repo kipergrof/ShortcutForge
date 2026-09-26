@@ -90,6 +90,18 @@ To make a single self-contained `.exe` that runs without .NET installed:
 dotnet publish src/ShortcutForge.App -c Release -r win-x64 --self-contained -p:PublishSingleFile=true -o publish
 ```
 
+## macOS and Linux (preview)
+
+A cross-platform version built with [Avalonia UI](https://avaloniaui.net/) lives in `src/ShortcutForge.Desktop`. It uses the same core, text language and signing code as the Windows app. It is a preview: there is no download yet, so run it from source with the [.NET 8 SDK](https://dotnet.microsoft.com/download) or later:
+
+```
+git clone https://github.com/kipergrof/ShortcutForge.git
+cd ShortcutForge
+dotnet run --project src/ShortcutForge.Desktop
+```
+
+It has the visual editor, the text view (DSL), the action library and the shortcut settings. It can open `.sfdsl`, `.shortcut` (signed or unsigned) and `.plist` files and save `.sfdsl`. It exports `.shortcut` files unsigned, signed online with Shortcuty, or, on a Mac, signed locally with Apple's `shortcuts sign` tool. The UI is in English or Hungarian and follows the system light / dark mode. The QR code sending, dry run, command palette, template gallery, AI generation, find and replace, drag and drop and Mac signing over SSH are only in the Windows app for now.
+
 ## Project structure
 
 | Project | Contents |
@@ -98,6 +110,8 @@ dotnet publish src/ShortcutForge.App -c Release -r win-x64 --self-contained -p:P
 | `ShortcutForge.Dsl` | Lexer, parser and pretty-printer with verified lossless round trips |
 | `ShortcutForge.Signing` | `ISigner`: unsigned export, Shortcuty, Mac over SSH, signing server |
 | `ShortcutForge.App` | WPF app (MVVM, CommunityToolkit.Mvvm, AvalonEdit, Fluent theme) |
+| `ShortcutForge.Editor` | UI-independent editor view models (visual editor, text view sync, undo), used by the desktop app |
+| `ShortcutForge.Desktop` | Avalonia app for macOS and Linux (preview; AvaloniaEdit, Fluent theme) |
 | `tests/*` | xUnit tests: plist and DSL round trips, LZFSE reference vectors, a real Apple-signed file, view models, signers |
 
 ```

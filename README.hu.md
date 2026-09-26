@@ -82,6 +82,16 @@ dotnet test
 dotnet run --project src/ShortcutForge.App
 ```
 
+## macOS és Linux (előzetes)
+
+Az [Avalonia UI](https://avaloniaui.net/)-val készült, több platformon futó változat a `src/ShortcutForge.Desktop` mappában van, ugyanazzal a maggal, szöveges nyelvvel és aláíró kóddal, mint a Windowsos alkalmazás. Ez még előzetes verzió, letölthető változat nincs; forrásból futtatható (.NET 8 SDK vagy újabb kell):
+
+```
+dotnet run --project src/ShortcutForge.Desktop
+```
+
+Tudja: vizuális szerkesztő, szöveges nézet (DSL), akciókönyvtár, parancs beállításai; `.sfdsl`, `.shortcut` (aláírt és aláíratlan) és `.plist` megnyitása, `.sfdsl` mentése; `.shortcut` export aláírás nélkül, a Shortcuty online aláírásával, vagy Macen helyben a `shortcuts sign` paranccsal; magyar / angol felület, a rendszer szerinti világos / sötét téma. A QR-kódos küldés, próbafuttatás, parancspaletta, sablongaléria, AI, keresés és csere, húzás és a Mac SSH-s aláírás egyelőre csak a Windowsos változatban van meg.
+
 ## Felépítés
 
 | Projekt | Tartalom |
@@ -90,6 +100,8 @@ dotnet run --project src/ShortcutForge.App
 | `ShortcutForge.Dsl` | Lexer, parser, pretty-printer – veszteségmentes oda-vissza alakítás |
 | `ShortcutForge.Signing` | `ISigner`: aláíratlan export, Shortcuty, Mac SSH, aláíró szerver |
 | `ShortcutForge.App` | WPF felület (MVVM, AvalonEdit) |
+| `ShortcutForge.Editor` | Felülettől független szerkesztő ViewModelek (vizuális szerkesztő, szöveges nézet, visszavonás) |
+| `ShortcutForge.Desktop` | Avalonia felület macOS-re és Linuxra (előzetes) |
 | `tests/*` | xUnit tesztek (plist és DSL oda-vissza alakítás, LZFSE referencia-vektorok, valódi Apple-aláírt fájl, ViewModel, aláírók) |
 
 Új akció felvétele: egy bejegyzés a megfelelő `src/ShortcutForge.Core/Catalog/Data/*.json` fájlba (azonosító, név, DSL név, paraméterek).
