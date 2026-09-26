@@ -77,6 +77,7 @@ public class CommandPaletteTests
         public void Error(string title, string message) { }
         public bool EditSettings(Services.AppSettings settings) => false;
         public string? PickGalleryTemplate() => null;
+        public string? GenerateWithAi(string? apiKey) => null;
         public void OpenUrl(string url) { }
         public void ShowShare(byte[] data, string fileName, bool isSigned) { }
     }

@@ -13,6 +13,7 @@ Apple Parancsok (Shortcuts) készítése és szerkesztése **Windowson**.
 - **Export**: `.shortcut` fájl, **ingyenes online aláírással** (Shortcuty), saját Macen SSH-n keresztül vagy aláíró szerverrel.
 - **Küldés iPhone-ra QR-kóddal** (Ctrl+Shift+E): aláírja a parancsot és QR-kódot mutat. Ugyanazon a Wi-Fi-n az iPhone kamerájával beolvasva egyenesen a Parancsok appba töltődik, AirDrop, kábel vagy felhő nélkül.
 - **Sablonok** (*Fájl › Új sablonból*) és **online sablongaléria** (*Fájl › Sablongaléria*), ami a GitHubon bővül, app-frissítés nélkül: pomodoro, vágólap jegyzetbe, fordítás, fotó-átméretezés, véletlen választó, QR-kód, szószámláló, éjszakai mód és még több.
+- **Parancs leírásból (AI)** (*Fájl › Parancs leírásból*, Ctrl+Shift+N): írd le a saját szavaiddal, bármilyen nyelven, mit csináljon a parancs, és a Claude megírja. Megnyitás előtt átnézheted. Saját Claude API-kulcs kell hozzá (*Eszközök › Beállítások*, vagy az `ANTHROPIC_API_KEY` környezeti változó). A leírásod az Anthropichoz kerül.
 - **Kényelem**: kategóriaikonok, összecsukható kártyák (egyenként vagy *Nézet › Összes kártya összecsukása*), vezetővonalak a beágyazott blokkoknál, Ctrl+F keresés (Enter: az első találat hozzáadása), összecsukható `{ }` blokkok a szöveges nézetben.
 - **Parancspaletta** (Ctrl+K): pár betűvel bármely parancs, sablon vagy akció elérhető; elgépelést tűrő, ékezetfüggetlen keresés.
 

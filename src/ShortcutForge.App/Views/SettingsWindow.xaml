@@ -69,6 +69,10 @@
             </Grid>
         </Border>
 
+        <TextBlock Text="{l:T 'AI-generálás (Claude)', 'AI generation (Claude)'}" FontWeight="SemiBold" FontSize="14" Margin="0,16,0,0" />
+        <TextBlock TextWrapping="Wrap" Foreground="{DynamicResource MutedText}" Margin="0,4,0,6"
+                   Text="{l:T 'A „Parancs leírásból” funkcióhoz egy Claude API-kulcs kell (console.anthropic.com). A leírásod és a generált parancs az Anthropic szervereire kerül. A kulcsot a Windows titkosítva tárolja; üresen hagyva az ANTHROPIC_API_KEY környezeti változót használja.', 'The Shortcut from description feature needs a Claude API key (console.anthropic.com). Your description and the generated shortcut are sent to Anthropic. The key is stored encrypted by Windows; if left empty, the ANTHROPIC_API_KEY environment variable is used.'}" />
+        <PasswordBox x:Name="ClaudeKeyBox" />
         <CheckBox x:Name="UpdatesCheck" Margin="0,14,0,0"
                   Content="{l:T 'Frissítések keresése indításkor (naponta egyszer, a GitHubon)', 'Check for updates at startup (once a day, on GitHub)'}" />
 

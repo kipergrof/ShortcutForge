@@ -29,6 +29,7 @@ ShortcutForge is a Windows desktop app for building shortcuts for Apple's Shortc
 - **Templates** (*File › New from template*) and an **online template gallery** (*File › Template gallery*) that grows on GitHub without app updates: pomodoro, clipboard to notes, translate, resize photos, random picker, QR code, word count, night mode and more.
 - **Command palette** (Ctrl+K): type a few letters to run any command, template or add any action; fuzzy and accent-insensitive.
 - **Update notifications**: checks GitHub for a newer release once a day (can be turned off; also *Help › Check for updates*).
+- **Shortcut from a description (AI)** (*File › Shortcut from description*, Ctrl+Shift+N): describe what you want in plain words, in any language, and Claude writes the shortcut. You can review it before opening. It needs your own Claude API key (*Tools › Settings*, or the `ANTHROPIC_API_KEY` environment variable). Your description is sent to Anthropic.
 - **Light / dark theme** (follows Windows), **English / Hungarian** UI (*View* menu).
 
 ## Signing — important

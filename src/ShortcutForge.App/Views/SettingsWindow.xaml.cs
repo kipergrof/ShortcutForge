@@ -25,6 +25,7 @@ public partial class SettingsWindow : Window
         PasswordBox.Password = settings.MacPassword ?? "";
         KeyBox.Text = settings.MacKeyPath ?? "";
         ModeBox.SelectedIndex = settings.SigningMode == SigningMode.Anyone ? 0 : 1;
+        ClaudeKeyBox.Password = settings.ClaudeApiKey ?? "";
         UpdatesCheck.IsChecked = settings.CheckForUpdates;
     }
 
@@ -74,6 +75,7 @@ public partial class SettingsWindow : Window
         _settings.MacPassword = ssh.Password;
         _settings.MacKeyPath = ssh.PrivateKeyPath;
         _settings.SigningMode = ModeBox.SelectedIndex == 1 ? SigningMode.PeopleWhoKnowMe : SigningMode.Anyone;
+        _settings.ClaudeApiKey = ClaudeKeyBox.Password.Trim();
         _settings.CheckForUpdates = UpdatesCheck.IsChecked == true;
         DialogResult = true;
     }

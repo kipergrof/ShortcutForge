@@ -1,0 +1,46 @@
+<Window Icon="/Assets/app.ico" x:Class="ShortcutForge.App.Views.AiGenerateWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:l="clr-namespace:ShortcutForge.App.Services"
+        xmlns:avalon="http://icsharpcode.net/sharpdevelop/avalonedit"
+        Title="{l:T 'Parancs leírásból (AI)', 'Shortcut from description (AI)'}" Width="980" Height="680" MinWidth="700" MinHeight="480"
+        WindowStartupLocation="CenterOwner" ShowInTaskbar="False"
+        Background="{DynamicResource WindowBg}" Foreground="{DynamicResource TextFg}" FontFamily="Segoe UI" FontSize="13">
+    <DockPanel Margin="14">
+        <TextBlock DockPanel.Dock="Top" FontWeight="SemiBold" FontSize="15"
+                   Text="{l:T 'Írd le, mit csináljon a parancs', 'Describe what the shortcut should do'}" />
+        <TextBlock DockPanel.Dock="Top" Margin="0,4,0,8" Foreground="{DynamicResource MutedText}" TextWrapping="Wrap"
+                   Text="{l:T 'Pl.: „Kérdezze meg, hány percig tanulok, várjon annyit, aztán küldjön értesítést és rezegjen.” – bármilyen nyelven írhatsz.', 'E.g. “Ask how many minutes I want to study, wait that long, then send a notification and vibrate.” – any language works.'}" />
+        <TextBox x:Name="DescriptionBox" DockPanel.Dock="Top" AcceptsReturn="True" TextWrapping="Wrap" MinHeight="90" MaxHeight="160"
+                 VerticalScrollBarVisibility="Auto" />
+
+        <DockPanel DockPanel.Dock="Top" Margin="0,8,0,8">
+            <StackPanel DockPanel.Dock="Right" Orientation="Horizontal">
+                <Button x:Name="GenerateButton" Style="{StaticResource PrimaryButton}" MinWidth="130" Click="Generate_Click"
+                        Content="{l:T '✨ Generálás', '✨ Generate'}" />
+                <Button x:Name="CancelButton" Style="{StaticResource ToolButton}" Visibility="Collapsed" Click="Cancel_Click"
+                        Content="{l:T 'Megszakítás', 'Stop'}" />
+            </StackPanel>
+            <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                <ProgressBar x:Name="Progress" Width="90" Height="8" IsIndeterminate="True" Visibility="Collapsed" Margin="0,0,10,0" />
+                <TextBlock x:Name="StatusText" TextWrapping="Wrap" Foreground="{DynamicResource MutedText}" MaxWidth="560" />
+            </StackPanel>
+        </DockPanel>
+
+        <DockPanel DockPanel.Dock="Bottom" Margin="0,10,0,0">
+            <StackPanel DockPanel.Dock="Right" Orientation="Horizontal">
+                <Button x:Name="OpenButton" Style="{StaticResource PrimaryButton}" MinWidth="170" IsEnabled="False" Click="Open_Click"
+                        Content="{l:T 'Megnyitás a szerkesztőben', 'Open in the editor'}" />
+                <Button Style="{StaticResource ToolButton}" MinWidth="80" IsCancel="True" Content="{l:T 'Bezárás', 'Close'}" />
+            </StackPanel>
+            <TextBlock TextWrapping="Wrap" FontSize="11" Foreground="{DynamicResource MutedText}" VerticalAlignment="Center"
+                       Text="{l:T 'A leírás és a parancs a Claude API-hoz (Anthropic) kerül. Az eredményt nézd át megnyitás előtt.', 'The description and the shortcut are sent to the Claude API (Anthropic). Review the result before using it.'}" />
+        </DockPanel>
+
+        <TextBlock x:Name="ExplanationText" DockPanel.Dock="Top" TextWrapping="Wrap" Margin="0,0,0,6" Visibility="Collapsed" />
+        <Border BorderBrush="{DynamicResource CardBorder}" BorderThickness="1" CornerRadius="6" Background="{DynamicResource EditorBg}">
+            <avalon:TextEditor x:Name="Preview" IsReadOnly="True" FontFamily="Cascadia Mono, Consolas" FontSize="13" Padding="6"
+                               HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto" />
+        </Border>
+    </DockPanel>
+</Window>

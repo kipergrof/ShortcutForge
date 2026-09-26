@@ -29,6 +29,8 @@ public interface IDialogService
     void Error(string title, string message);
     bool EditSettings(AppSettings settings);
 
+    /// <summary>Shows the AI window; returns the generated code the user opened, or null.</summary>
+    string? GenerateWithAi(string? apiKey);
     /// <summary>Shows the online template gallery; returns the chosen template's source or null.</summary>
     string? PickGalleryTemplate();
     /// <summary>Opens a web page in the default browser.</summary>
@@ -790,6 +792,26 @@ public sealed partial class MainViewModel : ObservableObject
         if (template is null || !ConfirmDiscardIncludingDsl()) return;
         LoadShortcut(DslParser.Parse(template.Source), null);
         Status = L.F("Új parancs sablonból: {0}", "New shortcut from template: {0}", template.Name);
+    }
+
+    /// <summary>File › Shortcut from description (AI).</summary>
+    [RelayCommand]
+    private void GenerateWithAi()
+    {
+        if (!ConfirmDiscardIncludingDsl()) return;
+        var code = _dialogs.GenerateWithAi(Settings.EffectiveClaudeApiKey);
+        if (code is null) return;
+        try
+        {
+            LoadShortcut(DslParser.Parse(code), null);
+            IsDirty = true;
+            Status = L.T("AI által generált parancs megnyitva – nézd át, mielőtt használod.",
+                "AI-generated shortcut opened – review it before using it.");
+        }
+        catch (DslException ex)
+        {
+            _dialogs.Error(L.T("Parancs leírásból", "Shortcut from description"), ex.ToString());
+        }
     }
 
     [RelayCommand]

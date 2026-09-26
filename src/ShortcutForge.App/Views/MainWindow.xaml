@@ -11,6 +11,7 @@
 
     <Window.InputBindings>
         <KeyBinding Key="N" Modifiers="Control" Command="{Binding NewCommand}" />
+        <KeyBinding Key="N" Modifiers="Control+Shift" Command="{Binding GenerateWithAiCommand}" />
         <KeyBinding Key="O" Modifiers="Control" Command="{Binding OpenCommand}" />
         <KeyBinding Key="S" Modifiers="Control" Command="{Binding SaveFileCommand}" />
         <KeyBinding Key="S" Modifiers="Control+Shift" Command="{Binding SaveFileAsCommand}" />
@@ -273,6 +274,7 @@
                         </Style>
                     </MenuItem.ItemContainerStyle>
                 </MenuItem>
+                <MenuItem Header="{l:T 'Parancs _leírásból (AI)…', 'Shortcut from _description (AI)…'}" InputGestureText="Ctrl+Shift+N" Command="{Binding GenerateWithAiCommand}" />
                 <MenuItem Header="{l:T 'Sablon_galéria (online)…', 'Template _gallery (online)…'}" Command="{Binding OpenGalleryCommand}" />
                 <MenuItem Header="{l:T '_Megnyitás…', '_Open…'}" InputGestureText="Ctrl+O" Command="{Binding OpenCommand}" />
                 <MenuItem Header="{l:T '_Legutóbbiak', '_Recent files'}" ItemsSource="{Binding RecentFiles}">
@@ -352,6 +354,8 @@
                     <Rectangle Width="1" Fill="{DynamicResource CardBorder}" Margin="6,2" />
                     <Button Style="{StaticResource ToolButton}" Command="{Binding SendToIPhoneCommand}" Content="{l:T '📱 Küldés iPhone-ra', '📱 Send to iPhone'}"
                             ToolTip="{l:T 'Aláírja, és QR-kódot mutat: olvasd be az iPhone kamerájával (ugyanazon a Wi-Fi-n)', 'Signs it and shows a QR code: scan it with the iPhone camera (same Wi-Fi)'}" />
+                    <Button Style="{StaticResource ToolButton}" Command="{Binding GenerateWithAiCommand}" Content="{l:T '✨ AI', '✨ AI'}"
+                            ToolTip="{l:T 'Parancs leírásból, Claude-dal (Ctrl+Shift+N)', 'Shortcut from a description, with Claude (Ctrl+Shift+N)'}" />
                     <Button Style="{StaticResource ToolButton}" Command="{Binding ImportICloudCommand}" Content="{l:T '☁ iCloud import', '☁ iCloud import'}"
                             ToolTip="{l:T 'Megosztott parancs letöltése iCloud linkről', 'Download a shared shortcut from an iCloud link'}" />
                     <Button Style="{StaticResource ToolButton}" Command="{Binding OpenSettingsCommand}" Content="{l:T '⚙ Beállítások', '⚙ Settings'}" />
