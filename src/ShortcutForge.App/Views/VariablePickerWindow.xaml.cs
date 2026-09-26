@@ -97,14 +97,15 @@ public partial class VariablePickerWindow : Window
         try
         {
             if (DslParser.ParseValue(expression, ParamKind.Variable, _scope) is VariableValue) return true;
-            error = L.T("Ez nem változó.", "This is not a variable.");
-            return false;
         }
-        catch (DslException ex)
+        catch (DslException)
         {
-            error = ex.Message;
-            return false;
+            // The box holds a variable reference, not arbitrary DSL source (e.g. pasted text or a
+            // regex can contain characters the expression lexer rejects, like '^'); surface the
+            // same plain message as any other non-variable input instead of a raw lexer error.
         }
+        error = L.T("Ez nem változó.", "This is not a variable.");
+        return false;
     }
 
     private void UpdatePreview()
