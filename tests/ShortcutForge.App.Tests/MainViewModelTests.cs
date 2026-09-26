@@ -39,6 +39,9 @@ public class MainViewModelTests : IDisposable
         public void Info(string title, string message) => Messages.Add(message);
         public void Error(string title, string message) => Messages.Add("ERROR: " + message);
         public bool EditSettings(AppSettings settings) => false;
+        public readonly List<string> OpenedUrls = [];
+        public void OpenUrl(string url) => OpenedUrls.Add(url);
+
         public (byte[] Data, string Name, bool Signed)? Shared;
         public void ShowShare(byte[] data, string fileName, bool isSigned) => Shared = (data, fileName, isSigned);
     }

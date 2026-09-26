@@ -6,6 +6,7 @@ using System.Windows.Data;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using ShortcutForge.App.Services;
+using ShortcutForge.Core;
 using ShortcutForge.Core.Catalog;
 using ShortcutForge.Core.Import;
 using ShortcutForge.Core.Model;
@@ -27,6 +28,9 @@ public interface IDialogService
     void Info(string title, string message);
     void Error(string title, string message);
     bool EditSettings(AppSettings settings);
+
+    /// <summary>Opens a web page in the default browser.</summary>
+    void OpenUrl(string url);
 
     /// <summary>Shows the QR code window that serves <paramref name="data"/> on the local network.</summary>
     void ShowShare(byte[] data, string fileName, bool isSigned);
@@ -998,6 +1002,96 @@ public sealed partial class MainViewModel : ObservableObject
             IsBusy = false;
         }
     }
+
+    // ------------------------------------------------------------------ updates
+
+    /// <summary>The update check; replaceable in tests.</summary>
+    public Func<CancellationToken, Task<UpdateCheckResult>> UpdateCheck { get; set; } =
+        ct => UpdateChecker.CheckAsync(ShortcutForge.Core.AppInfo.Version, null, ct);
+
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(UpdateBannerText))]
+    private UpdateInfo? _availableUpdate;
+
+    public string UpdateBannerText => AvailableUpdate is { } u
+        ? L.T($"Elérhető a ShortcutForge {u.Version} (most: {ShortcutForge.Core.AppInfo.Version}).",
+              $"ShortcutForge {u.Version} is available (you have {ShortcutForge.Core.AppInfo.Version}).")
+        : "";
+
+    /// <summary>Background check at startup: at most once a day, silent on errors.</summary>
+    public async Task CheckForUpdatesInBackgroundAsync()
+    {
+        if (!Settings.CheckForUpdates) return;
+        if (Settings.LastUpdateCheck is { } last && DateTime.UtcNow - last < TimeSpan.FromHours(20)) return;
+        var result = await UpdateCheck(CancellationToken.None);
+        if (result.Error is not null) return;
+        Settings.LastUpdateCheck = DateTime.UtcNow;
+        Settings.Save();
+        if (result.Update is { } update && update.Version != Settings.SkippedVersion) AvailableUpdate = update;
+    }
+
+    /// <summary>Help › Check for updates: always checks and reports the result.</summary>
+    [RelayCommand]
+    private async Task CheckForUpdatesAsync()
+    {
+        IsBusy = true;
+        try
+        {
+            var result = await UpdateCheck(CancellationToken.None);
+            if (result.Error is { } error)
+            {
+                _dialogs.Error(L.T("Frissítések", "Updates"), error);
+                return;
+            }
+            Settings.LastUpdateCheck = DateTime.UtcNow;
+            Settings.Save();
+            if (result.Update is { } update)
+            {
+                AvailableUpdate = update;
+                if (_dialogs.Confirm(L.T("Frissítés elérhető", "Update available"),
+                        L.T($"Elérhető a ShortcutForge {update.Version} (most: {ShortcutForge.Core.AppInfo.Version}). Letöltöd?",
+                            $"ShortcutForge {update.Version} is available (you have {ShortcutForge.Core.AppInfo.Version}). Download it?")))
+                    DownloadUpdate();
+            }
+            else
+            {
+                _dialogs.Info(L.T("Frissítések", "Updates"),
+                    L.T($"A legfrissebb verziót használod ({ShortcutForge.Core.AppInfo.Version}).",
+                        $"You are using the latest version ({ShortcutForge.Core.AppInfo.Version})."));
+            }
+        }
+        finally
+        {
+            IsBusy = false;
+        }
+    }
+
+    [RelayCommand]
+    private void DownloadUpdate()
+    {
+        if (AvailableUpdate is not { } update) return;
+        _dialogs.OpenUrl(update.DownloadUrl ?? update.PageUrl);
+        Status = L.T("A letöltés elindult a böngészőben. Az új exe-t a régi helyett indítsd el.",
+            "The download started in your browser. Run the new exe instead of the old one.");
+    }
+
+    [RelayCommand]
+    private void ShowReleaseNotes()
+    {
+        if (AvailableUpdate is { } update) _dialogs.OpenUrl(update.PageUrl);
+    }
+
+    [RelayCommand]
+    private void SkipUpdate()
+    {
+        if (AvailableUpdate is not { } update) return;
+        Settings.SkippedVersion = update.Version;
+        Settings.Save();
+        AvailableUpdate = null;
+    }
+
+    [RelayCommand]
+    private void DismissUpdate() => AvailableUpdate = null;
 
     public const string SourceHelperUrl = "https://routinehub.co/shortcut/10060/";
 

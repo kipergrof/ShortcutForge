@@ -14,6 +14,7 @@ Apple Parancsok (Shortcuts) készítése és szerkesztése **Windowson**.
 - **Küldés iPhone-ra QR-kóddal** (Ctrl+Shift+E): aláírja a parancsot és QR-kódot mutat. Ugyanazon a Wi-Fi-n az iPhone kamerájával beolvasva egyenesen a Parancsok appba töltődik, AirDrop, kábel vagy felhő nélkül.
 - **Sablonok** (*Fájl › Új sablonból*): üdvözlés, JSON API lekérés, gyors menü, listafeldolgozás, akkumulátor-figyelő, megosztási lapos link-megnyitó.
 - **Kényelem**: kategóriaikonok, összecsukható kártyák (egyenként vagy *Nézet › Összes kártya összecsukása*), vezetővonalak a beágyazott blokkoknál, Ctrl+F keresés (Enter: az első találat hozzáadása), összecsukható `{ }` blokkok a szöveges nézetben.
+- **Frissítés-értesítés**: naponta egyszer megnézi a GitHubon, van-e újabb kiadás (kikapcsolható; kézzel: *Súgó › Frissítések keresése*).
 - **Sötét / világos téma** (a Windows beállítását követi), **magyar / angol** felület.
 
 ## Aláírás – fontos

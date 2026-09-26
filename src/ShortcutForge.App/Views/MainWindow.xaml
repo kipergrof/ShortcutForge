@@ -251,6 +251,7 @@
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
@@ -324,6 +325,7 @@
             </MenuItem>
             <MenuItem Header="{l:T '_Súgó', '_Help'}">
                 <MenuItem Header="{l:T '_Szöveges nyelv (DSL) súgó', '_Text language (DSL) help'}" InputGestureText="F1" Command="{x:Static vm:AppCommands.Help}" />
+                <MenuItem Header="{l:T '_Frissítések keresése…', 'Check for _updates…'}" Command="{Binding CheckForUpdatesCommand}" />
                 <MenuItem Header="{l:T '_Névjegy', '_About'}" Click="About_Click" />
             </MenuItem>
         </Menu>
@@ -354,8 +356,24 @@
             </DockPanel>
         </Border>
 
+        <!-- Update available -->
+        <Border Grid.Row="2" Background="{DynamicResource AccentSoft}" BorderBrush="{DynamicResource CardBorder}" BorderThickness="0,0,0,1" Padding="12,6"
+                Visibility="{Binding AvailableUpdate, Converter={StaticResource NullToCollapsed}}">
+            <DockPanel>
+                <StackPanel DockPanel.Dock="Right" Orientation="Horizontal">
+                    <Button Style="{StaticResource PrimaryButton}" Command="{Binding DownloadUpdateCommand}" Content="{l:T 'Letöltés', 'Download'}" />
+                    <Button Style="{StaticResource ToolButton}" Command="{Binding ShowReleaseNotesCommand}" Content="{l:T 'Újdonságok', 'Release notes'}" />
+                    <Button Style="{StaticResource ToolButton}" Command="{Binding SkipUpdateCommand}" Content="{l:T 'Ezt kihagyom', 'Skip this version'}" />
+                    <Button Style="{StaticResource CardIconButton}" Command="{Binding DismissUpdateCommand}" Content="✕" ToolTip="{l:T 'Most nem', 'Not now'}" />
+                </StackPanel>
+                <TextBlock VerticalAlignment="Center" FontWeight="SemiBold">
+                    <Run Text="⬆ " /><Run Text="{Binding UpdateBannerText, Mode=OneWay}" />
+                </TextBlock>
+            </DockPanel>
+        </Border>
+
         <!-- Main area -->
-        <Grid Grid.Row="2">
+        <Grid Grid.Row="3">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="280" MinWidth="180" />
                 <ColumnDefinition Width="Auto" />
@@ -588,7 +606,7 @@
         </Grid>
 
         <!-- Status bar -->
-        <Border Grid.Row="3" Background="{DynamicResource PanelBg}" BorderBrush="{DynamicResource CardBorder}" BorderThickness="0,1,0,0" Padding="10,4">
+        <Border Grid.Row="4" Background="{DynamicResource PanelBg}" BorderBrush="{DynamicResource CardBorder}" BorderThickness="0,1,0,0" Padding="10,4">
             <DockPanel>
                 <TextBlock DockPanel.Dock="Right" Text="{Binding VersionText}" Foreground="{DynamicResource MutedText}" Margin="12,0,0,0" />
                 <TextBlock DockPanel.Dock="Right" Text="{Binding ActionCountText}" Foreground="{DynamicResource MutedText}" />
