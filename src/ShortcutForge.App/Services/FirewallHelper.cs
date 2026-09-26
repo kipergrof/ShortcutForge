@@ -44,6 +44,12 @@ public static class FirewallHelper
                 if (protocol != NetFwIpProtocolTcp && protocol != NetFwIpProtocolAny) continue;
                 string? app = rule.ApplicationName;
                 if (!string.IsNullOrEmpty(app) && !string.Equals(app, exe, StringComparison.OrdinalIgnoreCase)) continue;
+                // Rules for one service or one Store app (package / per-user AppContainer rules such as
+                // Game Bar's "any port") do not apply to this process even though they look open.
+                if (!string.IsNullOrEmpty((string?)rule.serviceName) ||
+                    !string.IsNullOrEmpty((string?)rule.LocalAppPackageId) ||
+                    !string.IsNullOrEmpty((string?)rule.LocalUserOwner)) continue;
+                if (!RemoteAllowsLan((string?)rule.RemoteAddresses)) continue;
                 string? ports = protocol == NetFwIpProtocolAny ? "*" : rule.LocalPorts;
                 if (PortMatches(ports, port)) return true;
             }
@@ -54,6 +60,17 @@ public static class FirewallHelper
         {
             return null;
         }
+    }
+
+    /// <summary>
+    /// Whether a rule's remote address scope lets a phone on the local network in: "*" or one of
+    /// the LAN keywords. A rule for specific remote addresses is not counted. Exposed for tests.
+    /// </summary>
+    public static bool RemoteAllowsLan(string? remoteAddresses)
+    {
+        if (string.IsNullOrWhiteSpace(remoteAddresses)) return true;
+        return remoteAddresses.Split(',', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries)
+            .Any(a => a == "*" || a.Equals("LocalSubnet", StringComparison.OrdinalIgnoreCase));
     }
 
     /// <summary>Firewall port list syntax: "*", "80", "1000-2000", "80,443,8000-8100". Exposed for tests.</summary>

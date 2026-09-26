@@ -40,4 +40,14 @@ public class FirewallHelperTests
         Assert.True(command.IndexOf("delete rule", StringComparison.Ordinal)
                   < command.IndexOf("add rule", StringComparison.Ordinal));
     }
+
+    [Theory]
+    [InlineData(null, true)]
+    [InlineData("*", true)]
+    [InlineData("LocalSubnet", true)]
+    [InlineData("localsubnet,10.0.0.5", true)]
+    [InlineData("10.0.0.5", false)]
+    [InlineData("Internet", false)]
+    public void Only_rules_open_to_the_lan_count(string? remote, bool expected) =>
+        Assert.Equal(expected, FirewallHelper.RemoteAllowsLan(remote));
 }

@@ -174,7 +174,7 @@ public sealed class LocalShareServer : IDisposable
             a.btn{display:block;background:#007aff;color:#fff;text-decoration:none;font-size:18px;font-weight:600;padding:15px;border-radius:12px}
             ol{text-align:left;font-size:15px;line-height:1.5;padding-left:22px;margin:20px 0 0;color:#333}
             small{display:block;margin-top:18px;color:#888}
-            @media (prefers-color-scheme:dark){body{background:#000;color:#eee}.card{background:#1c1c1e}ol{color:#ccc}}
+            @media (prefers-color-scheme:dark){body{background:#000;color:#eee}.card{background:#1c1c1e}ol{color:#ccc} }
             </style></head>
             <body><div class="card">
             <div style="font-size:40px">⚡️</div>
