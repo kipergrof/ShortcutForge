@@ -1,3 +1,0 @@
-- Add changelog and check that release tags match the project version
-- Add CI, release workflow, issue templates and README badges
-- README: link to the downloadable release
