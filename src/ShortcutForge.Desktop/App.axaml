@@ -1,0 +1,45 @@
+<Application xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             x:Class="ShortcutForge.Desktop.App"
+             Name="ShortcutForge"
+             RequestedThemeVariant="Default">
+    <!-- "Default" follows the system light / dark setting. -->
+
+    <Application.Styles>
+        <FluentTheme />
+        <StyleInclude Source="avares://AvaloniaEdit/Themes/Fluent/AvaloniaEdit.xaml" />
+    </Application.Styles>
+
+    <Application.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.ThemeDictionaries>
+                <ResourceDictionary x:Key="Light">
+                    <SolidColorBrush x:Key="PanelBg" Color="#F3F3F5" />
+                    <SolidColorBrush x:Key="CardBg" Color="#FFFFFF" />
+                    <SolidColorBrush x:Key="MarkerCardBg" Color="#F7F7F9" />
+                    <SolidColorBrush x:Key="CardBorder" Color="#DADAE0" />
+                    <SolidColorBrush x:Key="MutedText" Color="#6B6B73" />
+                    <SolidColorBrush x:Key="AccentText" Color="#0A64C2" />
+                    <SolidColorBrush x:Key="AccentSoft" Color="#E3EEFB" />
+                    <SolidColorBrush x:Key="ErrorText" Color="#C42B1C" />
+                    <SolidColorBrush x:Key="ErrorPanelBg" Color="#FDE7E9" />
+                    <SolidColorBrush x:Key="WarningPanelBg" Color="#FFF4CE" />
+                    <SolidColorBrush x:Key="GuideLine" Color="#C8C8CE" />
+                </ResourceDictionary>
+                <ResourceDictionary x:Key="Dark">
+                    <SolidColorBrush x:Key="PanelBg" Color="#1F1F22" />
+                    <SolidColorBrush x:Key="CardBg" Color="#2B2B2F" />
+                    <SolidColorBrush x:Key="MarkerCardBg" Color="#252528" />
+                    <SolidColorBrush x:Key="CardBorder" Color="#3C3C42" />
+                    <SolidColorBrush x:Key="MutedText" Color="#A0A0A8" />
+                    <SolidColorBrush x:Key="AccentText" Color="#6CB4FF" />
+                    <SolidColorBrush x:Key="AccentSoft" Color="#1E3350" />
+                    <SolidColorBrush x:Key="ErrorText" Color="#FF99A4" />
+                    <SolidColorBrush x:Key="ErrorPanelBg" Color="#442726" />
+                    <SolidColorBrush x:Key="WarningPanelBg" Color="#433519" />
+                    <SolidColorBrush x:Key="GuideLine" Color="#4A4A52" />
+                </ResourceDictionary>
+            </ResourceDictionary.ThemeDictionaries>
+        </ResourceDictionary>
+    </Application.Resources>
+</Application>
