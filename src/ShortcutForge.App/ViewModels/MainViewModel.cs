@@ -1363,6 +1363,7 @@ public sealed partial class MainViewModel : ObservableObject
             new(L.T("Plist XML másolása a vágólapra", "Copy plist XML to clipboard"), file, "", () => Run(CopyPlistXmlCommand), "xml plist copy"),
             new(L.T("Visszavonás", "Undo"), edit, "", () => Run(UndoCommand), "undo", "Ctrl+Z"),
             new(L.T("Mégis", "Redo"), edit, "", () => Run(RedoCommand), "redo", "Ctrl+Y"),
+            new(L.T("Keresés és csere", "Find and replace"), edit, "", () => Run(ToggleFindPanelCommand), "find replace kereses csere rename atnevezes", "Ctrl+H"),
             new(L.T("Kijelölt kártya duplikálása", "Duplicate selected card"), edit, "", () => Run(DuplicateCardCommand), "duplicate copy", "Ctrl+D"),
             new(L.T("Kijelölt kártya törlése", "Delete selected card"), edit, "", () => Run(DeleteCardCommand), "delete remove torles", "Del"),
             new(L.T("Kijelölt kártya fel", "Move selected card up"), edit, "", () => Run(MoveUpCommand), "move up", "Alt+↑"),
