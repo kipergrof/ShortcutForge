@@ -24,6 +24,10 @@ concurrency:
 jobs:
   release:
     runs-on: windows-latest
+    env:
+      # Optional: a classic GitHub token with public_repo scope, saved as the WINGET_TOKEN secret.
+      # When set, each release also opens the winget-pkgs pull request that updates the package.
+      WINGET_TOKEN: ${{ secrets.WINGET_TOKEN }}
     steps:
       - uses: actions/checkout@v4
         with:
@@ -103,3 +107,13 @@ jobs:
           $v = '${{ steps.version.outputs.version }}'
           $notes = (Get-Content release-notes.md -Raw) + "`n`n**Download:** ShortcutForge-$v-win-x64.exe runs on Windows 10/11 x64 without installing .NET. SmartScreen may warn because the file is not code-signed (More info › Run anyway)."
           gh release create "v$v" "ShortcutForge-$v-win-x64.exe" --title "ShortcutForge $v" --notes $notes
+
+      - name: Update the winget package
+        if: env.WINGET_TOKEN != ''
+        shell: pwsh
+        run: |
+          $v = '${{ steps.version.outputs.version }}'
+          Invoke-WebRequest https://aka.ms/wingetcreate/latest -OutFile wingetcreate.exe
+          ./wingetcreate.exe update kipergrof.ShortcutForge --version $v `
+            --urls "https://github.com/kipergrof/ShortcutForge/releases/download/v$v/ShortcutForge-$v-win-x64.exe" `
+            --submit --token $env:WINGET_TOKEN
