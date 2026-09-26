@@ -15,6 +15,7 @@
         <KeyBinding Key="S" Modifiers="Control" Command="{Binding SaveFileCommand}" />
         <KeyBinding Key="S" Modifiers="Control+Shift" Command="{Binding SaveFileAsCommand}" />
         <KeyBinding Key="E" Modifiers="Control" Command="{Binding ExportCommand}" />
+        <KeyBinding Key="E" Modifiers="Control+Shift" Command="{Binding SendToIPhoneCommand}" />
         <KeyBinding Key="F1" Command="{x:Static vm:AppCommands.Help}" />
         <KeyBinding Key="F" Modifiers="Control" Command="{x:Static vm:AppCommands.FocusSearch}" />
     </Window.InputBindings>
@@ -250,6 +251,7 @@
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
@@ -282,7 +284,8 @@
                 <MenuItem Header="{l:T 'Mentés _másként…', 'Save _As…'}" InputGestureText="Ctrl+Shift+S" Command="{Binding SaveFileAsCommand}" />
                 <Separator />
                 <MenuItem Header="{l:T '_Exportálás .shortcut fájlba…', '_Export to .shortcut file…'}" InputGestureText="Ctrl+E" Command="{Binding ExportCommand}" />
-                <MenuItem Header="{l:T 'Exportálás i_Phone-ra (ingyenes, Mac nélkül)…', 'Export for i_Phone (free, no Mac)…'}" Command="{Binding ExportForIPhoneCommand}" />
+                <MenuItem Header="{l:T '_Küldés iPhone-ra QR-kóddal…', '_Send to iPhone with a QR code…'}" InputGestureText="Ctrl+Shift+E" Command="{Binding SendToIPhoneCommand}" />
+                <MenuItem Header="{l:T 'Exportálás i_Phone-ra (Shortcut Source Helper)…', 'Export for i_Phone (Shortcut Source Helper)…'}" Command="{Binding ExportForIPhoneCommand}" />
                 <MenuItem Header="{l:T 'Importálás _iCloud linkről…', 'Import from _iCloud link…'}" Command="{Binding ImportICloudCommand}" />
                 <Separator />
                 <MenuItem Header="{l:T '_Kilépés', 'E_xit'}" Click="Exit_Click" />
@@ -322,6 +325,7 @@
             </MenuItem>
             <MenuItem Header="{l:T '_Súgó', '_Help'}">
                 <MenuItem Header="{l:T '_Szöveges nyelv (DSL) súgó', '_Text language (DSL) help'}" InputGestureText="F1" Command="{x:Static vm:AppCommands.Help}" />
+                <MenuItem Header="{l:T '_Frissítések keresése…', 'Check for _updates…'}" Command="{Binding CheckForUpdatesCommand}" />
                 <MenuItem Header="{l:T '_Névjegy', '_About'}" Click="About_Click" />
             </MenuItem>
         </Menu>
@@ -337,8 +341,8 @@
                     <Button Style="{StaticResource ToolButton}" Command="{Binding UndoCommand}" ToolTip="{l:T 'Visszavonás (Ctrl+Z)', 'Undo (Ctrl+Z)'}">↶</Button>
                     <Button Style="{StaticResource ToolButton}" Command="{Binding RedoCommand}" ToolTip="{l:T 'Mégis (Ctrl+Y)', 'Redo (Ctrl+Y)'}">↷</Button>
                     <Rectangle Width="1" Fill="{DynamicResource CardBorder}" Margin="6,2" />
-                    <Button Style="{StaticResource ToolButton}" Command="{Binding ExportForIPhoneCommand}" Content="{l:T '📱 iPhone-ra', '📱 For iPhone'}"
-                            ToolTip="{l:T 'Plist mentése a Shortcut Source Helperhez: ingyenes aláírás és import az iPhone-on, Mac nélkül', 'Save a plist for Shortcut Source Helper: free signing and import on the iPhone, no Mac needed'}" />
+                    <Button Style="{StaticResource ToolButton}" Command="{Binding SendToIPhoneCommand}" Content="{l:T '📱 Küldés iPhone-ra', '📱 Send to iPhone'}"
+                            ToolTip="{l:T 'Aláírja, és QR-kódot mutat: olvasd be az iPhone kamerájával (ugyanazon a Wi-Fi-n)', 'Signs it and shows a QR code: scan it with the iPhone camera (same Wi-Fi)'}" />
                     <Button Style="{StaticResource ToolButton}" Command="{Binding ImportICloudCommand}" Content="{l:T '☁ iCloud import', '☁ iCloud import'}"
                             ToolTip="{l:T 'Megosztott parancs letöltése iCloud linkről', 'Download a shared shortcut from an iCloud link'}" />
                     <Button Style="{StaticResource ToolButton}" Command="{Binding OpenSettingsCommand}" Content="{l:T '⚙ Beállítások', '⚙ Settings'}" />
@@ -352,8 +356,24 @@
             </DockPanel>
         </Border>
 
+        <!-- Update available -->
+        <Border Grid.Row="2" Background="{DynamicResource AccentSoft}" BorderBrush="{DynamicResource CardBorder}" BorderThickness="0,0,0,1" Padding="12,6"
+                Visibility="{Binding AvailableUpdate, Converter={StaticResource NullToCollapsed}}">
+            <DockPanel>
+                <StackPanel DockPanel.Dock="Right" Orientation="Horizontal">
+                    <Button Style="{StaticResource PrimaryButton}" Command="{Binding DownloadUpdateCommand}" Content="{l:T 'Letöltés', 'Download'}" />
+                    <Button Style="{StaticResource ToolButton}" Command="{Binding ShowReleaseNotesCommand}" Content="{l:T 'Újdonságok', 'Release notes'}" />
+                    <Button Style="{StaticResource ToolButton}" Command="{Binding SkipUpdateCommand}" Content="{l:T 'Ezt kihagyom', 'Skip this version'}" />
+                    <Button Style="{StaticResource CardIconButton}" Command="{Binding DismissUpdateCommand}" Content="✕" ToolTip="{l:T 'Most nem', 'Not now'}" />
+                </StackPanel>
+                <TextBlock VerticalAlignment="Center" FontWeight="SemiBold">
+                    <Run Text="⬆ " /><Run Text="{Binding UpdateBannerText, Mode=OneWay}" />
+                </TextBlock>
+            </DockPanel>
+        </Border>
+
         <!-- Main area -->
-        <Grid Grid.Row="2">
+        <Grid Grid.Row="3">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="280" MinWidth="180" />
                 <ColumnDefinition Width="Auto" />
@@ -586,7 +606,7 @@
         </Grid>
 
         <!-- Status bar -->
-        <Border Grid.Row="3" Background="{DynamicResource PanelBg}" BorderBrush="{DynamicResource CardBorder}" BorderThickness="0,1,0,0" Padding="10,4">
+        <Border Grid.Row="4" Background="{DynamicResource PanelBg}" BorderBrush="{DynamicResource CardBorder}" BorderThickness="0,1,0,0" Padding="10,4">
             <DockPanel>
                 <TextBlock DockPanel.Dock="Right" Text="{Binding VersionText}" Foreground="{DynamicResource MutedText}" Margin="12,0,0,0" />
                 <TextBlock DockPanel.Dock="Right" Text="{Binding ActionCountText}" Foreground="{DynamicResource MutedText}" />

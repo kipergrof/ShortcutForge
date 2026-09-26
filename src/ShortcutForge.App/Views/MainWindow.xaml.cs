@@ -64,6 +64,12 @@ public partial class MainWindow : Window
             if (select is { } i && i >= 0 && i < _vm.Cards.Count) CardsList.ScrollIntoView(_vm.Cards[i]);
         });
 
+        Loaded += async (_, _) =>
+        {
+            try { await _vm.CheckForUpdatesInBackgroundAsync(); }
+            catch (Exception ex) when (ex is System.IO.IOException or UnauthorizedAccessException) { /* settings not writable: ignore */ }
+        };
+
         var args = Environment.GetCommandLineArgs();
         if (args.Length > 1 && System.IO.File.Exists(args[1])) _vm.OpenPath(args[1]);
     }
@@ -79,10 +85,10 @@ public partial class MainWindow : Window
 
     private void About_Click(object sender, RoutedEventArgs e) =>
         MessageBox.Show(this,
-            L.T($"ShortcutForge {ShortcutForge.Core.AppInfo.Version}\nApple Parancsok (Shortcuts) készítése Windowson.\n{ShortcutForge.Core.AppInfo.RepositoryUrl}\n\n" +
+            L.T($"ShortcutForge {ShortcutForge.Core.AppInfo.Version}\nApple Parancsok (Shortcuts) készítése Windowson.\n\nKészítette: Szilvágyi Krisztián\n{ShortcutForge.Core.AppInfo.Copyright}\n{ShortcutForge.Core.AppInfo.RepositoryUrl}\n\n" +
                 $"Akciókatalógus: {ActionCatalog.Default.Actions.Count} beépített akció; bármely más akció (külső appok) " +
                 "általános blokként szerkeszthető.\n\nA .shortcut fájlokat iOS 15 óta alá kell írni (Macen: shortcuts sign).",
-                $"ShortcutForge {ShortcutForge.Core.AppInfo.Version}\nCreate Apple Shortcuts on Windows.\n{ShortcutForge.Core.AppInfo.RepositoryUrl}\n\n" +
+                $"ShortcutForge {ShortcutForge.Core.AppInfo.Version}\nCreate Apple Shortcuts on Windows.\n\nCreated by Krisztián Szilvágyi\n{ShortcutForge.Core.AppInfo.Copyright}\n{ShortcutForge.Core.AppInfo.RepositoryUrl}\n\n" +
                 $"Action catalog: {ActionCatalog.Default.Actions.Count} built-in actions; any other action (third-party apps) " +
                 "can be edited as a generic block.\n\nSince iOS 15, .shortcut files must be signed (on a Mac: shortcuts sign)."),
             L.T("Névjegy", "About"), MessageBoxButton.OK, MessageBoxImage.Information);

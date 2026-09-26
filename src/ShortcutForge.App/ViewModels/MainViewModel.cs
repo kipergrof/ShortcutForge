@@ -6,6 +6,7 @@ using System.Windows.Data;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using ShortcutForge.App.Services;
+using ShortcutForge.Core;
 using ShortcutForge.Core.Catalog;
 using ShortcutForge.Core.Import;
 using ShortcutForge.Core.Model;
@@ -27,6 +28,12 @@ public interface IDialogService
     void Info(string title, string message);
     void Error(string title, string message);
     bool EditSettings(AppSettings settings);
+
+    /// <summary>Opens a web page in the default browser.</summary>
+    void OpenUrl(string url);
+
+    /// <summary>Shows the QR code window that serves <paramref name="data"/> on the local network.</summary>
+    void ShowShare(byte[] data, string fileName, bool isSigned);
 }
 
 public sealed partial class MainViewModel : ObservableObject
@@ -874,6 +881,64 @@ public sealed partial class MainViewModel : ObservableObject
         return cleaned.Length == 0 ? "parancs" : cleaned;
     }
 
+    /// <summary>One-time offer of free online signing, so nothing is sent anywhere without consent.</summary>
+    private void OfferFreeSigningOnce()
+    {
+        if (Settings.Signer != SignerKind.Unsigned || Settings.ShortcutyOfferShown) return;
+        Settings.ShortcutyOfferShown = true;
+        if (_dialogs.Confirm(L.T("Ingyenes aláírás", "Free signing"),
+                L.T("Az iPhone csak aláírt parancsot importál. Aláírassam most ingyen a Shortcuty online szolgáltatással?\n\n" +
+                    "A parancs tartalma a Shortcuty szerverére kerül (jelszót, személyes adatot ne küldj így). " +
+                    "Később az Eszközök › Beállítások menüben módosítható.",
+                    "iPhone only imports signed shortcuts. Sign it now for free with the Shortcuty online service?\n\n" +
+                    "The shortcut's content is sent to Shortcuty's server (don't send passwords or personal data this way). " +
+                    "You can change this later in Tools › Settings.")))
+            Settings.Signer = SignerKind.Shortcuty;
+        Settings.Save();
+    }
+
+    /// <summary>
+    /// Signs the shortcut with the configured signer and offers it on the local network with a
+    /// QR code, so the iPhone can download it with its camera (no AirDrop on Windows).
+    /// </summary>
+    [RelayCommand]
+    private async Task SendToIPhoneAsync()
+    {
+        if (!ApplyDslIfNeeded())
+        {
+            _dialogs.Error(L.T("Küldés iPhone-ra", "Send to iPhone"), L.T("A szöveges nézetben hiba van:\n", "The text view has an error:\n") + DslError);
+            return;
+        }
+        if (ControlFlow.Validate(Current.Actions) is { } problem &&
+            !_dialogs.Confirm(L.T("Szerkezeti hiba", "Structure error"), problem + L.T("\n\nÍgy is elküldöd?", "\n\nSend anyway?")))
+            return;
+
+        try
+        {
+            IsBusy = true;
+            OfferFreeSigningOnce();
+            var signer = Settings.CreateSigner();
+            Status = L.T($"Aláírás: {signer.DisplayName}…", $"Signing: {signer.DisplayName}…");
+            var bytes = await signer.SignAsync(ShortcutDocument.UnsignedBytes(Current), Settings.SigningMode, Current.Name);
+            Status = L.T("QR-kód megjelenítve – olvasd be az iPhone kamerájával.", "QR code shown – scan it with the iPhone camera.");
+            _dialogs.ShowShare(bytes, SafeFileName(Current.Name) + ".shortcut", signer.ProducesSignedFile);
+        }
+        catch (SigningException ex)
+        {
+            _dialogs.Error(L.T("Aláírás sikertelen", "Signing failed"), ex.Message);
+            Status = L.T("Aláírás sikertelen.", "Signing failed.");
+        }
+        catch (System.Net.Sockets.SocketException ex)
+        {
+            _dialogs.Error(L.T("Küldés iPhone-ra", "Send to iPhone"),
+                L.T($"Nem sikerült elindítani a helyi megosztást: {ex.Message}", $"Could not start local sharing: {ex.Message}"));
+        }
+        finally
+        {
+            IsBusy = false;
+        }
+    }
+
     [RelayCommand]
     private async Task ExportAsync()
     {
@@ -899,21 +964,7 @@ public sealed partial class MainViewModel : ObservableObject
                 return;
             }
 
-            // One-time offer of free online signing, so nothing is sent anywhere without consent.
-            if (Settings.Signer == SignerKind.Unsigned && !Settings.ShortcutyOfferShown)
-            {
-                Settings.ShortcutyOfferShown = true;
-                if (_dialogs.Confirm(L.T("Ingyenes aláírás", "Free signing"),
-                        L.T("Az iPhone csak aláírt parancsot importál. Aláírassam most ingyen a Shortcuty online szolgáltatással?\n\n" +
-                            "A parancs tartalma a Shortcuty szerverére kerül (jelszót, személyes adatot ne küldj így). " +
-                            "Később az Eszközök › Beállítások menüben módosítható.",
-                            "iPhone only imports signed shortcuts. Sign it now for free with the Shortcuty online service?\n\n" +
-                            "The shortcut's content is sent to Shortcuty's server (don't send passwords or personal data this way). " +
-                            "You can change this later in Tools › Settings.")))
-                    Settings.Signer = SignerKind.Shortcuty;
-                Settings.Save();
-            }
-
+            OfferFreeSigningOnce();
             var signer = Settings.CreateSigner();
             Status = L.T($"Exportálás: {signer.DisplayName}…", $"Exporting: {signer.DisplayName}…");
             var bytes = await signer.SignAsync(ShortcutDocument.UnsignedBytes(Current), Settings.SigningMode, Current.Name);
@@ -951,6 +1002,96 @@ public sealed partial class MainViewModel : ObservableObject
             IsBusy = false;
         }
     }
+
+    // ------------------------------------------------------------------ updates
+
+    /// <summary>The update check; replaceable in tests.</summary>
+    public Func<CancellationToken, Task<UpdateCheckResult>> UpdateCheck { get; set; } =
+        ct => UpdateChecker.CheckAsync(ShortcutForge.Core.AppInfo.Version, null, ct);
+
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(UpdateBannerText))]
+    private UpdateInfo? _availableUpdate;
+
+    public string UpdateBannerText => AvailableUpdate is { } u
+        ? L.T($"Elérhető a ShortcutForge {u.Version} (most: {ShortcutForge.Core.AppInfo.Version}).",
+              $"ShortcutForge {u.Version} is available (you have {ShortcutForge.Core.AppInfo.Version}).")
+        : "";
+
+    /// <summary>Background check at startup: at most once a day, silent on errors.</summary>
+    public async Task CheckForUpdatesInBackgroundAsync()
+    {
+        if (!Settings.CheckForUpdates) return;
+        if (Settings.LastUpdateCheck is { } last && DateTime.UtcNow - last < TimeSpan.FromHours(20)) return;
+        var result = await UpdateCheck(CancellationToken.None);
+        if (result.Error is not null) return;
+        Settings.LastUpdateCheck = DateTime.UtcNow;
+        Settings.Save();
+        if (result.Update is { } update && update.Version != Settings.SkippedVersion) AvailableUpdate = update;
+    }
+
+    /// <summary>Help › Check for updates: always checks and reports the result.</summary>
+    [RelayCommand]
+    private async Task CheckForUpdatesAsync()
+    {
+        IsBusy = true;
+        try
+        {
+            var result = await UpdateCheck(CancellationToken.None);
+            if (result.Error is { } error)
+            {
+                _dialogs.Error(L.T("Frissítések", "Updates"), error);
+                return;
+            }
+            Settings.LastUpdateCheck = DateTime.UtcNow;
+            Settings.Save();
+            if (result.Update is { } update)
+            {
+                AvailableUpdate = update;
+                if (_dialogs.Confirm(L.T("Frissítés elérhető", "Update available"),
+                        L.T($"Elérhető a ShortcutForge {update.Version} (most: {ShortcutForge.Core.AppInfo.Version}). Letöltöd?",
+                            $"ShortcutForge {update.Version} is available (you have {ShortcutForge.Core.AppInfo.Version}). Download it?")))
+                    DownloadUpdate();
+            }
+            else
+            {
+                _dialogs.Info(L.T("Frissítések", "Updates"),
+                    L.T($"A legfrissebb verziót használod ({ShortcutForge.Core.AppInfo.Version}).",
+                        $"You are using the latest version ({ShortcutForge.Core.AppInfo.Version})."));
+            }
+        }
+        finally
+        {
+            IsBusy = false;
+        }
+    }
+
+    [RelayCommand]
+    private void DownloadUpdate()
+    {
+        if (AvailableUpdate is not { } update) return;
+        _dialogs.OpenUrl(update.DownloadUrl ?? update.PageUrl);
+        Status = L.T("A letöltés elindult a böngészőben. Az új exe-t a régi helyett indítsd el.",
+            "The download started in your browser. Run the new exe instead of the old one.");
+    }
+
+    [RelayCommand]
+    private void ShowReleaseNotes()
+    {
+        if (AvailableUpdate is { } update) _dialogs.OpenUrl(update.PageUrl);
+    }
+
+    [RelayCommand]
+    private void SkipUpdate()
+    {
+        if (AvailableUpdate is not { } update) return;
+        Settings.SkippedVersion = update.Version;
+        Settings.Save();
+        AvailableUpdate = null;
+    }
+
+    [RelayCommand]
+    private void DismissUpdate() => AvailableUpdate = null;
 
     public const string SourceHelperUrl = "https://routinehub.co/shortcut/10060/";
 

@@ -14,6 +14,10 @@ public static class AppInfo
         (typeof(AppInfo).Assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion ?? "0.0.0")
         .Split('+')[0]; // drop the source revision suffix
 
+    /// <summary>Copyright line with the author (from Directory.Build.props).</summary>
+    public static string Copyright { get; } =
+        typeof(AppInfo).Assembly.GetCustomAttribute<AssemblyCopyrightAttribute>()?.Copyright ?? "";
+
     /// <summary>HTTP User-Agent used when talking to online services.</summary>
     public static string UserAgent => $"{Name}/{Version} (+{RepositoryUrl})";
 }
