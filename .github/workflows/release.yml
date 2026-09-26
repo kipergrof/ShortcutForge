@@ -21,6 +21,16 @@ jobs:
             8.0.x
             10.0.x
 
+      - name: Check that the tag matches Directory.Build.props
+        shell: pwsh
+        run: |
+          $tagVersion = "${{ github.ref_name }}".TrimStart('v')
+          $propsVersion = ([xml](Get-Content Directory.Build.props)).Project.PropertyGroup.Version
+          if ($tagVersion -ne $propsVersion) {
+            Write-Error "Tag ${{ github.ref_name }} does not match <Version>$propsVersion</Version> in Directory.Build.props."
+            exit 1
+          }
+
       - name: Test
         run: dotnet test -c Release
 
