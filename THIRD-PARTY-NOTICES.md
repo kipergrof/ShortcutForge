@@ -47,3 +47,5 @@ distributed under the MIT license by their authors:
 | [plist-cil](https://github.com/claunia/plist-cil) | MIT |
 | [SSH.NET](https://github.com/sshnet/SSH.NET) | MIT |
 | [System.Security.Cryptography.ProtectedData](https://github.com/dotnet/runtime) | MIT |
+
+The Shortcuty logo (`src/ShortcutForge.App/Assets/shortcuty*.png`) belongs to [Shortcuty](https://sign.shortcuty.app) and is used with their permission to credit the free signing service. It is not covered by this project's MIT license.

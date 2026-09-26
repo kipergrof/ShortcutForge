@@ -62,6 +62,12 @@ public partial class SettingsWindow : Window
         }
     }
 
+    private void Link_RequestNavigate(object sender, System.Windows.Navigation.RequestNavigateEventArgs e)
+    {
+        System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo(e.Uri.AbsoluteUri) { UseShellExecute = true });
+        e.Handled = true;
+    }
+
     private void Ok_Click(object sender, RoutedEventArgs e)
     {
         var ssh = CurrentSsh();
